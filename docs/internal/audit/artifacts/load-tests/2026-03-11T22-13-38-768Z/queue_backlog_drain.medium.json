@@ -1,0 +1,40 @@
+{
+  "gate": "queue_backlog_drain",
+  "mode": "live",
+  "operationCount": 6,
+  "concurrency": 26,
+  "durationMs": 122286.73866600002,
+  "throughputRps": 0.04906500954602864,
+  "successCount": 6,
+  "errorCount": 0,
+  "errorRate": 0,
+  "observedDuplicateCount": 0,
+  "duplicateCount": 0,
+  "duplicateRate": 0,
+  "retryCount": 6,
+  "deadLetterCount": 0,
+  "timeoutCount": 0,
+  "timeoutRate": 0,
+  "statusCounts": {
+    "200": 6
+  },
+  "failureCategory": "worker/queue saturation",
+  "latencies": {
+    "p50": 167.78533300000709,
+    "p95": 196.10416699998314,
+    "p99": 196.10416699998314,
+    "max": 196.10416699998314,
+    "min": 160.95083300000988
+  },
+  "pass": false,
+  "failures": [
+    "p50 167.8ms > 20ms",
+    "p95 196.1ms > 100ms",
+    "queue drain 0.05 jobs/s < 800 jobs/s"
+  ],
+  "notes": [
+    "queue gate mode: live-api-backed",
+    "ramp stage: medium"
+  ],
+  "stage": "medium"
+}

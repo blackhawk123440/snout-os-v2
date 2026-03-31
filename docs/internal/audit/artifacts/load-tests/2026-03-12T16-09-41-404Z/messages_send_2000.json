@@ -1,0 +1,40 @@
+{
+  "gate": "messages_send_2000",
+  "mode": "live",
+  "operationCount": 2000,
+  "concurrency": 2000,
+  "durationMs": 20462.209625,
+  "throughputRps": 97.74115487295522,
+  "successCount": 515,
+  "errorCount": 1485,
+  "errorRate": 0.7425,
+  "observedDuplicateCount": 0,
+  "duplicateCount": 0,
+  "duplicateRate": 0,
+  "retryCount": 0,
+  "deadLetterCount": 0,
+  "timeoutCount": 869,
+  "timeoutRate": 0.4345,
+  "statusCounts": {
+    "0": 886,
+    "202": 515,
+    "502": 599
+  },
+  "failureCategory": "messaging/provider bottleneck",
+  "latencies": {
+    "p50": 15296.060667000002,
+    "p95": 20099.659917,
+    "p99": 20100.524,
+    "max": 20301.372000000003,
+    "min": 1760.2005829999998
+  },
+  "pass": false,
+  "failures": [
+    "p50 15296.1ms > 180ms",
+    "p95 20099.7ms > 700ms",
+    "p99 20100.5ms > 1400ms",
+    "errorRate 74.25% > 2.50%",
+    "throughput 97.74 rps < 300 rps"
+  ],
+  "notes": []
+}

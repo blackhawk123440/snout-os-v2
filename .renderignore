@@ -1,0 +1,15 @@
+# Files to ignore during Render deployment
+.git
+.github
+.vscode
+.idea
+*.md
+!README.md
+!RENDER_SETUP.md
+tests/
+*.test.ts
+*.spec.ts
+.env.example
+.env.local
+dev.db
+prisma/dev.db

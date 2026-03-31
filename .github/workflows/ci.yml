@@ -1,0 +1,325 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+env:
+  DATABASE_URL: postgresql://postgres:postgres@localhost:5432/snout_ci
+  NEXTAUTH_SECRET: ci_test_secret_minimum_32_characters_required_for_nextauth_validation
+  NEXTAUTH_URL: http://localhost:3000
+  JWT_SECRET: test_jwt_secret_for_ci
+  NEXT_PUBLIC_API_URL: http://localhost:3000
+  OPENAI_API_KEY: sk-dummy
+  ENABLE_MESSAGING_V1: "true"
+  NEXT_PUBLIC_ENABLE_MESSAGING_V1: "true"
+  ENABLE_E2E_LOGIN: "true"
+  E2E_AUTH_KEY: test-e2e-key-change-in-production
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: snout_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    strategy:
+      matrix:
+        node-version: [20.x]
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Show env (diagnostic)
+        run: node -v && pnpm -v && head -2 pnpm-lock.yaml
+
+      - name: Generate Prisma client
+        run: pnpm prisma generate
+
+      - name: Apply database schema
+        run: pnpm prisma db push --accept-data-loss
+
+      - name: Run lint
+        run: pnpm run lint
+
+      - name: Check no raw prisma in high-risk API routes
+        run: pnpm run check:no-raw-prisma
+
+      - name: Check no raw UI primitives in app/components
+        run: pnpm run check:no-raw-ui
+
+      - name: Run TypeScript type check
+        run: pnpm run typecheck
+
+      - name: Run core tests
+        run: pnpm run test:core
+
+      - name: Check UI Constitution violations
+        run: pnpm exec tsx scripts/check-ui-constitution.ts
+        continue-on-error: true # Advisory — 153 pre-existing violations across owner pages
+
+      - name: Feature Completion Gate audit
+        run: pnpm run feature:audit
+        continue-on-error: true # Advisory — route naming drift from audit spec
+
+      - name: Build application
+        run: pnpm run build
+
+  command-center-verifier:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: snout_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: pnpm prisma generate
+
+      - name: Build application
+        run: pnpm run build
+
+      - name: Apply database schema
+        run: pnpm prisma db push --accept-data-loss
+
+      - name: Seed database for verifier
+        run: pnpm prisma db seed
+        env:
+          NODE_ENV: development
+
+      - name: Start application
+        run: |
+          pnpm start > /tmp/nextjs-verifier.log 2>&1 &
+          echo $! > /tmp/nextjs-verifier.pid
+        env:
+          PORT: "3000"
+          CI: "true"
+          ENV_NAME: staging
+          ENABLE_E2E_LOGIN: "true"
+          ENABLE_E2E_AUTH: "true"
+          ENABLE_DEBUG_ENDPOINTS: "true"
+          E2E_AUTH_KEY: test-e2e-key-change-in-production
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/snout_ci
+
+      - name: Wait for application
+        run: |
+          npx wait-on http://localhost:3000 --timeout 60000 || (cat /tmp/nextjs-verifier.log && exit 1)
+
+      - name: Run command center deterministic verifier (required gate)
+        run: pnpm tsx scripts/verify-command-center.ts
+        env:
+          BASE_URL: "http://localhost:3000"
+          E2E_AUTH_KEY: test-e2e-key-change-in-production
+
+      - name: Dump server log on failure
+        if: failure()
+        run: |
+          echo "--- Verifier server log (last 200 lines) ---"
+          tail -200 /tmp/nextjs-verifier.log || true
+
+      - name: Stop application
+        if: always()
+        run: |
+          if [ -f /tmp/nextjs-verifier.pid ]; then
+            kill $(cat /tmp/nextjs-verifier.pid) 2>/dev/null || true
+          fi
+          pkill -f "next start" || true
+
+  proof-pack:
+    runs-on: ubuntu-latest
+    needs: [build-and-test, command-center-verifier]
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: snout_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps
+
+      - name: Generate Prisma client
+        run: pnpm prisma generate
+
+      - name: Build application
+        run: pnpm run build
+
+      - name: Apply database schema
+        run: pnpm prisma db push --accept-data-loss
+
+      - name: Seed database for E2E
+        run: pnpm prisma db seed
+        env:
+          NODE_ENV: development
+
+      - name: Start application
+        run: |
+          pnpm start > /tmp/nextjs.log 2>&1 &
+          echo $! > /tmp/nextjs.pid
+        env:
+          PORT: "3000"
+          CI: "true"
+          ENABLE_E2E_LOGIN: "true"
+          ENABLE_E2E_AUTH: "true"
+          E2E_AUTH_KEY: test-e2e-key-change-in-production
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/snout_ci
+
+      - name: Wait for application
+        run: |
+          npx wait-on http://localhost:3000 --timeout 60000 || (cat /tmp/nextjs.log && exit 1)
+
+      - name: Warm up API (allow NextAuth/API to be ready)
+        run: |
+          curl -s -o /dev/null http://localhost:3000/api/health || true
+          sleep 3
+
+      - name: Run command center deterministic verifier
+        run: pnpm tsx scripts/verify-command-center.ts
+        env:
+          BASE_URL: "http://localhost:3000"
+          E2E_AUTH_KEY: test-e2e-key-change-in-production
+
+      - name: Run proof-pack tests
+        run: |
+          mkdir -p proof-pack
+          pnpm run test:ui:smoke
+          pnpm run test -- src/lib/messaging/__tests__/pool-capacity.test.ts src/lib/messaging/__tests__/pool-release.test.ts src/lib/messaging/__tests__/invariants.test.ts --reporter=json --outputFile=proof-pack/test-output.json
+        env:
+          CI: "true"
+          BASE_URL: "http://localhost:3000"
+          OWNER_EMAIL: "owner@example.com"
+          E2E_AUTH_KEY: test-e2e-key-change-in-production
+
+      - name: Dump server log on failure
+        if: failure()
+        run: |
+          echo "--- Server log (last 200 lines) ---"
+          cat /tmp/nextjs.log 2>/dev/null | tail -200 || true
+
+      - name: Run snapshot suites (owner, sitter, client)
+        run: |
+          pnpm exec playwright test tests/e2e/owner-snapshots.spec.ts --project=owner-desktop
+          pnpm exec playwright test tests/e2e/sitter-snapshots.spec.ts --project=sitter-desktop
+          pnpm exec playwright test tests/e2e/client-snapshots.spec.ts --project=client-mobile
+        env:
+          CI: "true"
+          BASE_URL: "http://localhost:3000"
+          OWNER_EMAIL: "owner@example.com"
+          OWNER_PASSWORD: "password"
+          E2E_AUTH_KEY: test-e2e-key-change-in-production
+
+      - name: Capture screenshots
+        run: |
+          pnpm run test:ui -- tests/e2e/rotation-settings-persistence.spec.ts --screenshot=only-on-failure
+          mkdir -p proof-pack/screenshots
+          cp -r test-results/*/screenshots/* proof-pack/screenshots/ 2>/dev/null || true
+        env:
+          BASE_URL: "http://localhost:3000"
+
+      - name: Release gate summary
+        if: ${{ success() }}
+        run: |
+          echo "Release gate checks passed:"
+          echo "- build: PASS"
+          echo "- smoke tests: PASS"
+          echo "- unit tests: PASS"
+          exit 0
+
+      - name: Stop application
+        if: always()
+        run: |
+          if [ -f /tmp/nextjs.pid ]; then
+            kill $(cat /tmp/nextjs.pid) 2>/dev/null || true
+          fi
+          pkill -f "next start" || true
+
+      - name: Upload proof-pack artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: proof-pack
+          path: proof-pack/
+          retention-days: 90

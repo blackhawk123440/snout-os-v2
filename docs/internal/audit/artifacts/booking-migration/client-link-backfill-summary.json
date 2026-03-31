@@ -1,0 +1,14 @@
+{
+  "oldBaseUrl": "https://backend-291r.onrender.com",
+  "targetOrgId": "default",
+  "oldBookingIds": 238,
+  "targetBookingsMatched": 238,
+  "attemptedToLink": 238,
+  "linkedExisting": 151,
+  "createdAndLinked": 87,
+  "skippedNoPhone": 0,
+  "unresolvedCrossOrgCount": 0,
+  "unresolvedCrossOrg": [],
+  "stillUnlinked": 0,
+  "finishedAt": "2026-03-28T11:56:32.005Z"
+}

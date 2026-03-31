@@ -1,0 +1,43 @@
+{
+  "gate": "session_validation_burst",
+  "mode": "live",
+  "operationCount": 105,
+  "concurrency": 105,
+  "durationMs": 5652.007791000011,
+  "throughputRps": 18.577469084030106,
+  "successCount": 30,
+  "errorCount": 75,
+  "errorRate": 0.7142857142857143,
+  "observedDuplicateCount": 0,
+  "duplicateCount": 0,
+  "duplicateRate": 0,
+  "retryCount": 0,
+  "deadLetterCount": 0,
+  "timeoutCount": 0,
+  "timeoutRate": 0,
+  "statusCounts": {
+    "200": 30,
+    "429": 75
+  },
+  "failureCategory": "DB/read bottleneck",
+  "latencies": {
+    "p50": 3698.9330419999897,
+    "p95": 5492.402916999999,
+    "p99": 5521.2548329999845,
+    "max": 5589.716999999975,
+    "min": 1156.1855409999844
+  },
+  "pass": false,
+  "failures": [
+    "p50 3698.9ms > 140ms",
+    "p95 5492.4ms > 600ms",
+    "p99 5521.3ms > 1200ms",
+    "errorRate 71.43% > 3.00%",
+    "throughput 18.58 rps < 300 rps"
+  ],
+  "notes": [
+    "Requests are spread across owner/sitter/client session cookies when provided",
+    "ramp stage: low"
+  ],
+  "stage": "low"
+}

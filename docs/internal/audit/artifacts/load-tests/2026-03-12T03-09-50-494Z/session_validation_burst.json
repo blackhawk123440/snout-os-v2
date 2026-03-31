@@ -1,0 +1,41 @@
+{
+  "gate": "session_validation_burst",
+  "mode": "live",
+  "operationCount": 300,
+  "concurrency": 300,
+  "durationMs": 17632.562082999997,
+  "throughputRps": 17.01397667496306,
+  "successCount": 30,
+  "errorCount": 270,
+  "errorRate": 0.9,
+  "observedDuplicateCount": 0,
+  "duplicateCount": 0,
+  "duplicateRate": 0,
+  "retryCount": 0,
+  "deadLetterCount": 0,
+  "timeoutCount": 0,
+  "timeoutRate": 0,
+  "statusCounts": {
+    "200": 30,
+    "429": 270
+  },
+  "failureCategory": "auth/session collapse",
+  "latencies": {
+    "p50": 9694.62595799999,
+    "p95": 17386.899915999995,
+    "p99": 17522.435083999997,
+    "max": 17560.120999999985,
+    "min": 1878.6366249999846
+  },
+  "pass": false,
+  "failures": [
+    "p50 9694.6ms > 140ms",
+    "p95 17386.9ms > 600ms",
+    "p99 17522.4ms > 1200ms",
+    "errorRate 90.00% > 3.00%",
+    "throughput 17.01 rps < 300 rps"
+  ],
+  "notes": [
+    "Requests are spread across owner/sitter/client session cookies when provided"
+  ]
+}

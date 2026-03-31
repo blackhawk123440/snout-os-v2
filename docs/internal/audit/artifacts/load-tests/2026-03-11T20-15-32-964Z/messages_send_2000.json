@@ -1,0 +1,25 @@
+{
+  "gate": "messages_send_2000",
+  "mode": "mock",
+  "operationCount": 2000,
+  "concurrency": 2000,
+  "durationMs": 708.896917,
+  "throughputRps": 2821.284663592351,
+  "successCount": 1964,
+  "errorCount": 36,
+  "errorRate": 0.018,
+  "duplicateCount": 0,
+  "duplicateRate": 0,
+  "retryCount": 0,
+  "deadLetterCount": 0,
+  "latencies": {
+    "p50": 105.5980636957969,
+    "p95": 137.72935026963296,
+    "p99": 465.7374036006604,
+    "max": 705.067836699568,
+    "min": 70.02334688919291
+  },
+  "pass": true,
+  "failures": [],
+  "notes": []
+}

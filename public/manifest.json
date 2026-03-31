@@ -1,0 +1,13 @@
+{
+  "name": "Snout OS",
+  "short_name": "Snout",
+  "description": "Professional pet care management",
+  "start_url": "/client/home",
+  "display": "standalone",
+  "background_color": "#fef7fb",
+  "theme_color": "#432f21",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

@@ -1,0 +1,394 @@
+{
+  "generatedAt": "2026-03-10T16:44:34.659Z",
+  "baseUrl": "https://snout-os-staging.onrender.com",
+  "setup": {
+    "mainBookingId": "97c0fd66-7056-4c3f-8a16-f8945b97cd44",
+    "inProgressBookingId": "32178e1d-da40-4b47-b535-6b3572fd59b6",
+    "emergencyBookingId": "2c374876-e888-4385-8b76-d6e7d1baf812",
+    "sitterId": "709c7f4f-2c78-4db4-99d2-b74f0f4b3707",
+    "threadId": null,
+    "paidProofBookingId": null
+  },
+  "scenarios": 15,
+  "images": 43,
+  "summaryByScenario": {
+    "scenario-01-client-first-booking": {
+      "real": 2,
+      "placeholder": 0,
+      "priority": false
+    },
+    "scenario-02-recurring-bookings": {
+      "real": 1,
+      "placeholder": 0,
+      "priority": false
+    },
+    "scenario-03-owner-assigns-sitter": {
+      "real": 2,
+      "placeholder": 0,
+      "priority": false
+    },
+    "scenario-04-twilio-masked-messaging": {
+      "real": 12,
+      "placeholder": 0,
+      "priority": true
+    },
+    "scenario-05-sitter-start-visit": {
+      "real": 2,
+      "placeholder": 0,
+      "priority": true
+    },
+    "scenario-06-sitter-end-visit": {
+      "real": 2,
+      "placeholder": 0,
+      "priority": true
+    },
+    "scenario-07-client-report-received": {
+      "real": 2,
+      "placeholder": 0,
+      "priority": false
+    },
+    "scenario-08-calendar-conflict-detection": {
+      "real": 2,
+      "placeholder": 0,
+      "priority": true
+    },
+    "scenario-09-payment-processing": {
+      "real": 2,
+      "placeholder": 0,
+      "priority": true
+    },
+    "scenario-10-loyalty-points-awarded": {
+      "real": 2,
+      "placeholder": 0,
+      "priority": true
+    },
+    "scenario-11-owner-revenue-dashboard": {
+      "real": 3,
+      "placeholder": 0,
+      "priority": false
+    },
+    "scenario-12-busy-sitter-day": {
+      "real": 4,
+      "placeholder": 0,
+      "priority": true
+    },
+    "scenario-13-client-reschedule": {
+      "real": 2,
+      "placeholder": 0,
+      "priority": false
+    },
+    "scenario-14-reminder-automation": {
+      "real": 2,
+      "placeholder": 0,
+      "priority": false
+    },
+    "scenario-15-emergency-booking": {
+      "real": 3,
+      "placeholder": 0,
+      "priority": true
+    }
+  },
+  "report": [
+    {
+      "scenario": "scenario-01-client-first-booking",
+      "file": "client-upcoming-visits.png",
+      "role": "client",
+      "route": "/client/bookings",
+      "status": "real"
+    },
+    {
+      "scenario": "scenario-01-client-first-booking",
+      "file": "client-booking-confirmation.png",
+      "role": "client",
+      "route": "/client/bookings/97c0fd66-7056-4c3f-8a16-f8945b97cd44",
+      "status": "real"
+    },
+    {
+      "scenario": "scenario-02-recurring-bookings",
+      "file": "client-recurring-bookings-list.png",
+      "role": "client",
+      "route": "/client/bookings",
+      "status": "real"
+    },
+    {
+      "scenario": "scenario-03-owner-assigns-sitter",
+      "file": "owner-assign-sitter.png",
+      "role": "owner",
+      "route": "/bookings/97c0fd66-7056-4c3f-8a16-f8945b97cd44",
+      "status": "real"
+    },
+    {
+      "scenario": "scenario-03-owner-assigns-sitter",
+      "file": "owner-booking-notification.png",
+      "role": "owner",
+      "route": "/dashboard",
+      "status": "real"
+    },
+    {
+      "scenario": "scenario-04-twilio-masked-messaging",
+      "file": "client-booking-confirmation.png",
+      "role": "client",
+      "route": "/client/bookings/97c0fd66-7056-4c3f-8a16-f8945b97cd44",
+      "status": "real"
+    },
+    {
+      "scenario": "scenario-04-twilio-masked-messaging",
+      "file": "masked-number-thread-client.png",
+      "role": "client",
+      "route": "/client/messages",
+      "status": "real"
+    },
+    {
+      "scenario": "scenario-04-twilio-masked-messaging",
+      "file": "owner-booking-notification.png",
+      "role": "owner",
+      "route": "/dashboard",
+      "status": "real"
+    },
+    {
+      "scenario": "scenario-04-twilio-masked-messaging",
+      "file": "owner-assign-sitter.png",
+      "role": "owner",
+      "route": "/bookings/97c0fd66-7056-4c3f-8a16-f8945b97cd44",
+      "status": "real"
+    },
+    {
+      "scenario": "scenario-04-twilio-masked-messaging",
+      "file": "sitter-assignment.png",
+      "role": "sitter",
+      "route": "/sitter/today",
+      "status": "real"
+    },
+    {
+      "scenario": "scenario-04-twilio-masked-messaging",
+      "file": "masked-number-thread-sitter.png",
+      "role": "sitter",
+      "route": "/sitter/inbox",
+      "status": "real"
+    },
+    {
+      "scenario": "scenario-04-twilio-masked-messaging",
+      "file": "message-thread-active.png",
+      "role": "owner",
+      "route": "/messages?tab=inbox",
+      "status": "real"
+    },
+    {
+      "scenario": "scenario-04-twilio-masked-messaging",
+      "file": "sitter-calendar.png",
+      "role": "sitter",
+      "route": "/sitter/calendar",
+      "status": "real"
+    },
+    {
+      "scenario": "scenario-04-twilio-masked-messaging",
+      "file": "google-calendar-sync.png",
+      "role": "owner",
+      "route": "/bookings/97c0fd66-7056-4c3f-8a16-f8945b97cd44",
+      "status": "real"
+    },
+    {
+      "scenario": "scenario-04-twilio-masked-messaging",
+      "file": "payment-success.png",
+      "role": "client",
+      "route": "/client/billing",
+      "status": "real"
+    },
+    {
+      "scenario": "scenario-04-twilio-masked-messaging",
+      "file": "loyalty-points.png",
+      "role": "client",
+      "route": "/client/billing",
+      "status": "real"
+    },
+    {
+      "scenario": "scenario-04-twilio-masked-messaging",
+      "file": "owner-dashboard-updated.png",
+      "role": "owner",
+      "route": "/dashboard",
+      "status": "real"
+    },
+    {
+      "scenario": "scenario-05-sitter-start-visit",
+      "file": "sitter-start-visit-button.png",
+      "role": "sitter",
+      "route": "/sitter/bookings/32178e1d-da40-4b47-b535-6b3572fd59b6",
+      "status": "real"
+    },
+    {
+      "scenario": "scenario-05-sitter-start-visit",
+      "file": "sitter-visit-timer.png",
+      "role": "sitter",
+      "route": "/sitter/bookings/32178e1d-da40-4b47-b535-6b3572fd59b6",
+      "status": "real"
+    },
+    {
+      "scenario": "scenario-06-sitter-end-visit",
+      "file": "sitter-end-visit.png",
+      "role": "sitter",
+      "route": "/sitter/bookings/97c0fd66-7056-4c3f-8a16-f8945b97cd44",
+      "status": "real"
+    },
+    {
+      "scenario": "scenario-06-sitter-end-visit",
+      "file": "sitter-report-form.png",
+      "role": "sitter",
+      "route": "/sitter/reports/new?bookingId=97c0fd66-7056-4c3f-8a16-f8945b97cd44",
+      "status": "real"
+    },
+    {
+      "scenario": "scenario-07-client-report-received",
+      "file": "client-report-view.png",
+      "role": "client",
+      "route": "/client/reports",
+      "status": "real"
+    },
+    {
+      "scenario": "scenario-07-client-report-received",
+      "file": "client-message-report-notice.png",
+      "role": "client",
+      "route": "/client/messages",
+      "status": "real"
+    },
+    {
+      "scenario": "scenario-08-calendar-conflict-detection",
+      "file": "owner-calendar-conflict.png",
+      "role": "owner",
+      "route": "/calendar",
+      "status": "real"
+    },
+    {
+      "scenario": "scenario-08-calendar-conflict-detection",
+      "file": "owner-conflict-resolution.png",
+      "role": "owner",
+      "route": "/calendar",
+      "status": "real"
+    },
+    {
+      "scenario": "scenario-09-payment-processing",
+      "file": "payment-success.png",
+      "role": "client",
+      "route": "/client/billing",
+      "status": "real"
+    },
+    {
+      "scenario": "scenario-09-payment-processing",
+      "file": "owner-payment-status.png",
+      "role": "owner",
+      "route": "/payments",
+      "status": "real"
+    },
+    {
+      "scenario": "scenario-10-loyalty-points-awarded",
+      "file": "client-points-balance.png",
+      "role": "client",
+      "route": "/client/billing",
+      "status": "real"
+    },
+    {
+      "scenario": "scenario-10-loyalty-points-awarded",
+      "file": "owner-loyalty-ledger.png",
+      "role": "owner",
+      "route": "/dashboard",
+      "status": "real"
+    },
+    {
+      "scenario": "scenario-11-owner-revenue-dashboard",
+      "file": "owner-command-center.png",
+      "role": "owner",
+      "route": "/dashboard",
+      "status": "real"
+    },
+    {
+      "scenario": "scenario-11-owner-revenue-dashboard",
+      "file": "owner-revenue-dashboard.png",
+      "role": "owner",
+      "route": "/analytics",
+      "status": "real"
+    },
+    {
+      "scenario": "scenario-11-owner-revenue-dashboard",
+      "file": "owner-automation-log.png",
+      "role": "owner",
+      "route": "/automations",
+      "status": "real"
+    },
+    {
+      "scenario": "scenario-12-busy-sitter-day",
+      "file": "sitter-today-overview.png",
+      "role": "sitter",
+      "route": "/sitter/today",
+      "status": "real"
+    },
+    {
+      "scenario": "scenario-12-busy-sitter-day",
+      "file": "sitter-upcoming-visits.png",
+      "role": "sitter",
+      "route": "/sitter/bookings",
+      "status": "real"
+    },
+    {
+      "scenario": "scenario-12-busy-sitter-day",
+      "file": "sitter-visit-timer.png",
+      "role": "sitter",
+      "route": "/sitter/bookings/32178e1d-da40-4b47-b535-6b3572fd59b6",
+      "status": "real"
+    },
+    {
+      "scenario": "scenario-12-busy-sitter-day",
+      "file": "sitter-report-form.png",
+      "role": "sitter",
+      "route": "/sitter/reports/new?bookingId=97c0fd66-7056-4c3f-8a16-f8945b97cd44",
+      "status": "real"
+    },
+    {
+      "scenario": "scenario-13-client-reschedule",
+      "file": "client-reschedule-flow.png",
+      "role": "client",
+      "route": "/client/bookings",
+      "status": "real"
+    },
+    {
+      "scenario": "scenario-13-client-reschedule",
+      "file": "owner-reschedule-notification.png",
+      "role": "owner",
+      "route": "/dashboard",
+      "status": "real"
+    },
+    {
+      "scenario": "scenario-14-reminder-automation",
+      "file": "owner-automation-log.png",
+      "role": "owner",
+      "route": "/automations",
+      "status": "real"
+    },
+    {
+      "scenario": "scenario-14-reminder-automation",
+      "file": "client-reminder-message.png",
+      "role": "client",
+      "route": "/client/messages",
+      "status": "real"
+    },
+    {
+      "scenario": "scenario-15-emergency-booking",
+      "file": "owner-emergency-booking-card.png",
+      "role": "owner",
+      "route": "/bookings/2c374876-e888-4385-8b76-d6e7d1baf812",
+      "status": "real"
+    },
+    {
+      "scenario": "scenario-15-emergency-booking",
+      "file": "sitter-emergency-assignment.png",
+      "role": "sitter",
+      "route": "/sitter/today",
+      "status": "real"
+    },
+    {
+      "scenario": "scenario-15-emergency-booking",
+      "file": "client-emergency-confirmation.png",
+      "role": "client",
+      "route": "/client/bookings/2c374876-e888-4385-8b76-d6e7d1baf812",
+      "status": "real"
+    }
+  ]
+}

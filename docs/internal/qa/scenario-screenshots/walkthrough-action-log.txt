@@ -1,0 +1,71 @@
+🚀 Starting 7-scenario walkthrough on Snout OS staging
+📍 Base URL: https://snout-os-staging.onrender.com
+
+🌱 Seeding fixtures...
+🔐 Authenticating as owner...
+🔐 Authenticating as sitter...
+🔐 Authenticating as client...
+
+📝 Creating test bookings...
+  ✓ Created booking: a67a410c-a36d-47be-a162-3406fa5d762d
+  ✓ Created booking: 3961d142-f0f2-44c3-b638-17588bb27445
+  ✓ Created booking: c405c8c3-0b0d-4a08-9713-6b6125be5169
+  ✓ Assigned booking to sitter: 709c7f4f-2c78-4db4-99d2-b74f0f4b3707
+  ✓ Completed check-in, check-out, and report for booking: c405c8c3-0b0d-4a08-9713-6b6125be5169
+
+
+📦 SCENARIO 01: Client First Booking
+  → Navigate to client bookings: /client/bookings
+  📸 Screenshot saved: client-upcoming-visits.png
+  → Navigate to booking detail: /client/bookings/a67a410c-a36d-47be-a162-3406fa5d762d
+  📸 Screenshot saved: client-booking-confirmation.png
+
+
+📦 SCENARIO 02: Recurring Bookings
+  → Navigate to client bookings list: /client/bookings
+  📸 Screenshot saved: client-recurring-bookings-list.png
+
+
+📦 SCENARIO 03: Owner Assigns Sitter
+  → Navigate to owner dashboard: /dashboard
+  📸 Screenshot saved: owner-booking-notification.png
+  → Navigate to booking detail for assignment: /bookings/a67a410c-a36d-47be-a162-3406fa5d762d
+  📸 Screenshot saved: owner-assign-sitter.png
+
+
+📦 SCENARIO 07: Client Report Received
+  → Navigate to client reports: /client/reports
+  📸 Screenshot saved: client-report-view.png
+  → Navigate to client messages: /client/messages
+  📸 Screenshot saved: client-message-report-notice.png
+
+
+📦 SCENARIO 11: Owner Revenue Dashboard
+  → Navigate to command center: /dashboard
+  📸 Screenshot saved: owner-command-center.png
+  → Navigate to analytics dashboard: /analytics
+  📸 Screenshot saved: owner-revenue-dashboard.png
+  → Navigate to automation log: /automations
+  📸 Screenshot saved: owner-automation-log.png
+
+
+📦 SCENARIO 13: Client Reschedule
+  → Navigate to client bookings for reschedule: /client/bookings
+  📸 Screenshot saved: client-reschedule-flow.png
+  → Navigate to owner dashboard for reschedule notification: /dashboard
+  📸 Screenshot saved: owner-reschedule-notification.png
+
+
+📦 SCENARIO 14: Reminder Automation
+  → Triggering test automation message...
+  → Navigate to automation log: /automations
+  📸 Screenshot saved: owner-automation-log.png
+  → Navigate to client messages: /client/messages
+  📸 Screenshot saved: client-reminder-message.png
+
+
+✅ All 7 scenarios completed!
+
+📊 Action Log Summary:
+  - Total actions: 50
+  - Click failures: 0

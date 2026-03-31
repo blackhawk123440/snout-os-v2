@@ -1,0 +1,108 @@
+{
+  "runId": "2026-03-12T03-46-53-526Z",
+  "startedAt": "2026-03-12T03:46:53.525Z",
+  "completedAt": "2026-03-12T03:46:54.236Z",
+  "mode": "mock",
+  "suite": "messages",
+  "baseUrl": "http://localhost:3000",
+  "thresholds": {
+    "bookings_create_1000": {
+      "p50Ms": 300,
+      "p95Ms": 1000,
+      "p99Ms": 2000,
+      "maxErrorRate": 0.02,
+      "maxDuplicateRate": 0,
+      "minThroughputRps": 120
+    },
+    "messages_send_2000": {
+      "p50Ms": 180,
+      "p95Ms": 700,
+      "p99Ms": 1400,
+      "maxErrorRate": 0.025,
+      "minThroughputRps": 300
+    },
+    "bookings_reads_paginated": {
+      "p50Ms": 120,
+      "p95Ms": 450,
+      "p99Ms": 900,
+      "maxErrorRate": 0.01,
+      "minThroughputRps": 400
+    },
+    "thread_reads": {
+      "p50Ms": 130,
+      "p95Ms": 500,
+      "p99Ms": 950,
+      "maxErrorRate": 0.01,
+      "minThroughputRps": 350
+    },
+    "queue_backlog_drain": {
+      "p50Ms": 20,
+      "p95Ms": 100,
+      "p99Ms": 250,
+      "maxErrorRate": 0.01,
+      "minQueueDrainPerSec": 800
+    },
+    "session_validation_burst": {
+      "p50Ms": 140,
+      "p95Ms": 600,
+      "p99Ms": 1200,
+      "maxErrorRate": 0.03,
+      "minThroughputRps": 300
+    },
+    "queue_retry_failure_storm": {
+      "p50Ms": 30,
+      "p95Ms": 180,
+      "p99Ms": 350,
+      "maxErrorRate": 0.25,
+      "minQueueDrainPerSec": 500,
+      "maxDeadLetterCount": 150,
+      "maxRetryCount": 4000
+    }
+  },
+  "results": [
+    {
+      "gate": "messages_send_2000",
+      "mode": "mock",
+      "operationCount": 2000,
+      "concurrency": 2000,
+      "durationMs": 697.5367080000001,
+      "throughputRps": 2867.232615950012,
+      "successCount": 1964,
+      "errorCount": 36,
+      "errorRate": 0.018,
+      "observedDuplicateCount": 0,
+      "duplicateCount": 0,
+      "duplicateRate": 0,
+      "retryCount": 0,
+      "deadLetterCount": 0,
+      "timeoutCount": 0,
+      "timeoutRate": 0,
+      "statusCounts": {
+        "202": 1964,
+        "500": 36
+      },
+      "failureCategory": "none",
+      "latencies": {
+        "p50": 96.69854777184767,
+        "p95": 120.79701270222472,
+        "p99": 454.35652558474203,
+        "max": 693.6348912242647,
+        "min": 70.01751016689468
+      },
+      "pass": true,
+      "failures": [],
+      "notes": []
+    }
+  ],
+  "topBottlenecks": [
+    {
+      "gate": "messages_send_2000",
+      "reason": "high p95 120.8ms, throughput 2867.2 rps",
+      "severity": 210.79701270222472
+    }
+  ],
+  "failingGates": [],
+  "recommendations": [
+    "No gate failures in this pass. Next step: run same suite in live staging with production-like auth+data volume."
+  ]
+}

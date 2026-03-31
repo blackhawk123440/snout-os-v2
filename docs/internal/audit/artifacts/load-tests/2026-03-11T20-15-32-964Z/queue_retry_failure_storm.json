@@ -1,0 +1,30 @@
+{
+  "gate": "queue_retry_failure_storm",
+  "mode": "mock",
+  "operationCount": 6000,
+  "concurrency": 100,
+  "durationMs": 1389.9534169999997,
+  "throughputRps": 4316.691427652357,
+  "successCount": 5509,
+  "errorCount": 491,
+  "errorRate": 0.08183333333333333,
+  "duplicateCount": 0,
+  "duplicateRate": 0,
+  "retryCount": 5875,
+  "deadLetterCount": 491,
+  "latencies": {
+    "p50": 18.22333108911971,
+    "p95": 52.23293990091406,
+    "p99": 65.10934613052837,
+    "max": 79.27046658172367,
+    "min": 4.003445615675446
+  },
+  "pass": false,
+  "failures": [
+    "dead letters 491 > 150",
+    "retry count 5875 > 4000"
+  ],
+  "notes": [
+    "Uses synthetic storm profile (approx 8% dead-letter candidates, 27% transient retries)"
+  ]
+}

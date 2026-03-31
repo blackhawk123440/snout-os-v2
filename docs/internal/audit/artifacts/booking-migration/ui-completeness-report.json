@@ -1,0 +1,71 @@
+{
+  "targetOrgId": "default",
+  "generatedAt": "2026-03-28T12:05:11.573Z",
+  "migrated": {
+    "totalIdsFromArtifact": 238,
+    "foundInTargetDb": 238,
+    "missingInTargetDbCount": 0,
+    "missingInTargetDb": []
+  },
+  "readPathChecks": {
+    "ownerIncludesAddressFields": true,
+    "clientIncludesAddressFields": true,
+    "ownerIncludesTimeSlots": true,
+    "ownerHasInferredPaidFallback": true,
+    "clientHasInferredPaidFallback": true
+  },
+  "clientLinkage": {
+    "totalMigratedChecked": 238,
+    "linkedClients": 238,
+    "missingClientId": 0,
+    "brokenClientRelation": 0,
+    "crossOrgClientAnomaly": 0
+  },
+  "paidFallback": {
+    "paidWithCharge": 0,
+    "paidWithoutCharge": 74,
+    "paidWithoutChargeEligibleFallback": 74,
+    "paidWouldRenderNoProofOrFallback": 0
+  },
+  "addresses": {
+    "withPickupAddress": 1,
+    "withDropoffAddress": 1,
+    "addressPathOmissionBookings": 0
+  },
+  "timeSlots": {
+    "withMultiTimeSlots": 161,
+    "timeSlotPathOmissionBookings": 0
+  },
+  "samples": [
+    {
+      "id": "47aed6bd-e335-42e9-ae3b-8f9a657124fe",
+      "existsInMigratedSet": true,
+      "existsInTargetDb": true,
+      "clientLinked": true,
+      "paidFallbackNeeded": true,
+      "pickupPresent": false,
+      "dropoffPresent": false,
+      "multiSlotPresent": false
+    },
+    {
+      "id": "65a1b4e2-0a06-4f88-be8f-987b86a91f5e",
+      "existsInMigratedSet": true,
+      "existsInTargetDb": true,
+      "clientLinked": true,
+      "paidFallbackNeeded": false,
+      "pickupPresent": true,
+      "dropoffPresent": true,
+      "multiSlotPresent": true
+    },
+    {
+      "id": "48abcd6d-df79-4458-a2fe-64d54be7fc4b",
+      "existsInMigratedSet": true,
+      "existsInTargetDb": true,
+      "clientLinked": true,
+      "paidFallbackNeeded": false,
+      "pickupPresent": false,
+      "dropoffPresent": false,
+      "multiSlotPresent": true
+    }
+  ]
+}

@@ -1,0 +1,175 @@
+services:
+  # PostgreSQL Database
+  - type: pg
+    name: snout-os-db
+    plan: starter
+    databaseName: snout_os
+    user: snoutos
+
+  # Web Service (Next.js — handles UI + API routes)
+  - type: web
+    name: snout-os-web
+    env: node
+    plan: starter
+    region: oregon
+    rootDir: .
+    buildCommand: pnpm install --frozen-lockfile && pnpm prisma generate && RENDER=true NODE_OPTIONS="--max-old-space-size=2048" npx next build
+    startCommand: npx prisma migrate deploy && node scripts/verify-schema.js && pnpm run start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXTAUTH_URL
+        fromService:
+          name: snout-os-web
+          type: web
+          property: host
+      - key: NEXTAUTH_SECRET
+        generateValue: true
+      - key: NEXT_PUBLIC_ENABLE_MESSAGING_V1
+        value: "true"
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: DATABASE_URL
+        fromDatabase:
+          name: snout-os-db
+          property: connectionString
+      - key: STRIPE_MOCK_TRANSFER
+        value: "false"
+      - key: NEXT_PUBLIC_PERSONAL_MODE
+        value: "true"
+      - key: MESSAGING_PROVIDER
+        value: "openphone"
+      - key: OPENPHONE_API_KEY
+        sync: false
+      - key: OPENPHONE_NUMBER_ID
+        sync: false
+      - key: OPENPHONE_PHONE_NUMBER
+        sync: false
+      - key: OWNER_PHONE
+        sync: false
+      - key: OWNER_PERSONAL_PHONE
+        sync: false
+      - key: OWNER_OPENPHONE_PHONE
+        sync: false
+      - key: ENABLE_AUTH_PROTECTION
+        value: "true"
+      - key: ENABLE_SITTER_AUTH
+        value: "true"
+      - key: ENABLE_PERMISSION_CHECKS
+        value: "true"
+      - key: REDIS_URL
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: INTERNAL_API_KEY
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+    healthCheckPath: /api/health
+
+  # Background worker (calendar sync, payouts, automations, etc.)
+  # Must run same commit as web for calendar/booking consistency. Deploy with web.
+  - type: worker
+    name: snout-os-worker
+    env: node
+    plan: starter
+    region: oregon
+    rootDir: .
+    buildCommand: pnpm install --frozen-lockfile && pnpm prisma generate && RENDER=true NODE_OPTIONS="--max-old-space-size=2048" npx next build
+    startCommand: pnpm run worker
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: REDIS_URL
+        sync: false
+      - key: DATABASE_URL
+        fromDatabase:
+          name: snout-os-db
+          property: connectionString
+      - key: NEXT_PUBLIC_GIT_SHA
+        fromService:
+          name: snout-os-web
+          type: web
+          property: commitSha
+      - key: NEXTAUTH_SECRET
+        generateValue: true
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+
+  # Cron: Expire unpaid bookings (every 15 minutes)
+  - type: cron
+    name: expire-unpaid-bookings
+    env: node
+    plan: starter
+    region: oregon
+    schedule: "*/15 * * * *"
+    buildCommand: echo "no build needed"
+    startCommand: "curl -s -X POST -H \"Authorization: Bearer $INTERNAL_API_KEY\" https://$RENDER_EXTERNAL_HOSTNAME/api/cron/expire-unpaid"
+    envVars:
+      - key: INTERNAL_API_KEY
+        sync: false
+      - key: RENDER_EXTERNAL_HOSTNAME
+        fromService:
+          name: snout-os-web
+          type: web
+          property: host
+
+  # Cron: Collect advance booking balances (daily 8 AM Central = 1 PM UTC)
+  - type: cron
+    name: collect-balances
+    env: node
+    plan: starter
+    region: oregon
+    schedule: "0 13 * * *"
+    buildCommand: echo "no build needed"
+    startCommand: "curl -s -X POST -H \"Authorization: Bearer $INTERNAL_API_KEY\" https://$RENDER_EXTERNAL_HOSTNAME/api/cron/collect-balances"
+    envVars:
+      - key: INTERNAL_API_KEY
+        sync: false
+      - key: RENDER_EXTERNAL_HOSTNAME
+        fromService:
+          name: snout-os-web
+          type: web
+          property: host
+
+  # Cron: Weekly recurring auto-charge (Sunday 6 AM Central = 11 AM UTC)
+  - type: cron
+    name: weekly-recurring-charge
+    env: node
+    plan: starter
+    region: oregon
+    schedule: "0 11 * * 0"
+    buildCommand: echo "no build needed"
+    startCommand: "curl -s -X POST -H \"Authorization: Bearer $INTERNAL_API_KEY\" https://$RENDER_EXTERNAL_HOSTNAME/api/cron/weekly-recurring-charge"
+    envVars:
+      - key: INTERNAL_API_KEY
+        sync: false
+      - key: RENDER_EXTERNAL_HOSTNAME
+        fromService:
+          name: snout-os-web
+          type: web
+          property: host
+
+  # Cron: Weekly recurring retry (Sunday 6 PM Central = 11 PM UTC)
+  - type: cron
+    name: weekly-recurring-retry
+    env: node
+    plan: starter
+    region: oregon
+    schedule: "0 23 * * 0"
+    buildCommand: echo "no build needed"
+    startCommand: "curl -s -X POST -H \"Authorization: Bearer $INTERNAL_API_KEY\" https://$RENDER_EXTERNAL_HOSTNAME/api/cron/weekly-recurring-charge"
+    envVars:
+      - key: INTERNAL_API_KEY
+        sync: false
+      - key: RENDER_EXTERNAL_HOSTNAME
+        fromService:
+          name: snout-os-web
+          type: web
+          property: host

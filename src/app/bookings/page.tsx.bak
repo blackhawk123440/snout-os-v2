@@ -1,0 +1,823 @@
+/**
+ * Bookings List Page - Enterprise Rebuild
+ * 
+ * Complete rebuild using design system and components.
+ * Zero legacy styling - all through components and tokens.
+ */
+
+'use client';
+
+import { useState, useEffect, useMemo, Suspense } from 'react';
+import Link from 'next/link';
+import {
+  PageHeader,
+  Table,
+  Button,
+  Badge,
+  Card,
+  Input,
+  Select,
+  EmptyState,
+  Skeleton,
+  StatCard,
+  Tabs,
+  TabPanel,
+  MobileFilterBar,
+} from '@/components/ui';
+import { AppShell } from '@/components/layout/AppShell';
+import { tokens } from '@/lib/design-tokens';
+import { TableColumn } from '@/components/ui/Table';
+import { useMobile } from '@/lib/use-mobile';
+import { SitterAssignmentDisplay } from '@/components/sitter';
+import { BookingScheduleDisplay } from '@/components/booking';
+import { BookingRowActions } from '@/components/bookings/BookingRowActions';
+import { BookingsMobileControlBar } from '@/components/bookings/BookingsMobileControlBar';
+
+interface Booking {
+  id: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  email: string;
+  address: string;
+  service: string;
+  startAt: Date | string;
+  endAt: Date | string;
+  status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
+  totalPrice: number;
+  pets: Array<{ species: string }>;
+  sitter?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+  } | null;
+  timeSlots?: Array<{
+    startAt: Date | string;
+    endAt: Date | string;
+    duration?: number;
+  }>;
+}
+
+interface OverviewStats {
+  todaysVisits: number;
+  unassigned: number;
+  pending: number;
+  monthlyRevenue: number;
+}
+
+interface Sitter {
+  id: string;
+  firstName: string;
+  lastName: string;
+  currentTier?: {
+    id: string;
+    name: string;
+    priorityLevel?: number;
+  } | null;
+}
+
+function BookingsPageContent() {
+  const isMobile = useMobile();
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [sitters, setSitters] = useState<Sitter[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [overviewStats, setOverviewStats] = useState<OverviewStats>({
+    todaysVisits: 0,
+    unassigned: 0,
+    pending: 0,
+    monthlyRevenue: 0,
+  });
+  const [activeTab, setActiveTab] = useState<'all' | 'today' | 'pending' | 'confirmed' | 'completed' | 'unassigned'>('all');
+  const [filter, setFilter] = useState<'all' | 'pending' | 'confirmed' | 'completed' | 'cancelled' | 'today'>('all');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortBy, setSortBy] = useState<'date' | 'name' | 'price' | 'sitter'>('date');
+
+  // Sync activeTab with filter
+  useEffect(() => {
+    if (activeTab === 'all') {
+      setFilter('all');
+    } else if (activeTab === 'today') {
+      setFilter('today');
+    } else if (activeTab === 'pending') {
+      setFilter('pending');
+    } else if (activeTab === 'confirmed') {
+      setFilter('confirmed');
+    } else if (activeTab === 'completed') {
+      setFilter('completed');
+    } else if (activeTab === 'unassigned') {
+      // "unassigned" is a view-mode (not a Booking.status). Keep `filter` as a status-only filter.
+      setFilter('all');
+    }
+  }, [activeTab]);
+
+  // Part A: Persist stats visibility to localStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('bookings-stats-visible', String(statsVisible));
+    }
+  }, [statsVisible]);
+
+  // Part A: Reset selection when filters change
+  useEffect(() => {
+    setSelectedIds(new Set());
+  }, [activeTab, filter, searchTerm, sortBy]);
+
+  // Initial load
+  useEffect(() => {
+    let cancelled = false;
+
+    const load = async () => {
+      setLoading(true);
+      try {
+        const [bookingsRes, sittersRes] = await Promise.allSettled([
+          fetch('/api/bookings').catch(() => null),
+          fetch('/api/sitters').catch(() => null),
+        ]);
+
+        let nextBookings: Booking[] = [];
+        if (bookingsRes.status === 'fulfilled' && bookingsRes.value?.ok) {
+          const data = await bookingsRes.value.json();
+          nextBookings = (data.bookings || []) as Booking[];
+        }
+
+        let nextSitters: Sitter[] = [];
+        if (sittersRes.status === 'fulfilled' && sittersRes.value?.ok) {
+          const data = await sittersRes.value.json();
+          nextSitters = (data.sitters || []) as Sitter[];
+        }
+
+        if (cancelled) return;
+        setBookings(nextBookings);
+        setSitters(nextSitters);
+
+        // Overview stats
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+
+        const todaysVisits = nextBookings.filter((b) => {
+          const startDate = new Date(b.startAt);
+          return startDate >= today && startDate < tomorrow && b.status !== 'cancelled';
+        }).length;
+
+        const unassigned = nextBookings.filter((b) => !b.sitter?.id && b.status !== 'cancelled' && b.status !== 'completed').length;
+        const pending = nextBookings.filter((b) => b.status === 'pending').length;
+
+        const currentMonth = new Date().getMonth();
+        const currentYear = new Date().getFullYear();
+        const monthlyRevenue = nextBookings
+          .filter((b) => {
+            const d = new Date(b.startAt);
+            return d.getMonth() == currentMonth && d.getFullYear() == currentYear && b.status !== 'cancelled';
+          })
+          .reduce((sum, b) => sum + (b.totalPrice || 0), 0);
+
+        setOverviewStats({
+          todaysVisits,
+          unassigned,
+          pending,
+          monthlyRevenue,
+        });
+      } catch {
+        if (!cancelled) {
+          setBookings([]);
+          setSitters([]);
+          setOverviewStats({ todaysVisits: 0, unassigned: 0, pending: 0, monthlyRevenue: 0 });
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+
+    void load();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const filteredAndSortedBookings = useMemo(() => {
+    let filtered = bookings;
+
+    // Apply tab-based filter
+    if (activeTab === 'today') {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      filtered = filtered.filter((b) => {
+        const start = new Date(b.startAt);
+        start.setHours(0, 0, 0, 0);
+        return start.getTime() === today.getTime();
+      });
+    } else if (activeTab === 'unassigned') {
+      filtered = filtered.filter((b) => !b.sitter?.id && b.status !== 'cancelled' && b.status !== 'completed');
+    } else if (activeTab !== 'all') {
+      filtered = filtered.filter((b) => b.status === activeTab);
+    }
+
+    // Apply legacy filter (for backward compatibility)
+    if (filter === 'today') {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      filtered = filtered.filter((b) => {
+        const start = new Date(b.startAt);
+        start.setHours(0, 0, 0, 0);
+        return start.getTime() === today.getTime();
+      });
+    } else if (filter !== 'all') {
+      filtered = filtered.filter((b) => b.status === filter);
+    }
+
+    // Apply search
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      filtered = filtered.filter(
+        (b) =>
+          b.firstName.toLowerCase().includes(term) ||
+          b.lastName.toLowerCase().includes(term) ||
+          b.phone.includes(term) ||
+          b.email.toLowerCase().includes(term) ||
+          b.service.toLowerCase().includes(term)
+      );
+    }
+
+    // Apply sort
+    filtered = [...filtered].sort((a, b) => {
+      if (sortBy === 'date') {
+        return new Date(b.startAt).getTime() - new Date(a.startAt).getTime();
+      } else if (sortBy === 'name') {
+          return `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`);
+      } else if (sortBy === 'sitter') {
+        // Sort by sitter name, unassigned at top
+        const aSitter = a.sitter ? `${a.sitter.firstName} ${a.sitter.lastName}`.toLowerCase() : '';
+        const bSitter = b.sitter ? `${b.sitter.firstName} ${b.sitter.lastName}`.toLowerCase() : '';
+        if (!aSitter && !bSitter) return 0;
+        if (!aSitter) return -1; // Unassigned first
+        if (!bSitter) return 1; // Unassigned first
+        return aSitter.localeCompare(bSitter);
+      } else {
+        return b.totalPrice - a.totalPrice;
+      }
+    });
+
+    return filtered;
+  }, [bookings, activeTab, filter, searchTerm, sortBy]);
+
+  const getStatusBadge = (status: string) => {
+    const variants: Record<string, 'default' | 'success' | 'warning' | 'error' | 'neutral'> = {
+      pending: 'warning',
+      confirmed: 'success',
+      completed: 'default',
+      cancelled: 'error',
+    };
+    return (
+      <Badge variant={variants[status] || 'neutral'}>
+        {status.charAt(0).toUpperCase() + status.slice(1)}
+      </Badge>
+    );
+  };
+
+  const formatDate = (date: Date | string) => {
+    const d = typeof date === 'string' ? new Date(date) : date;
+    return d.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    });
+  };
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    }).format(amount);
+  };
+
+  const formatPets = (pets: Array<{ species: string }>) => {
+    const counts: Record<string, number> = {};
+    pets.forEach((pet) => {
+      counts[pet.species] = (counts[pet.species] || 0) + 1;
+    });
+    return Object.entries(counts)
+      .map(([species, count]) => `${count} ${species}${count > 1 ? 's' : ''}`)
+      .join(', ');
+  };
+
+
+  const handleSitterAssign = async (bookingId: string, sitterId: string) => {
+    try {
+      const response = await fetch(`/api/bookings/${bookingId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sitterId: sitterId || "" }),
+      });
+
+      if (response.ok) {
+        // Refresh bookings
+        const bookingsRes = await fetch('/api/bookings');
+        if (bookingsRes.ok) {
+          const data = await bookingsRes.json();
+          setBookings(data.bookings || []);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to assign sitter:', error);
+      throw error;
+    }
+  };
+
+  const columns: TableColumn<Booking>[] = [
+    {
+      key: 'client',
+      header: 'Client',
+      mobileLabel: 'Client',
+      mobileOrder: 1,
+      render: (row) => (
+                <div>
+          <div style={{ fontWeight: tokens.typography.fontWeight.medium }}>
+            {row.firstName} {row.lastName}
+                </div>
+          <div
+            style={{
+              fontSize: tokens.typography.fontSize.sm[0],
+              color: tokens.colors.text.secondary,
+            }}
+          >
+            {row.phone}
+              </div>
+            </div>
+      ),
+    },
+    {
+      key: 'service',
+      header: 'Service',
+      mobileLabel: 'Service',
+      mobileOrder: 5,
+      render: (row) => (
+        <div>
+          <div style={{ fontWeight: tokens.typography.fontWeight.medium }}>{row.service}</div>
+          <div
+                          style={{
+              fontSize: tokens.typography.fontSize.sm[0],
+              color: tokens.colors.text.secondary,
+            }}
+          >
+            {formatPets(row.pets)}
+                    </div>
+                  </div>
+      ),
+    },
+    {
+      key: 'date',
+      header: 'Date',
+      mobileLabel: 'Schedule',
+      mobileOrder: 4,
+      render: (row) => (
+        <BookingScheduleDisplay
+          service={row.service}
+          startAt={row.startAt}
+          endAt={row.endAt}
+          timeSlots={row.timeSlots}
+          compact={true}
+        />
+      ),
+    },
+        {
+      key: 'actions',
+      header: 'Actions',
+      mobileLabel: 'Sitter Assignment',
+      mobileOrder: 6,
+      render: (row) => (
+        <BookingRowActions
+          bookingId={row.id}
+          sitter={row.sitter}
+          sitters={sitters.map(s => ({
+            id: s.id,
+            firstName: s.firstName,
+            lastName: s.lastName,
+            currentTier: s.currentTier,
+          }))}
+          onAssign={async (bookingId, sitterId) => {
+            await handleSitterAssign(bookingId, sitterId);
+          }}
+          onUnassign={async (bookingId) => {
+            await handleSitterAssign(bookingId, '');
+          }}
+        />
+      ),
+    },
+    {
+      key: 'status',
+      header: 'Status',
+      mobileLabel: 'Status',
+      mobileOrder: 2,
+      render: (row) => getStatusBadge(row.status),
+      align: 'center',
+    },
+    {
+      key: 'price',
+      header: 'Price',
+      mobileLabel: 'Total Price',
+      mobileOrder: 3,
+      render: (row) => (
+        <div style={{ fontWeight: tokens.typography.fontWeight.semibold }}>
+          ${row.totalPrice.toFixed(2)}
+                                </div>
+      ),
+      align: 'right',
+    },
+  ];
+                                      
+                                      return (
+    <AppShell>
+      <PageHeader
+        title="Bookings"
+        description="Manage all bookings and assignments"
+        actions={
+          <Link href="/bookings/new">
+            <Button variant="primary" leftIcon={<i className="fas fa-plus" />}>
+              New Booking
+            </Button>
+          </Link>
+        }
+      />
+
+
+      )}
+      {/* Overview Dashboard Cards */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(200px, 1fr))',
+          gap: tokens.spacing[4],
+          marginBottom: tokens.spacing[6],
+        }}
+      >
+        <StatCard
+          label="Today's Visits"
+          value={overviewStats.todaysVisits}
+          compact={isMobile}
+          icon={<i className="fas fa-calendar-day" />}
+        />
+        <StatCard
+          label="Unassigned"
+          value={overviewStats.unassigned}
+          compact={isMobile}
+          icon={<i className="fas fa-user-slash" />}
+        />
+        <StatCard
+          label="Pending"
+          value={overviewStats.pending}
+          compact={isMobile}
+          icon={<i className="fas fa-clock" />}
+        />
+        <StatCard
+          label="Monthly Revenue"
+          value={formatCurrency(overviewStats.monthlyRevenue)}
+          compact={isMobile}
+          icon={<i className="fas fa-dollar-sign" />}
+        />
+      </div>
+
+      {/* Filter Navigation - Mobile vs Desktop */}
+      {isMobile ? (
+        <>
+          {/* Mobile: MobileFilterBar */}
+          {/* Part A: Mobile Control Bar */}
+          {isMobile && (
+            <BookingsMobileControlBar
+              count={filteredAndSortedBookings.length}
+              statsVisible={statsVisible}
+              onToggleStats={setStatsVisible}
+              selectedCount={selectedIds.size}
+              allSelected={selectedIds.size === filteredAndSortedBookings.length && filteredAndSortedBookings.length > 0}
+              onToggleSelectAll={handleToggleSelectAll}
+              onBatchStatus={handleBatchStatus}
+              onBatchSitterPool={handleBatchSitterPool}
+              onClearSelection={handleClearSelection}
+            />
+          )}
+
+          <MobileFilterBar
+            activeFilter={activeTab}
+            onFilterChange={(filterId) => setActiveTab(filterId as any)}
+            sticky
+            options={[
+              { id: 'all', label: 'All' },
+              { id: 'today', label: "Today's", badge: overviewStats.todaysVisits > 0 ? overviewStats.todaysVisits : undefined },
+              { id: 'pending', label: 'Pending', badge: overviewStats.pending > 0 ? overviewStats.pending : undefined },
+              { id: 'confirmed', label: 'Confirmed' },
+              { id: 'completed', label: 'Completed' },
+              { id: 'unassigned', label: 'Unassigned', badge: overviewStats.unassigned > 0 ? overviewStats.unassigned : undefined },
+            ]}
+          />
+          {/* Search and Sort Controls */}
+          <Card
+            style={{ 
+              marginBottom: tokens.spacing[4],
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: tokens.spacing[3],
+              }}
+            >
+              <Input
+                placeholder="Search bookings..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                leftIcon={<i className="fas fa-search" />}
+              />
+              <Select
+                label="Sort By"
+                options={[
+                  { value: 'date', label: 'Date' },
+                  { value: 'name', label: 'Name' },
+                  { value: 'price', label: 'Price' },
+                    { value: 'sitter', label: 'Sitter' },
+                ]}
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as any)}
+              />
+            </div>
+          </Card>
+          {/* Bookings Table */}
+          {loading ? (
+            <Card>
+              <Skeleton height="400px" />
+            </Card>
+          ) : filteredAndSortedBookings.length === 0 ? (
+            <Card>
+              <EmptyState
+                icon={activeTab === 'today' ? '📅' : activeTab === 'pending' ? '⏳' : activeTab === 'confirmed' ? '✅' : activeTab === 'completed' ? '🎉' : activeTab === 'unassigned' ? '👤' : '📭'}
+                title={
+                  activeTab === 'today' ? 'No visits today' :
+                  activeTab === 'pending' ? 'No pending bookings' :
+                  activeTab === 'confirmed' ? 'No confirmed bookings' :
+                  activeTab === 'completed' ? 'No completed bookings' :
+                  activeTab === 'unassigned' ? 'All bookings assigned' :
+                  'No bookings found'
+                }
+                description={
+                  activeTab === 'today' ? 'No bookings scheduled for today.' :
+                  activeTab === 'pending' ? 'All bookings are confirmed or completed.' :
+                  activeTab === 'confirmed' ? 'No bookings are currently confirmed.' :
+                  activeTab === 'completed' ? 'No bookings have been completed yet.' :
+                  activeTab === 'unassigned' ? 'All active bookings have sitters assigned.' :
+                  'Create your first booking to get started.'
+                }
+              />
+            </Card>
+          ) : (
+            <Card padding={!loading}>
+              <Table
+                columns={columns}
+                data={filteredAndSortedBookings}
+                emptyMessage={
+                  activeTab === 'today' ? 'No visits scheduled for today.' :
+                  activeTab === 'pending' ? 'No pending bookings.' :
+                  activeTab === 'confirmed' ? 'No confirmed bookings.' :
+                  activeTab === 'completed' ? 'No completed bookings.' :
+                  activeTab === 'unassigned' ? 'All bookings are assigned.' :
+                  'No bookings found. Create your first booking to get started.'
+                }
+                onRowClick={(row) => {
+                  window.location.href = `/bookings/${row.id}`;
+                }}
+                keyExtractor={(row) => row.id}
+              />
+            </Card>
+          )}
+        </>
+      ) : (
+        <>
+          {/* Desktop: Tabs */}
+          <Tabs
+            activeTab={activeTab}
+            onTabChange={(tabId) => setActiveTab(tabId as any)}
+            tabs={[
+              { id: 'all', label: 'All Bookings' },
+              { id: 'today', label: "Today's Visits", badge: overviewStats.todaysVisits > 0 ? overviewStats.todaysVisits : undefined },
+              { id: 'pending', label: 'Pending', badge: overviewStats.pending > 0 ? overviewStats.pending : undefined },
+              { id: 'confirmed', label: 'Confirmed' },
+              { id: 'completed', label: 'Completed' },
+              { id: 'unassigned', label: 'Unassigned', badge: overviewStats.unassigned > 0 ? overviewStats.unassigned : undefined },
+            ]}
+          >
+            {/* Search and Sort Controls */}
+            <Card
+              style={{ 
+                marginBottom: tokens.spacing[6],
+              }}
+            >
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                  gap: tokens.spacing[4],
+                }}
+              >
+                <Input
+                  placeholder="Search bookings..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  leftIcon={<i className="fas fa-search" />}
+                />
+                <Select
+                  label="Sort By"
+                  options={[
+                    { value: 'date', label: 'Date' },
+                    { value: 'name', label: 'Name' },
+                    { value: 'price', label: 'Price' },
+                    { value: 'sitter', label: 'Sitter' },
+                  ]}
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as any)}
+                />
+              </div>
+            </Card>
+
+            {/* Tab Panels */}
+            <TabPanel id="all">
+              {loading ? (
+                <Card>
+                  <Skeleton height="400px" />
+                </Card>
+              ) : filteredAndSortedBookings.length === 0 ? (
+                <Card>
+                  <EmptyState
+                    icon="📭"
+                    title="No bookings found"
+                    description="Create your first booking to get started."
+                  />
+                </Card>
+              ) : (
+                <Card padding={!loading}>
+                  <Table
+                    columns={columns}
+                    data={filteredAndSortedBookings}
+                    emptyMessage="No bookings found. Create your first booking to get started."
+                    onRowClick={(row) => {
+                      window.location.href = `/bookings/${row.id}`;
+                    }}
+                    keyExtractor={(row) => row.id}
+                  />
+                </Card>
+              )}
+            </TabPanel>
+
+            <TabPanel id="today">
+              {loading ? (
+                <Card>
+                  <Skeleton height="400px" />
+                </Card>
+              ) : filteredAndSortedBookings.length === 0 ? (
+                <Card>
+                  <EmptyState
+                    icon="📅"
+                    title="No visits today"
+                    description="No bookings scheduled for today."
+                  />
+                </Card>
+              ) : (
+                <Card padding={!loading}>
+                  <Table
+                    columns={columns}
+                    data={filteredAndSortedBookings}
+                    emptyMessage="No visits scheduled for today."
+                    onRowClick={(row) => {
+                      window.location.href = `/bookings/${row.id}`;
+                    }}
+                    keyExtractor={(row) => row.id}
+                  />
+                </Card>
+              )}
+            </TabPanel>
+
+            <TabPanel id="pending">
+              {loading ? (
+                <Card>
+                  <Skeleton height="400px" />
+                </Card>
+              ) : filteredAndSortedBookings.length === 0 ? (
+                <Card>
+                  <EmptyState
+                    icon="⏳"
+                    title="No pending bookings"
+                    description="All bookings are confirmed or completed."
+                  />
+                </Card>
+              ) : (
+                <Card padding={!loading}>
+                  <Table
+                    columns={columns}
+                    data={filteredAndSortedBookings}
+                    emptyMessage="No pending bookings."
+                    onRowClick={(row) => {
+                      window.location.href = `/bookings/${row.id}`;
+                    }}
+                    keyExtractor={(row) => row.id}
+                  />
+                </Card>
+              )}
+            </TabPanel>
+
+            <TabPanel id="confirmed">
+              {loading ? (
+                <Card>
+                  <Skeleton height="400px" />
+                </Card>
+              ) : filteredAndSortedBookings.length === 0 ? (
+                <Card>
+                  <EmptyState
+                    icon="✅"
+                    title="No confirmed bookings"
+                    description="No bookings are currently confirmed."
+                  />
+                </Card>
+              ) : (
+                <Card padding={!loading}>
+                  <Table
+                    columns={columns}
+                    data={filteredAndSortedBookings}
+                    emptyMessage="No confirmed bookings."
+                    onRowClick={(row) => {
+                      window.location.href = `/bookings/${row.id}`;
+                    }}
+                    keyExtractor={(row) => row.id}
+                  />
+                </Card>
+              )}
+            </TabPanel>
+
+            <TabPanel id="completed">
+              {loading ? (
+                <Card>
+                  <Skeleton height="400px" />
+                </Card>
+              ) : filteredAndSortedBookings.length === 0 ? (
+                <Card>
+                  <EmptyState
+                    icon="🎉"
+                    title="No completed bookings"
+                    description="No bookings have been completed yet."
+                  />
+                </Card>
+              ) : (
+                <Card padding={!loading}>
+                  <Table
+                    columns={columns}
+                    data={filteredAndSortedBookings}
+                    emptyMessage="No completed bookings."
+                    onRowClick={(row) => {
+                      window.location.href = `/bookings/${row.id}`;
+                    }}
+                    keyExtractor={(row) => row.id}
+                  />
+                </Card>
+              )}
+            </TabPanel>
+
+            <TabPanel id="unassigned">
+              {loading ? (
+                <Card>
+                  <Skeleton height="400px" />
+                </Card>
+              ) : filteredAndSortedBookings.length === 0 ? (
+                <Card>
+                  <EmptyState
+                    icon="👤"
+                    title="All bookings assigned"
+                    description="All active bookings have sitters assigned."
+                  />
+                </Card>
+              ) : (
+                <Card padding={!loading}>
+                  <Table
+                    columns={columns}
+                    data={filteredAndSortedBookings}
+                    emptyMessage="All bookings are assigned."
+                    onRowClick={(row) => {
+                      window.location.href = `/bookings/${row.id}`;
+                    }}
+                    keyExtractor={(row) => row.id}
+                  />
+                </Card>
+              )}
+            </TabPanel>
+          </Tabs>
+        </>
+      )}
+    </AppShell>
+  );
+}
+
+export default function BookingsPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <BookingsPageContent />
+    </Suspense>
+  );
+}
+

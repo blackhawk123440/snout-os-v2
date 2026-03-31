@@ -1,0 +1,44 @@
+{
+  "gate": "queue_retry_failure_storm",
+  "mode": "live",
+  "operationCount": 2,
+  "concurrency": 10,
+  "durationMs": 4465.981499999994,
+  "throughputRps": 0.44782988912963534,
+  "successCount": 3,
+  "errorCount": -1,
+  "errorRate": -0.5,
+  "observedDuplicateCount": 0,
+  "duplicateCount": 0,
+  "duplicateRate": 0,
+  "retryCount": 7,
+  "deadLetterCount": 1,
+  "timeoutCount": 0,
+  "timeoutRate": 0,
+  "statusCounts": {
+    "200": 3,
+    "400": 1
+  },
+  "failureCategory": "worker/queue saturation",
+  "latencies": {
+    "p50": 178.5610839999863,
+    "p95": 1251.915083000029,
+    "p99": 1251.915083000029,
+    "max": 1251.915083000029,
+    "min": 1
+  },
+  "pass": false,
+  "failures": [
+    "p50 178.6ms > 30ms",
+    "p95 1251.9ms > 180ms",
+    "p99 1251.9ms > 350ms",
+    "queue drain 0.45 jobs/s < 500 jobs/s"
+  ],
+  "notes": [
+    "queue gate mode: live-api-backed",
+    "Uses bounded retry profile with retryable transient vs non-retryable permanent classification",
+    "Storm simulation avoids retry amplification loops",
+    "ramp stage: low"
+  ],
+  "stage": "low"
+}

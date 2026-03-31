@@ -1,0 +1,35 @@
+{
+  "gate": "bookings_create_1000",
+  "mode": "live",
+  "operationCount": 0,
+  "concurrency": 0,
+  "durationMs": 0,
+  "throughputRps": 0,
+  "successCount": 0,
+  "errorCount": 0,
+  "errorRate": 0,
+  "observedDuplicateCount": 0,
+  "duplicateCount": 0,
+  "duplicateRate": 0,
+  "retryCount": 0,
+  "deadLetterCount": 0,
+  "timeoutCount": 0,
+  "timeoutRate": 0,
+  "statusCounts": {},
+  "failureCategory": "config failure",
+  "stage": "low",
+  "latencies": {
+    "p50": 0,
+    "p95": 0,
+    "p99": 0,
+    "max": 0,
+    "min": 0
+  },
+  "pass": false,
+  "failures": [
+    "CONFIG-BLOCKED: Public booking is disabled in SaaS mode until org binding is configured"
+  ],
+  "notes": [
+    "bookings_create_1000 marked CONFIG-BLOCKED, not performance-failed"
+  ]
+}

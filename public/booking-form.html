@@ -1,0 +1,5524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="theme-color" content="#432f21">
+  <meta name="apple-mobile-web-app-title" content="Snout Services">
+  <title>Snout Pet Care - Booking Form</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <!-- Google Ads Global Tag -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=AW-11558191297"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'AW-11558191297');
+  </script>
+  <style>
+    /* ===== PERFORMANCE OPTIMIZATIONS ===== */
+    * {
+      box-sizing: border-box;
+    }
+    
+    html {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    
+    /* Optimize form performance */
+    .form-container {
+      will-change: transform;
+      transform: translateZ(0);
+    }
+    
+    /* Smooth transitions */
+    * {
+      transition: all 0.2s ease;
+    }
+    
+    /* Optimize button interactions */
+    button, .btn {
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    /* Prevent layout shifts */
+    .form-wrapper {
+      contain: layout style paint;
+    }
+    
+    /* Optimize animations */
+    .btn, .service-card, .type-card, .time-slot, .calendar-day {
+      will-change: transform;
+      transform: translateZ(0);
+    }
+    
+    /* Prevent unnecessary reflows */
+    .form-wrapper * {
+      box-sizing: border-box;
+    }
+    
+    /* Optimize scrolling */
+    .form-wrapper {
+      -webkit-overflow-scrolling: touch;
+      scroll-behavior: smooth;
+    }
+    
+    /* ===== DESIGN SYSTEM ===== */
+    :root {
+      /* Colors - Snout's warm, modern palette */
+      --primary: #432f21;
+      --primary-light: #fce1ef;
+      --secondary: #e2e8f0;
+      --accent: #f8fafc;
+      --white: #ffffff;
+      --success: #10b981;
+      --error: #ef4444;
+      
+      /* Typography */
+      --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-size-xs: 12px;
+      --font-size-sm: 14px;
+      --font-size-base: 16px;
+      --font-size-lg: 18px;
+      --font-size-xl: 20px;
+      
+      /* Spacing */
+      --space-xs: 4px;
+      --space-sm: 8px;
+      --space-md: 12px;
+      --space-lg: 16px;
+      --space-xl: 20px;
+      --space-2xl: 24px;
+      
+      /* Border radius */
+      --radius-sm: 6px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      
+      /* Shadows */
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+      
+      /* Transitions */
+      --transition-fast: 0.15s ease;
+      --transition-base: 0.2s ease;
+      --transition-slow: 0.3s ease;
+      
+      /* Touch targets */
+      --touch-target: 44px;
+    }
+
+    /* ===== RESET & BASE ===== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background: transparent;
+      color: var(--primary);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+      margin: 0;
+      padding: 20px;
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+    }
+
+    /* White container wrapper for iframe embedding */
+    .form-wrapper {
+      width: 100%;
+      max-width: 600px;
+      background: linear-gradient(to bottom, var(--white) 0%, #fefefe 100%);
+      border-radius: var(--radius-xl);
+      box-shadow: 0 20px 60px rgba(67, 47, 33, 0.12), 
+                  0 0 0 1px rgba(67, 47, 33, 0.05);
+      padding: 20px;
+      margin: 0 auto;
+      transition: all 0.3s ease;
+      overflow: visible;
+      position: relative;
+    }
+
+
+    /* Webflow integration optimizations */
+    .booking-container {
+      position: relative;
+      z-index: 1;
+      isolation: isolate;
+      width: 100%;
+      max-width: 100%;
+      margin: 0 auto;
+      background: transparent;
+      overflow: visible;
+    }
+
+    /* Prevent Webflow style conflicts */
+    .booking-container * {
+      box-sizing: border-box;
+    }
+
+    /* Webflow performance optimizations */
+    .booking-container,
+    .booking-form,
+    .booking-content {
+      transform: translateZ(0);
+      -webkit-transform: translateZ(0);
+    }
+
+    /* Prevent Webflow from overriding our styles */
+    .booking-container *:not([class*="w-"]) {
+      font-family: inherit !important;
+    }
+
+    /* Webflow-specific optimizations */
+    .booking-container,
+    .booking-form,
+    .booking-content,
+    .form-section {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+    }
+
+    /* Prevent Webflow animations from interfering */
+    .booking-container * {
+      animation-duration: 0s !important;
+      animation-delay: 0s !important;
+      transition-duration: 0s !important;
+    }
+
+    /* Restore our specific animations */
+    .booking-form,
+    .service-card,
+    .type-card,
+    .btn,
+    .time-slot,
+    .calendar-day {
+      animation-duration: initial !important;
+      transition-duration: initial !important;
+    }
+
+    /* ===== FORM CONTAINER ===== */
+    .booking-form {
+      all: initial;
+      font-family: var(--font-family);
+      width: 100%;
+      margin: 0;
+      background: transparent;
+      border-radius: 0;
+      box-shadow: none;
+      overflow: visible;
+      position: relative;
+      z-index: 10;
+      isolation: isolate;
+      transition: all var(--transition-slow);
+      backface-visibility: hidden;
+      min-height: 0;
+      flex-shrink: 0;
+    }
+
+    .booking-content {
+      padding: var(--space-md);
+      overflow: visible;
+    }
+
+    /* ===== PROGRESS INDICATOR ===== */
+    .progress-container {
+      padding: var(--space-sm) var(--space-md) 0;
+      margin-bottom: var(--space-md);
+    }
+
+    .progress-bar {
+      height: 4px;
+      background: var(--secondary);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-bottom: var(--space-md);
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--primary-light));
+      border-radius: 2px;
+      transition: width var(--transition-slow);
+      width: 20%;
+    }
+
+    .progress-steps {
+      display: none;
+    }
+
+    .progress-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-xs);
+      opacity: 0.4;
+      transition: opacity var(--transition-base);
+    }
+
+    .progress-step.current {
+      opacity: 1;
+    }
+
+    .progress-step.completed {
+      opacity: 1;
+    }
+
+    .progress-step-circle {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--secondary);
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+      transition: all var(--transition-base);
+    }
+
+    .progress-step.current .progress-step-circle {
+      background: var(--primary);
+      color: var(--white);
+    }
+
+    .progress-step.completed .progress-step-circle {
+      background: var(--success);
+      color: var(--white);
+    }
+
+    .progress-step-label {
+      font-size: var(--font-size-xs);
+      font-weight: 500;
+      text-align: center;
+    }
+
+    /* ===== FORM SECTIONS ===== */
+    .form-section {
+      display: none;
+      animation: fadeInUp 0.4s ease;
+      overflow: visible;
+      position: relative;
+      min-height: 100%;
+    }
+
+    .form-section.active {
+      display: block;
+      overflow: visible;
+      position: relative;
+      min-height: 100%;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ===== SECTION HEADERS ===== */
+    .section-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: var(--space-md);
+      padding-bottom: var(--space-xs);
+      border-bottom: 1px solid var(--secondary);
+      position: relative;
+    }
+
+    .section-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-lg);
+      background: var(--primary-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary);
+      font-size: var(--font-size-lg);
+      margin-right: var(--space-md);
+      flex-shrink: 0;
+    }
+
+    .section-content {
+      flex: 1;
+    }
+
+    .section-title {
+      font-size: var(--font-size-xl);
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: var(--space-sm);
+    }
+
+    .section-subtitle {
+      font-size: var(--font-size-sm);
+      color: var(--primary);
+      opacity: 0.8;
+    }
+
+    /* ===== SERVICE SELECTION ===== */
+    .service-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-xs);
+      margin-bottom: var(--space-md);
+    }
+
+    .service-card {
+      padding: var(--space-sm);
+      border: 2px solid var(--secondary);
+      border-radius: var(--radius-lg);
+      background: var(--white);
+      cursor: pointer;
+      transition: all var(--transition-base);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      min-height: 70px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .service-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, var(--primary-light), transparent);
+      opacity: 0;
+      transition: opacity var(--transition-base);
+      pointer-events: none;
+    }
+
+    .service-card:hover {
+      transform: translateY(-3px) scale(1.01);
+      box-shadow: 0 8px 20px rgba(67, 47, 33, 0.15);
+    }
+
+    .service-card:hover::before {
+      opacity: 0.15;
+    }
+
+    .service-card:active {
+      transform: scale(0.98);
+      transition: transform 0.1s ease;
+    }
+
+    .service-card.selected {
+      border-color: var(--primary);
+      background: var(--primary-light);
+      box-shadow: var(--shadow-md);
+      animation: subtlePulse 2s ease-in-out infinite;
+    }
+
+    .service-card.selected::before {
+      opacity: 0.2;
+    }
+
+    @keyframes subtlePulse {
+      0%, 100% { box-shadow: var(--shadow-md); }
+      50% { box-shadow: 0 6px 25px rgba(67, 47, 33, 0.2); }
+    }
+
+    .service-options {
+      margin-top: var(--space-sm);
+      padding-top: var(--space-sm);
+      border-top: 1px solid var(--secondary);
+    }
+
+    .option-toggle {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      cursor: pointer;
+      font-size: var(--font-size-sm);
+    }
+
+    .option-toggle input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--primary);
+    }
+
+    .toggle-label {
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    .house-sitting-options {
+      margin: var(--space-lg) 0 var(--space-md) 0;
+    }
+
+    .care-option {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: var(--space-sm) var(--space-md);
+      border: 2px solid var(--secondary);
+      border-radius: var(--radius-md);
+      background: var(--white);
+      cursor: pointer;
+      transition: all var(--transition-base);
+      font-size: var(--font-size-sm);
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .care-option:hover {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+
+    .care-option.selected {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: var(--white);
+    }
+
+    .care-option i {
+      font-size: var(--font-size-sm);
+    }
+
+    .service-icon {
+      font-size: 20px;
+      color: var(--primary);
+      margin-bottom: var(--space-xs);
+      position: relative;
+      z-index: 1;
+    }
+
+    .service-name {
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+      color: var(--primary);
+      position: relative;
+      z-index: 1;
+    }
+
+    .service-description {
+      font-size: var(--font-size-xs);
+      color: var(--primary);
+      opacity: 0.7;
+      margin-top: var(--space-xs);
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ===== PET SELECTION ===== */
+    .pet-section {
+      background: var(--accent);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--secondary);
+      margin-bottom: var(--space-xl);
+      overflow: visible;
+      position: relative;
+      z-index: 10;
+    }
+
+    .pet-dropdown {
+      position: relative;
+      margin: var(--space-md) var(--space-lg) var(--space-lg);
+    }
+
+    .pet-dropdown-trigger {
+      width: 100%;
+      padding: var(--space-md) var(--space-lg);
+      border: 2px solid var(--secondary);
+      border-radius: var(--radius-md);
+      background: var(--white);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      font-size: var(--font-size-base);
+      color: var(--primary);
+      transition: all var(--transition-base);
+      min-height: var(--touch-target);
+    }
+
+    .pet-dropdown-trigger:hover {
+      border-color: var(--primary);
+    }
+
+    .pet-dropdown-trigger.active {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+
+    .pet-dropdown-panel {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: var(--white);
+      border: 2px solid var(--primary);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
+      z-index: 1000;
+      max-height: 200px;
+      overflow-y: auto;
+      margin-top: var(--space-xs);
+      display: none;
+    }
+
+    .pet-dropdown-panel.active {
+      display: block;
+    }
+
+    .pet-type-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-md);
+      border-bottom: 1px solid var(--secondary);
+      transition: background var(--transition-fast);
+      min-height: var(--touch-target);
+      background: var(--white);
+    }
+
+    .pet-type-row:hover {
+      background: var(--accent);
+    }
+
+    .pet-type-row:last-child {
+      border-bottom: none;
+    }
+
+    .pet-type-name {
+      font-size: var(--font-size-base);
+      color: var(--primary);
+      font-weight: 500;
+    }
+
+    .pet-counter {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      background: var(--accent);
+      padding: var(--space-xs);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--secondary);
+    }
+
+    .pet-counter-btn {
+      width: 32px;
+      height: 32px;
+      border: none;
+      border-radius: var(--radius-sm);
+      background: var(--white);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--font-size-sm);
+      color: var(--primary);
+      font-weight: 600;
+      transition: all var(--transition-fast);
+    }
+
+    .pet-counter-btn:hover:not(:disabled) {
+      background: var(--primary);
+      color: var(--white);
+    }
+
+    .pet-counter-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    .pet-counter-input {
+      width: 32px;
+      text-align: center;
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+      background: transparent;
+      border: none;
+      color: var(--primary);
+    }
+
+    .pet-other-input-row {
+      padding: var(--space-sm) var(--space-md);
+      border-top: 1px solid var(--secondary);
+    }
+
+    .pet-other-input {
+      width: 100%;
+      padding: var(--space-sm);
+      border: 1px solid var(--secondary);
+      border-radius: var(--radius-sm);
+      font-size: var(--font-size-sm);
+      background: var(--white);
+    }
+
+    .pet-other-input:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    .selected-pets-summary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+      padding: 0 var(--space-lg) var(--space-lg);
+    }
+
+    .pet-chip {
+      background: var(--primary-light);
+      color: var(--primary);
+      padding: var(--space-xs) var(--space-sm);
+      border-radius: var(--radius-xl);
+      font-size: var(--font-size-xs);
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+      border: 1px solid var(--primary);
+    }
+
+    /* ===== BOOKING TYPE ===== */
+    .booking-type-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-md);
+      margin-bottom: var(--space-xl);
+    }
+
+    .type-card {
+      padding: var(--space-lg);
+      border: 2px solid var(--secondary);
+      border-radius: var(--radius-lg);
+      background: var(--white);
+      cursor: pointer;
+      transition: all var(--transition-base);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .type-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, var(--primary-light), transparent);
+      opacity: 0;
+      transition: opacity var(--transition-base);
+    }
+
+    .type-card:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 8px 20px rgba(67, 47, 33, 0.15);
+    }
+
+    .type-card:hover::before {
+      opacity: 0.15;
+    }
+
+    .type-card:active {
+      transform: scale(0.98);
+      transition: transform 0.1s ease;
+    }
+
+    .type-card.selected {
+      border-color: var(--primary);
+      background: var(--primary-light);
+      box-shadow: var(--shadow-md);
+    }
+
+    .type-card.selected::before {
+      opacity: 0.2;
+    }
+
+    .type-icon {
+      font-size: 24px;
+      color: var(--primary);
+      margin-bottom: var(--space-sm);
+      position: relative;
+      z-index: 1;
+    }
+
+    .type-label {
+      font-size: var(--font-size-base);
+      font-weight: 600;
+      color: var(--primary);
+      position: relative;
+      z-index: 1;
+    }
+
+    .type-description {
+      font-size: var(--font-size-sm);
+      color: var(--primary);
+      opacity: 0.7;
+      margin-top: var(--space-xs);
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ===== CALENDAR ===== */
+    .calendar-container {
+      background: var(--accent);
+      border-radius: var(--radius-lg);
+      padding: var(--space-md);
+      margin: 0 auto var(--space-xl);
+      border: 1px solid var(--secondary);
+      overflow: visible;
+      box-sizing: border-box;
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-lg);
+    }
+
+    .calendar-nav {
+      background: none;
+      border: none;
+      font-size: var(--font-size-lg);
+      color: var(--primary);
+      cursor: pointer;
+      padding: var(--space-sm);
+      border-radius: var(--radius-md);
+      transition: all var(--transition-base);
+      width: var(--touch-target);
+      height: var(--touch-target);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .calendar-nav:hover {
+      background: var(--secondary);
+    }
+
+    .calendar-title {
+      font-size: var(--font-size-lg);
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: var(--space-xs);
+      box-sizing: border-box;
+      width: 100%;
+    }
+
+    .calendar-header-day {
+      text-align: center;
+      font-size: var(--font-size-xs);
+      font-weight: 600;
+      color: var(--primary);
+      padding: var(--space-sm);
+      box-sizing: border-box;
+    }
+
+    .calendar-day {
+      aspect-ratio: 1;
+      border: 1px solid var(--secondary);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--font-size-sm);
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--transition-base);
+      background: var(--white);
+      color: var(--primary);
+      min-height: var(--touch-target);
+      position: relative;
+      box-sizing: border-box;
+    }
+
+    .calendar-day:hover:not(.disabled):not(.selected) {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+
+    .calendar-day:active:not(.disabled):not(.selected) {
+      transform: scale(0.95);
+    }
+
+    .calendar-day.selected {
+      border-color: var(--primary);
+      background: linear-gradient(135deg, var(--primary) 0%, #5c4032 100%);
+      color: var(--white);
+      box-shadow: 0 4px 12px rgba(67, 47, 33, 0.3), 
+                  inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+
+    .calendar-day.today {
+      border-color: var(--primary);
+      font-weight: 600;
+      background: var(--primary-light);
+    }
+
+    .calendar-day.disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+      background: var(--secondary);
+    }
+
+    .calendar-day.other-month {
+      opacity: 0.3;
+    }
+
+    /* ===== SELECTED DATES ===== */
+    .selected-dates-container {
+      margin: 0 auto var(--space-xl);
+      padding: var(--space-md);
+      background: var(--accent);
+      border: 1px solid var(--secondary);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 420px;
+      box-sizing: border-box;
+      min-height: 400px;
+    }
+
+    .selected-dates-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-md);
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+    }
+
+    .selected-dates-title {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      font-size: var(--font-size-base);
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .selected-date-count {
+      background: var(--primary);
+      color: var(--white);
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--font-size-xs);
+      font-weight: 700;
+    }
+
+    .selected-dates-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: var(--space-md);
+      min-height: 300px;
+    }
+
+    .selected-date-item {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      padding: var(--space-sm);
+      background: var(--accent);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--secondary);
+      transition: all var(--transition-base);
+      min-height: auto;
+      font-size: var(--font-size-xs);
+      gap: var(--space-sm);
+    }
+
+    .selected-date-item:hover {
+      background: var(--secondary);
+    }
+
+    .selected-date-info {
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .date-display {
+      font-size: var(--font-size-base);
+      font-weight: 500;
+      color: var(--primary);
+      margin-bottom: var(--space-xs);
+      flex-shrink: 0;
+      min-width: 60px;
+    }
+
+    .times-display {
+      font-size: var(--font-size-xs);
+      color: var(--primary);
+      opacity: 0.7;
+      line-height: 1.3;
+      word-wrap: break-word;
+      white-space: normal;
+    }
+
+    .no-times {
+      font-style: italic;
+      opacity: 0.5;
+    }
+
+    .add-times-btn {
+      background: var(--primary-light);
+      color: var(--primary);
+      border: 1px solid var(--secondary);
+      width: var(--touch-target);
+      height: var(--touch-target);
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+      transition: all var(--transition-base);
+      margin-left: var(--space-sm);
+    }
+
+    .add-times-btn:hover:not(.disabled) {
+      background: var(--primary);
+      color: var(--white);
+    }
+
+    .add-times-btn.disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    .remove-date-btn {
+      background: transparent;
+      color: var(--primary);
+      border: none;
+      width: var(--touch-target);
+      height: var(--touch-target);
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--font-size-sm);
+      transition: all var(--transition-base);
+      margin-left: var(--space-sm);
+    }
+
+    .remove-date-btn:hover {
+      background: var(--error);
+      color: var(--white);
+    }
+
+      .apply-all-section {
+        padding: var(--space-xs) 0;
+        border-bottom: 1px solid var(--secondary);
+        margin-bottom: var(--space-sm);
+        position: relative;
+        min-height: 40px;
+      }
+
+    .apply-all-btn {
+      font-size: 10px;
+      padding: 4px 8px;
+      min-height: 24px;
+      white-space: nowrap;
+      width: auto;
+      justify-content: center;
+      position: absolute;
+      top: var(--space-xs);
+      left: var(--space-xs);
+      border-radius: var(--radius-sm);
+    }
+
+    /* ===== TIME MODAL ===== */
+    /* Prevent body scroll when modal is open */
+    body.modal-open {
+      overflow: hidden;
+      position: fixed;
+      width: 100%;
+    }
+
+    .time-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.3);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: var(--space-xl);
+      box-sizing: border-box;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .time-modal.active {
+      display: flex;
+    }
+
+    .time-modal-content {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 500px;
+      max-height: calc(90vh - 40px);
+      height: auto;
+      min-height: 500px;
+      display: flex;
+      flex-direction: column;
+      animation: modalSlideIn 0.3s ease;
+      position: relative;
+      z-index: 1001;
+      overflow: hidden;
+    }
+
+    @keyframes modalSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .time-modal-header {
+      padding: var(--space-md) var(--space-lg);
+      border-bottom: 1px solid var(--secondary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .time-modal-title {
+      font-size: var(--font-size-base);
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .time-modal-close {
+      background: none;
+      border: none;
+      font-size: var(--font-size-base);
+      color: var(--primary);
+      cursor: pointer;
+      padding: var(--space-xs);
+      border-radius: var(--radius-sm);
+      transition: all var(--transition-base);
+      width: 36px;
+      height: 36px;
+      min-width: 36px;
+      min-height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .time-modal-close:hover {
+      background: var(--secondary);
+    }
+
+    .time-modal-date {
+      padding: var(--space-sm) var(--space-lg);
+      background: var(--accent);
+      border-bottom: 1px solid var(--secondary);
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .time-modal-date-text {
+      font-size: var(--font-size-sm);
+      font-weight: 500;
+      color: var(--primary);
+    }
+
+    .time-slots-container {
+      padding: var(--space-lg);
+      padding-bottom: calc(var(--space-lg) + 40px) !important; /* Reduced padding - just enough to see last item */
+      flex: 1 1 0;
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+      min-height: 400px;
+      max-height: 100%;
+      height: 0;
+      -webkit-overflow-scrolling: auto !important;
+      overscroll-behavior: none !important;
+      overscroll-behavior-y: none !important;
+      overscroll-behavior-x: none !important;
+      -webkit-overscroll-behavior: none !important;
+      -webkit-overscroll-behavior-y: none !important;
+      -webkit-overscroll-behavior-x: none !important;
+      transform: translateZ(0);
+      -webkit-transform: translateZ(0);
+      contain: layout style paint;
+      scroll-behavior: auto !important;
+      position: relative;
+      /* Disable momentum scrolling on iOS */
+      -webkit-momentum-scrolling: disabled;
+      touch-action: pan-y;
+      will-change: scroll-position;
+    }
+    
+    /* iOS specific fixes to prevent bounce */
+    @supports (-webkit-touch-callout: none) {
+      .time-slots-container {
+        -webkit-overflow-scrolling: auto !important;
+        overscroll-behavior-y: none !important;
+        -webkit-overscroll-behavior-y: none !important;
+      }
+    }
+
+    .time-slots-grid {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+      padding: var(--space-sm);
+      padding-bottom: calc(var(--space-sm) + 20px) !important; /* Minimal padding - just enough spacing */
+      min-height: fit-content;
+    }
+
+    .time-slot {
+      padding: var(--space-md);
+      border: 2px solid var(--secondary);
+      border-radius: var(--radius-md);
+      background: var(--white);
+      cursor: pointer;
+      transition: all var(--transition-base);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-md);
+      min-height: 56px;
+      position: relative;
+      font-size: var(--font-size-base);
+    }
+
+    .time-slot:hover:not(.selected) {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+
+    .time-slot:active:not(.selected) {
+      transform: scale(0.98);
+    }
+
+    .time-slot.selected {
+      border-color: var(--primary);
+      background: var(--primary-light);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .time-display {
+      flex: 1;
+      font-size: var(--font-size-sm);
+      font-weight: 500;
+      color: var(--primary);
+    }
+
+    .duration-toggle {
+      display: flex;
+      gap: var(--space-xs);
+    }
+
+    .duration-chip {
+      padding: var(--space-xs) var(--space-sm);
+      border-radius: var(--radius-sm);
+      background: var(--secondary);
+      font-size: var(--font-size-xs);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition-base);
+      color: var(--primary);
+      min-width: 28px;
+      text-align: center;
+    }
+
+    .duration-chip:hover:not(.active) {
+      background: var(--primary-light);
+    }
+
+    .duration-chip.active {
+      background: var(--primary);
+      color: var(--white);
+    }
+
+    .time-modal-actions {
+      padding: var(--space-md);
+      border-top: 1px solid var(--secondary);
+      display: flex;
+      justify-content: flex-end;
+      flex-shrink: 0;
+    }
+
+    /* ===== CONTACT FORM ===== */
+    .contact-grid {
+      display: grid;
+      gap: var(--space-md);
+      margin-bottom: var(--space-lg);
+    }
+
+    .contact-row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-md);
+    }
+
+    .contact-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .contact-label {
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: var(--space-xs);
+    }
+
+    .contact-input {
+      padding: var(--space-md);
+      border: 2px solid var(--secondary);
+      border-radius: var(--radius-md);
+      background: var(--white);
+      font-size: var(--font-size-base);
+      color: var(--primary);
+      transition: all var(--transition-base);
+      width: 100%;
+      min-height: var(--touch-target);
+    }
+
+    .contact-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(67, 47, 33, 0.1);
+    }
+
+    .contact-input::placeholder {
+      color: var(--primary);
+      opacity: 0.5;
+    }
+
+    /* Validation states */
+    .contact-input.valid {
+      border-color: var(--success);
+      background: rgba(16, 185, 129, 0.05);
+    }
+
+    .contact-input.invalid {
+      border-color: var(--error);
+      background: rgba(239, 68, 68, 0.05);
+    }
+
+    .validation-message {
+      font-size: var(--font-size-xs);
+      margin-top: var(--space-xs);
+      display: none;
+    }
+
+    .validation-message.error {
+      color: var(--error);
+      display: block;
+    }
+
+    .validation-message.success {
+      color: var(--success);
+      display: block;
+    }
+
+    .field-error {
+      font-size: var(--font-size-xs);
+      color: var(--error);
+      margin-top: var(--space-xs);
+      padding: var(--space-xs);
+      background: rgba(239, 68, 68, 0.1);
+      border-radius: var(--radius-sm);
+      display: none;
+    }
+
+    .field-error.show {
+      display: block;
+    }
+
+    .contact-textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .pet-taxi-addresses {
+      margin: var(--space-md) auto;
+      padding: var(--space-md);
+      background: var(--accent);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--secondary);
+      max-width: 540px;
+    }
+
+    .address-section {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+
+    .address-title {
+      font-size: var(--font-size-lg);
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: var(--space-sm);
+    }
+
+    .address-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-sm);
+    }
+
+    .policy-checkbox {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-sm);
+      margin: var(--space-lg) 0;
+      padding: var(--space-md);
+      background: var(--accent);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--secondary);
+    }
+
+    .policy-checkbox input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      accent-color: var(--primary);
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .policy-text {
+      font-size: var(--font-size-sm);
+      font-weight: 500;
+      color: var(--primary);
+      line-height: 1.4;
+    }
+
+    /* ===== BUTTONS ===== */
+    .button-group {
+      display: flex;
+      gap: var(--space-md);
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-md);
+    }
+
+    .btn {
+      padding: var(--space-md) var(--space-lg);
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: var(--font-size-base);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition-base);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-sm);
+      min-height: var(--touch-target);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn:not(.back-btn) {
+      flex: 1;
+    }
+
+    .back-btn {
+      flex: 0 0 auto;
+      padding: var(--space-sm) var(--space-md);
+      font-size: var(--font-size-sm);
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .btn:hover::before {
+      left: 100%;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary) 0%, #5c4032 50%, var(--primary) 100%);
+      background-size: 200% auto;
+      color: var(--white);
+      box-shadow: 0 4px 15px rgba(67, 47, 33, 0.2);
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(67, 47, 33, 0.3);
+      background-position: right center;
+    }
+
+    .btn-primary:active:not(:disabled) {
+      transform: scale(0.98);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Loading state for buttons */
+    .btn.loading {
+      pointer-events: none;
+      position: relative;
+      color: transparent !important;
+    }
+
+    .btn.loading::after {
+      content: '';
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      top: 50%;
+      left: 50%;
+      margin-left: -10px;
+      margin-top: -10px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 0.8s ease infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .btn-secondary {
+      background: var(--white);
+      color: var(--primary);
+      border: 2px solid var(--secondary);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+
+    /* ===== CONFIRMATION ===== */
+    .confirmation-message {
+      text-align: center;
+      padding: var(--space-2xl);
+      margin: var(--space-lg) 0;
+      background: var(--accent);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--secondary);
+    }
+
+    .confirmation-message h3 {
+      font-size: var(--font-size-xl);
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: var(--space-md);
+    }
+
+    .confirmation-message p {
+      font-size: var(--font-size-base);
+      color: var(--primary);
+      opacity: 0.8;
+      line-height: 1.6;
+    }
+
+    /* ===== CUSTOM ALERT NOTIFICATION ===== */
+    .custom-alert {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.9);
+      background: var(--white);
+      border: 2px solid var(--primary-light);
+      border-radius: var(--radius-xl);
+      padding: var(--space-2xl);
+      max-width: 400px;
+      width: 90%;
+      box-shadow: 0 20px 60px rgba(67, 47, 33, 0.3);
+      z-index: 10000;
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      pointer-events: none;
+    }
+
+    .custom-alert.show {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+      pointer-events: all;
+    }
+
+    .custom-alert-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 9999;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+      border-radius: var(--radius-lg);
+    }
+
+    .custom-alert-overlay.show {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .custom-alert-icon {
+      font-size: 48px;
+      margin-bottom: var(--space-lg);
+      text-align: center;
+      color: var(--primary);
+    }
+
+    .custom-alert-message {
+      font-size: var(--font-size-lg);
+      color: var(--primary);
+      text-align: center;
+      line-height: 1.5;
+      margin-bottom: var(--space-xl);
+      background: var(--primary-light);
+      padding: var(--space-lg);
+      border-radius: var(--radius-lg);
+      font-weight: 500;
+    }
+
+    .custom-alert-button {
+      width: 100%;
+      padding: var(--space-lg);
+      background: var(--primary);
+      color: var(--white);
+      border: none;
+      border-radius: var(--radius-lg);
+      font-size: var(--font-size-base);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition-base);
+      font-family: var(--font-family);
+      min-height: var(--touch-target);
+    }
+
+    .custom-alert-button:hover {
+      background: #5a4232;
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .custom-alert-button:active {
+      transform: translateY(0);
+    }
+
+    /* ===== CONFIRMATION DIALOG ===== */
+    .confirm-dialog-buttons {
+      display: flex;
+      gap: var(--space-md);
+      margin-top: var(--space-xl);
+    }
+
+    .confirm-btn {
+      flex: 1;
+      padding: var(--space-md) var(--space-lg);
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: var(--font-size-base);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition-base);
+      font-family: var(--font-family);
+      min-height: var(--touch-target);
+    }
+
+    .confirm-btn-yes {
+      background: var(--primary);
+      color: var(--white);
+    }
+
+    .confirm-btn-yes:hover {
+      background: #5a4232;
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .confirm-btn-no {
+      background: var(--white);
+      color: var(--primary);
+      border: 2px solid var(--secondary);
+    }
+
+    .confirm-btn-no:hover {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+
+    /* ===== CONFETTI ANIMATION ===== */
+    .confetti {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      background: var(--primary-light);
+      position: fixed;
+      left: 50%;
+      animation: confetti-fall 3s linear forwards;
+      z-index: 10000;
+      pointer-events: none;
+    }
+
+    @keyframes confetti-fall {
+      to {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    .confetti:nth-child(2n) { background: var(--primary); }
+    .confetti:nth-child(3n) { background: #f8b4d9; }
+    .confetti:nth-child(4n) { background: #fce1ef; }
+    .confetti:nth-child(5n) { width: 12px; height: 12px; }
+    .confetti:nth-child(6n) { width: 8px; height: 8px; }
+
+    /* ===== TOOLTIPS & HELP HINTS ===== */
+    .help-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--primary-light);
+      color: var(--primary);
+      font-size: 13px;
+      cursor: pointer;
+      position: absolute;
+      top: 0;
+      right: 0;
+      z-index: 10;
+      transition: background 0.2s ease, transform 0.15s ease;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    
+    .help-icon:hover {
+      background: var(--primary);
+      color: var(--white);
+    }
+
+    .help-icon:active {
+      transform: scale(0.95);
+    }
+
+    /* Tooltip bubble */
+    .tooltip-bubble {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--primary);
+      color: var(--white);
+      padding: var(--space-lg);
+      border-radius: var(--radius-lg);
+      font-size: var(--font-size-base);
+      line-height: 1.6;
+      max-width: 90%;
+      width: 320px;
+      z-index: 10001;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+      pointer-events: none;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s ease, visibility 0.2s ease;
+    }
+
+    .tooltip-bubble.show {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: all;
+    }
+
+    .tooltip-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 10000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s ease, visibility 0.2s ease;
+      border-radius: var(--radius-lg);
+    }
+
+    .tooltip-overlay.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .hint-text {
+      font-size: var(--font-size-xs);
+      color: var(--primary);
+      opacity: 0.7;
+      margin-top: var(--space-xs);
+      font-style: italic;
+    }
+
+    /* ===== RESPONSIVE DESIGN ===== */
+    @media (min-width: 481px) {
+      .form-wrapper {
+        max-width: 600px;
+      }
+
+      .service-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .booking-type-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .contact-row {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .time-slots-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (max-width: 480px) {
+      /* Enhanced Webflow mobile optimizations */
+      body {
+        padding: 0;
+      }
+
+      .form-wrapper {
+        max-width: 100%;
+        padding: 6px;
+        border-radius: var(--radius-sm);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      }
+
+      .booking-content {
+        padding: 2px;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+      }
+
+      /* Enhanced touch targets for mobile */
+      .btn {
+        min-height: 48px;
+        font-size: var(--font-size-base);
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+        user-select: none;
+      }
+
+      .service-card {
+        min-height: 88px;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+        user-select: none;
+      }
+
+      .time-slot {
+        min-height: 48px;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+        user-select: none;
+      }
+
+      .calendar-day {
+        min-height: 44px;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+        user-select: none;
+      }
+
+      .calendar-container {
+        padding: 2px;
+        margin: var(--space-xs) 0;
+        overflow: hidden;
+        width: 100%;
+        box-sizing: border-box;
+      }
+
+
+      .progress-container {
+        padding: 2px var(--space-xs) 0;
+        margin-bottom: var(--space-xs);
+      }
+
+      .progress-step-circle {
+        width: 28px;
+        height: 28px;
+        font-size: var(--font-size-xs);
+      }
+
+      .progress-step-label {
+        font-size: 10px;
+      }
+
+      .section-header {
+        margin-bottom: var(--space-lg);
+        padding-bottom: var(--space-xs);
+      }
+
+      .section-icon {
+        width: 40px;
+        height: 40px;
+        font-size: var(--font-size-base);
+        margin-right: var(--space-sm);
+      }
+
+      .section-title {
+        font-size: var(--font-size-base);
+      }
+
+      .section-subtitle {
+        font-size: var(--font-size-xs);
+      }
+
+      .service-grid {
+        gap: var(--space-xs);
+        margin-bottom: var(--space-sm);
+      }
+
+      .service-card {
+        padding: var(--space-xs);
+        min-height: 68px;
+      }
+
+      .service-icon {
+        font-size: 24px;
+        margin-bottom: var(--space-xs);
+      }
+
+      .service-name {
+        font-size: var(--font-size-sm);
+      }
+
+      .service-description {
+        font-size: var(--font-size-xs);
+      }
+
+      .pet-section {
+        margin-bottom: var(--space-sm);
+        overflow: visible;
+        z-index: 10;
+      }
+
+
+      .pet-dropdown {
+        margin: var(--space-xs) var(--space-sm) var(--space-sm);
+        z-index: 1000;
+      }
+
+      .pet-dropdown-trigger {
+        padding: var(--space-sm) var(--space-lg);
+        min-height: var(--touch-target);
+      }
+
+      .pet-dropdown-panel {
+        z-index: 1000;
+        max-height: 180px;
+      }
+
+      .pet-type-row {
+        padding: var(--space-sm) var(--space-sm);
+        min-height: 44px;
+      }
+
+      .pet-counter-btn {
+        width: 28px;
+        height: 28px;
+        font-size: var(--font-size-xs);
+      }
+
+      .booking-type-grid {
+        gap: var(--space-xs);
+        margin-bottom: var(--space-sm);
+      }
+
+      .type-card {
+        padding: var(--space-xs);
+      }
+
+      .type-icon {
+        font-size: 20px;
+        margin-bottom: var(--space-xs);
+      }
+
+      .type-label {
+        font-size: var(--font-size-sm);
+      }
+
+      .type-description {
+        font-size: var(--font-size-xs);
+      }
+
+      .calendar-container {
+        padding: var(--space-md);
+        margin-bottom: var(--space-lg);
+      }
+
+      .calendar-header {
+        margin-bottom: var(--space-sm);
+      }
+
+        .calendar-title {
+          font-size: var(--font-size-base);
+          font-weight: 600;
+        }
+
+        .calendar-nav {
+          width: 36px;
+          height: 36px;
+          font-size: var(--font-size-base);
+          border-radius: var(--radius-sm);
+        }
+
+        .calendar-grid {
+          gap: 2px;
+        }
+
+        .calendar-header-day,
+        .calendar-day {
+          padding: var(--space-xs);
+          font-size: var(--font-size-xs);
+          min-height: 38px;
+          border-radius: var(--radius-sm);
+        }
+
+        .calendar-day {
+          font-weight: 500;
+          transition: all 0.2s ease;
+          cursor: pointer;
+        }
+
+        .calendar-day:hover:not(.disabled):not(.selected) {
+          background: var(--primary-light);
+          transform: scale(1.05);
+        }
+
+        .calendar-day.selected {
+          background: var(--primary) !important;
+          color: var(--white) !important;
+          font-weight: 600;
+        }
+
+        .calendar-day.today {
+          border: 2px solid var(--primary);
+          font-weight: 600;
+        }
+
+        .calendar-day.disabled {
+          opacity: 0.3;
+          cursor: not-allowed;
+        }
+
+      .selected-dates-container {
+        margin: 0 auto var(--space-lg) !important;
+        padding: var(--space-md) !important;
+        width: 100% !important;
+        max-width: 540px !important;
+        min-height: 350px !important;
+      }
+
+      .selected-dates-list {
+        min-height: 250px !important;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)) !important;
+        gap: var(--space-sm) !important;
+      }
+
+      .selected-dates-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: var(--space-xs) !important;
+      }
+
+      .apply-all-section {
+        padding: var(--space-xs) 0 !important;
+        margin-bottom: var(--space-sm) !important;
+        position: relative !important;
+        min-height: 40px !important;
+      }
+
+      .apply-all-btn {
+        font-size: 10px !important;
+        padding: 4px 8px !important;
+        min-height: 24px !important;
+        font-weight: 600 !important;
+        position: absolute !important;
+        top: var(--space-xs) !important;
+        left: var(--space-xs) !important;
+        width: auto !important;
+        border-radius: var(--radius-sm) !important;
+        touch-action: manipulation !important;
+        -webkit-tap-highlight-color: transparent !important;
+      }
+
+      /* Mobile form input optimizations */
+      .contact-input {
+        font-size: 16px !important; /* Prevents zoom on iOS */
+        padding: var(--space-md) var(--space-lg) !important;
+        min-height: 48px !important;
+        border-radius: var(--radius-md) !important;
+        touch-action: manipulation !important;
+        -webkit-tap-highlight-color: transparent !important;
+      }
+
+      .contact-textarea {
+        font-size: 16px !important; /* Prevents zoom on iOS */
+        padding: var(--space-md) var(--space-lg) !important;
+        min-height: 120px !important;
+        border-radius: var(--radius-md) !important;
+        touch-action: manipulation !important;
+        -webkit-tap-highlight-color: transparent !important;
+      }
+
+      /* Mobile calendar optimizations */
+      .calendar-grid {
+        gap: 2px !important;
+        padding: 0 !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+      }
+
+      .calendar-day {
+        aspect-ratio: auto !important;
+        min-height: 48px !important;
+        height: 48px !important;
+        max-height: 48px !important;
+        font-size: 14px !important;
+        padding: 2px !important;
+        touch-action: manipulation !important;
+        -webkit-tap-highlight-color: transparent !important;
+        box-sizing: border-box !important;
+        width: 100% !important;
+        overflow: hidden !important;
+        border-width: 1px !important;
+      }
+
+      .calendar-header-day {
+        font-size: 11px !important;
+        padding: 4px 2px !important;
+        box-sizing: border-box !important;
+        width: 100% !important;
+      }
+
+      .selected-date-item {
+        padding: var(--space-sm);
+        margin-bottom: var(--space-xs);
+        min-height: auto;
+        gap: var(--space-sm);
+      }
+
+      .times-display {
+        font-size: var(--font-size-xs);
+        line-height: 1.3;
+        white-space: normal;
+      }
+
+      .add-times-btn,
+      .remove-date-btn {
+        width: 36px;
+        height: 36px;
+        font-size: var(--font-size-xs);
+      }
+
+      .time-modal {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        background: rgba(0, 0, 0, 0.3) !important;
+        display: none !important;
+        align-items: center !important;
+        justify-content: center !important;
+        z-index: 1000 !important;
+        padding: var(--space-xl) !important;
+        box-sizing: border-box !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        -webkit-overflow-scrolling: touch !important;
+      }
+
+      .time-modal.active {
+        display: flex !important;
+      }
+
+      .time-modal-content {
+        background: var(--white) !important;
+        border-radius: var(--radius-lg) !important;
+        width: 100% !important;
+        max-width: 500px !important;
+        max-height: calc(90vh - 40px) !important;
+        height: auto !important;
+        min-height: 500px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        animation: modalSlideIn 0.3s ease !important;
+        position: relative !important;
+        z-index: 1001 !important;
+        overflow: hidden !important;
+      }
+
+      .time-modal-header {
+        padding: var(--space-md) var(--space-lg) !important;
+        border-bottom: 1px solid var(--secondary);
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        flex-shrink: 0;
+      }
+
+      .time-modal-title {
+        font-size: var(--font-size-base) !important;
+        font-weight: 600;
+        color: var(--primary);
+      }
+
+      .time-modal-close {
+        background: none !important;
+        border: none !important;
+        font-size: var(--font-size-base) !important;
+        color: var(--primary) !important;
+        cursor: pointer !important;
+        padding: var(--space-xs) !important;
+        border-radius: var(--radius-sm) !important;
+        transition: all var(--transition-base) !important;
+        width: 36px !important;
+        height: 36px !important;
+        min-width: 36px !important;
+        min-height: 36px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+      }
+
+      .time-modal-close:hover {
+        background: var(--secondary) !important;
+      }
+
+      .time-modal-date {
+        padding: var(--space-sm) var(--space-lg) !important;
+        background: var(--accent);
+        border-bottom: 1px solid var(--secondary);
+        text-align: center;
+        flex-shrink: 0;
+      }
+
+      .time-modal-date-text {
+        font-size: var(--font-size-sm) !important;
+        font-weight: 500;
+        color: var(--primary);
+      }
+      
+      .time-modal-content .time-slots-container {
+        padding: var(--space-lg) !important;
+        padding-bottom: calc(var(--space-lg) + 40px) !important;
+        flex: 1 1 0 !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        min-height: 340px !important;
+        max-height: 100% !important;
+        height: 0 !important;
+        -webkit-overflow-scrolling: auto !important;
+        overscroll-behavior: none !important;
+        overscroll-behavior-y: none !important;
+        overscroll-behavior-x: none !important;
+        -webkit-overscroll-behavior: none !important;
+        -webkit-overscroll-behavior-y: none !important;
+        -webkit-overscroll-behavior-x: none !important;
+        transform: translateZ(0) !important;
+        -webkit-transform: translateZ(0) !important;
+        contain: layout style paint !important;
+        scroll-behavior: auto !important;
+        position: relative !important;
+        -webkit-momentum-scrolling: disabled !important;
+        touch-action: pan-y !important;
+        will-change: scroll-position !important;
+        box-sizing: border-box !important;
+        width: 100% !important;
+      }
+
+      .time-modal-actions {
+        padding: var(--space-md) !important;
+        border-top: 1px solid var(--secondary);
+        display: flex !important;
+        justify-content: flex-end !important;
+        flex-shrink: 0 !important;
+      }
+
+      .time-slots-grid {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: var(--space-sm) !important;
+        padding: var(--space-sm) !important;
+        padding-bottom: calc(var(--space-sm) + 20px) !important;
+        min-height: fit-content;
+      }
+
+      .time-slot {
+        padding: var(--space-md) !important;
+        border: 2px solid var(--secondary) !important;
+        border-radius: var(--radius-md) !important;
+        background: var(--white) !important;
+        cursor: pointer !important;
+        transition: all var(--transition-base) !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        gap: var(--space-md) !important;
+        min-height: 56px !important;
+        position: relative !important;
+        font-size: var(--font-size-base) !important;
+      }
+
+      .time-slot:hover:not(.selected) {
+        border-color: var(--primary) !important;
+        background: var(--primary-light) !important;
+      }
+
+      .time-slot:active:not(.selected) {
+        transform: scale(0.98) !important;
+      }
+
+      .time-slot.selected {
+        border-color: var(--primary) !important;
+        background: var(--primary-light) !important;
+        box-shadow: var(--shadow-sm) !important;
+      }
+
+      .time-display {
+        flex: 1 !important;
+        font-size: var(--font-size-sm) !important;
+        font-weight: 500 !important;
+        color: var(--primary) !important;
+      }
+
+      .duration-toggle {
+        display: flex !important;
+        gap: var(--space-xs) !important;
+      }
+
+      .duration-chip {
+        padding: var(--space-xs) var(--space-sm) !important;
+        border-radius: var(--radius-sm) !important;
+        background: var(--secondary) !important;
+        font-size: var(--font-size-xs) !important;
+        font-weight: 600 !important;
+        cursor: pointer !important;
+        transition: all var(--transition-base) !important;
+        color: var(--primary) !important;
+        min-width: 28px !important;
+        text-align: center !important;
+      }
+
+      .duration-chip:hover:not(.active) {
+        background: var(--primary-light) !important;
+      }
+
+      .duration-chip.active {
+        background: var(--primary) !important;
+        color: var(--white) !important;
+      }
+
+      .confirmation-message {
+        padding: var(--space-lg);
+        margin: var(--space-md) 0;
+      }
+
+      .confirmation-message h3 {
+        font-size: var(--font-size-lg);
+        margin-bottom: var(--space-sm);
+      }
+
+      .confirmation-message p {
+        font-size: var(--font-size-sm);
+      }
+
+      /* Mobile performance optimizations */
+      .booking-form * {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      /* Prevent text selection on interactive elements */
+      .btn, .service-card, .type-card, .time-slot, .calendar-day, .pet-counter-btn {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+
+      /* Optimize scrolling performance */
+      .booking-form, .booking-content, .time-modal-content, .time-slots-container {
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+        scroll-behavior: smooth;
+      }
+
+      /* Reduce motion for better performance */
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+    }
+
+    /* ===== ACCESSIBILITY ===== */
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* ===== FOCUS STYLES ===== */
+    *:focus {
+      outline: 2px solid var(--primary);
+      outline-offset: 2px;
+    }
+
+    button:focus,
+    .service-card:focus,
+    .type-card:focus,
+    .calendar-day:focus,
+    .time-slot:focus {
+      outline: 2px solid var(--primary);
+      outline-offset: 2px;
+    }
+
+    /* ===== LOADING STATES ===== */
+    .loading {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
+    .loading::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 20px;
+      height: 20px;
+      margin: -10px 0 0 -10px;
+      border: 2px solid var(--secondary);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="form-wrapper form-container">
+    <div class="booking-form" data-wf-form="booking">
+    <!-- Progress Indicator -->
+    <div class="progress-container" role="navigation" aria-label="Booking form progress">
+      <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="20" aria-label="Form completion progress">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <div class="progress-steps">
+        <div class="progress-step current" data-step="1">
+          <div class="progress-step-circle">1</div>
+          <div class="progress-step-label">Service</div>
+        </div>
+        <div class="progress-step" data-step="2">
+          <div class="progress-step-circle">2</div>
+          <div class="progress-step-label">Dates</div>
+        </div>
+        <div class="progress-step" data-step="3">
+          <div class="progress-step-circle">3</div>
+          <div class="progress-step-label">Times</div>
+        </div>
+        <div class="progress-step" data-step="4">
+          <div class="progress-step-circle">4</div>
+          <div class="progress-step-label">Contact</div>
+        </div>
+        <div class="progress-step" data-step="5">
+          <div class="progress-step-circle">✓</div>
+          <div class="progress-step-label">Complete</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="booking-content">
+      <!-- Step 1: Service Selection -->
+      <div class="form-section active" id="step1">
+        <div class="section-header">
+          <div class="section-icon">
+            <i class="fas fa-paw"></i>
+          </div>
+          <div class="section-content">
+            <h2 class="section-title">Choose Your Service</h2>
+            <p class="section-subtitle">Select the type of care your pet needs</p>
+          </div>
+        </div>
+        
+        <div class="service-grid">
+            <div class="service-card" data-service="dog-walking" data-automation="service-dog-walking" aria-label="Select Dog Walking service">
+              <i class="fas fa-dog service-icon"></i>
+              <div class="service-name">Dog Walking</div>
+              <div class="service-description">30 or 60 minute walk</div>
+            </div>
+            <div class="service-card" data-service="pet-sitting" data-automation="service-house-sitting" aria-label="Select House Sitting service">
+              <i class="fas fa-home service-icon"></i>
+              <div class="service-name">House Sitting</div>
+              <div class="service-description">Daytime and overnight care</div>
+            </div>
+
+            <div class="service-card" data-service="drop-in" data-automation="service-drop-in" aria-label="Select Drop-in Visits service">
+              <i class="fas fa-bone service-icon"></i>
+              <div class="service-name">Drop-in Visits</div>
+              <div class="service-description">30 or 60 minute visit</div>
+            </div>
+            <div class="service-card" data-service="pet-taxi" data-automation="service-pet-taxi" aria-label="Select Pet Taxi service">
+              <i class="fas fa-car service-icon"></i>
+              <div class="service-name">Pet Taxi</div>
+              <div class="service-description">Pet transport</div>
+            </div>
+        </div>
+
+        <div class="button-group">
+          <button class="btn btn-secondary back-btn" id="backBtn1" data-automation="back-button-step1" style="display: none;">
+            <i class="fas fa-arrow-left"></i>
+            Back
+          </button>
+          <button class="btn btn-primary" id="nextBtn1" data-automation="continue-to-pet-info" disabled>
+            Continue to Pet Info
+            <i class="fas fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 2: Pet Selection & Booking Type -->
+      <div class="form-section" id="step2">
+        <div class="section-header">
+          <div class="section-icon">
+            <i class="fas fa-heart"></i>
+          </div>
+          <div class="section-content">
+            <h2 class="section-title">Tell Us About Your Pet</h2>
+            <p class="section-subtitle">Help us provide the best care</p>
+          </div>
+          <span class="help-icon" onclick="showTooltip('Select the number of each type of pet you\'ll need care for')">?</span>
+        </div>
+
+        <!-- Pet Selection -->
+        <div class="pet-section">
+          <div class="pet-dropdown">
+            <div class="pet-dropdown-trigger" id="petDropdownTrigger">
+              <span>Tap to add your pets</span>
+              <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="pet-dropdown-panel" id="petDropdownPanel">
+              <div class="pet-wheel">
+                <div class="pet-type-row">
+                  <span class="pet-type-name">Dogs</span>
+                  <div class="pet-counter">
+                    <button class="pet-counter-btn" data-type="dogs" data-action="decrease" data-automation="pet-counter-dogs-decrease">-</button>
+                    <input type="text" class="pet-counter-input" id="dogsCount" name="dogsCount" value="0" readonly>
+                    <button class="pet-counter-btn" data-type="dogs" data-action="increase" data-automation="pet-counter-dogs-increase">+</button>
+                  </div>
+                </div>
+                <div class="pet-type-row">
+                  <span class="pet-type-name">Cats</span>
+                  <div class="pet-counter">
+                    <button class="pet-counter-btn" data-type="cats" data-action="decrease" data-automation="pet-counter-cats-decrease">-</button>
+                    <input type="text" class="pet-counter-input" id="catsCount" name="catsCount" value="0" readonly>
+                    <button class="pet-counter-btn" data-type="cats" data-action="increase" data-automation="pet-counter-cats-increase">+</button>
+                  </div>
+                </div>
+                <div class="pet-type-row">
+                  <span class="pet-type-name">Farm Animals</span>
+                  <div class="pet-counter">
+                    <button class="pet-counter-btn" data-type="farm" data-action="decrease" data-automation="pet-counter-farm-decrease">-</button>
+                    <input type="text" class="pet-counter-input" id="farmCount" name="farmCount" value="0" readonly>
+                    <button class="pet-counter-btn" data-type="farm" data-action="increase" data-automation="pet-counter-farm-increase">+</button>
+                  </div>
+                </div>
+                <div class="pet-type-row">
+                  <span class="pet-type-name">Reptiles</span>
+                  <div class="pet-counter">
+                    <button class="pet-counter-btn" data-type="reptiles" data-action="decrease" data-automation="pet-counter-reptiles-decrease">-</button>
+                    <input type="text" class="pet-counter-input" id="reptilesCount" name="reptilesCount" value="0" readonly>
+                    <button class="pet-counter-btn" data-type="reptiles" data-action="increase" data-automation="pet-counter-reptiles-increase">+</button>
+                  </div>
+                </div>
+                <div class="pet-type-row">
+                  <span class="pet-type-name">Birds</span>
+                  <div class="pet-counter">
+                    <button class="pet-counter-btn" data-type="birds" data-action="decrease" data-automation="pet-counter-birds-decrease">-</button>
+                    <input type="text" class="pet-counter-input" id="birdsCount" name="birdsCount" value="0" readonly>
+                    <button class="pet-counter-btn" data-type="birds" data-action="increase" data-automation="pet-counter-birds-increase">+</button>
+                  </div>
+                </div>
+                <div class="pet-type-row">
+                  <span class="pet-type-name">Other</span>
+                  <div class="pet-counter">
+                    <button class="pet-counter-btn" data-type="other" data-action="decrease" data-automation="pet-counter-other-decrease">-</button>
+                    <input type="text" class="pet-counter-input" id="otherCount" name="otherCount" value="0" readonly>
+                    <button class="pet-counter-btn" data-type="other" data-action="increase" data-automation="pet-counter-other-increase">+</button>
+                  </div>
+                </div>
+                <div class="pet-other-input-row">
+                  <input type="text" class="pet-other-input" id="otherPetType" name="otherPetType" placeholder="Specify other pet type...">
+                </div>
+              </div>
+            </div>
+          </div>
+
+           <div class="selected-pets-summary" id="selectedPetsSummary"></div>
+         </div>
+
+        <!-- Booking Type -->
+        <div class="booking-type-grid">
+          <div class="type-card" data-type="one-time" data-automation="booking-type-one-time" aria-label="Select One-time booking">
+            <i class="fas fa-calendar-day type-icon"></i>
+            <div class="type-label">One-time</div>
+            <div class="type-description">Single service booking</div>
+          </div>
+          <div class="type-card" data-type="recurring" data-automation="booking-type-recurring" aria-label="Select Recurring booking">
+            <i class="fas fa-calendar-week type-icon"></i>
+            <div class="type-label">Recurring</div>
+            <div class="type-description">Regular weekly service</div>
+          </div>
+        </div>
+
+         <!-- House Sitting 24/7 Care Option -->
+         <div class="house-sitting-options" id="houseSittingOptions" style="display: none;">
+           <div class="care-option" data-option="24-7-care" data-automation="house-sitting-24-7" aria-label="Select 24/7 Care option">
+             <i class="fas fa-clock"></i>
+             <span>24/7 Care</span>
+           </div>
+         </div>
+
+        <div class="button-group">
+          <button class="btn btn-secondary back-btn" id="backBtn2" data-automation="back-button-step2">
+            <i class="fas fa-arrow-left"></i>
+            Back
+          </button>
+          <button class="btn btn-primary" id="nextBtn2" data-automation="continue-to-dates" disabled>
+            Continue to Dates
+            <i class="fas fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 3: Date Selection -->
+      <div class="form-section" id="step3">
+        <div class="section-header">
+          <div class="section-icon">
+            <i class="fas fa-calendar-alt"></i>
+          </div>
+          <div class="section-content">
+            <h2 class="section-title">Choose Your Dates</h2>
+            <p class="section-subtitle">Select the dates you need care</p>
+          </div>
+          <span class="help-icon" onclick="showTooltip('Click on calendar dates to select them. For house sitting, dates must be consecutive.')">?</span>
+        </div>
+
+        <div class="calendar-container" data-automation="calendar-container">
+          <div class="calendar-header">
+            <button class="calendar-nav" id="prevMonth" data-automation="calendar-prev-month">
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <div class="calendar-title" id="calendarTitle" data-automation="calendar-month-year"></div>
+            <button class="calendar-nav" id="nextMonth" data-automation="calendar-next-month">
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
+          
+          <div class="calendar-grid" id="calendarGrid" data-automation="calendar-grid">
+            <!-- Calendar will be generated by JavaScript -->
+          </div>
+        </div>
+
+
+        <div class="button-group">
+          <button class="btn btn-secondary back-btn" id="backBtn3" data-automation="back-button-step3">
+            <i class="fas fa-arrow-left"></i>
+            Back
+          </button>
+          <button class="btn btn-primary" id="nextBtn3" data-automation="continue-to-times" disabled>
+            Continue to Times
+            <i class="fas fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 4: Time Selection -->
+      <div class="form-section" id="step4">
+        <div class="section-header">
+          <div class="section-icon">
+            <i class="fas fa-clock"></i>
+          </div>
+          <div class="section-content">
+            <h2 class="section-title">Select Times</h2>
+            <p class="section-subtitle">Choose the best times for your pet's care</p>
+          </div>
+          <span class="help-icon" onclick="showTooltip('Click the clock icon next to each date to choose specific times.')">?</span>
+        </div>
+
+        <div class="selected-dates-container">
+          <div class="selected-dates-header">
+            <div class="selected-dates-title">
+              Your Selected Dates
+              <div class="selected-date-count" id="selectedDateCountNum2">0</div>
+            </div>
+          </div>
+          <div class="apply-all-section">
+            <button class="btn btn-secondary apply-all-btn" id="applyAllBtn" data-automation="apply-all-times" disabled>
+              Apply First Date Times to All
+            </button>
+          </div>
+          <div class="selected-dates-list" id="selectedDatesList2" role="region" aria-live="polite" aria-label="Selected dates and times"></div>
+        </div>
+
+        <div class="button-group">
+          <button class="btn btn-secondary back-btn" id="backBtn4" data-automation="back-button-step4">
+            <i class="fas fa-arrow-left"></i>
+            Back
+          </button>
+          <button class="btn btn-primary" id="nextBtn4" data-automation="continue-to-contact" disabled>
+            Continue to Contact
+            <i class="fas fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 5: Pet Taxi Transportation Details -->
+      <div class="form-section" id="step5" style="display: none;">
+        <div class="section-header">
+          <div class="section-icon">
+            <i class="fas fa-car"></i>
+          </div>
+          <div class="section-content">
+            <h2 class="section-title">Transportation Details</h2>
+            <p class="section-subtitle">Tell us where to pick up and drop off your pet</p>
+          </div>
+        </div>
+
+        <div class="pet-taxi-addresses" id="petTaxiAddresses">
+          <div class="address-section">
+            <div class="address-grid">
+              <div class="contact-group">
+                <label class="contact-label" for="pickupAddress">Pickup Address</label>
+                <input type="text" class="contact-input" id="pickupAddress" name="pickupAddress" placeholder="Enter pickup location" required>
+                <div class="field-error" id="pickupAddressError" style="display: none;"></div>
+              </div>
+              <div class="contact-group">
+                <label class="contact-label" for="dropoffAddress">Dropoff Address</label>
+                <input type="text" class="contact-input" id="dropoffAddress" name="dropoffAddress" placeholder="Enter dropoff location" required>
+                <div class="field-error" id="dropoffAddressError" style="display: none;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="button-group">
+          <button class="btn btn-secondary back-btn" id="backBtn5" data-automation="back-button-step5">
+            <i class="fas fa-arrow-left"></i>
+            Back
+          </button>
+          <button class="btn btn-primary" id="nextBtn5" data-automation="continue-from-transportation" disabled>
+            Continue
+            <i class="fas fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 6: Contact Information -->
+      <div class="form-section" id="step6">
+        <div class="section-header">
+          <div class="section-icon">
+            <i class="fas fa-user"></i>
+          </div>
+          <div class="section-content">
+            <h2 class="section-title">Contact Information</h2>
+            <p class="section-subtitle">We'll use this to confirm your booking</p>
+          </div>
+        </div>
+
+        <form id="bookingForm" data-automation="booking-form">
+        <div class="contact-grid">
+          <div class="contact-row">
+            <div class="contact-group">
+              <label class="contact-label" for="firstName">First Name</label>
+              <input type="text" class="contact-input" id="firstName" name="firstName" placeholder="Enter your first name" required>
+              <div class="field-error" id="firstNameError" style="display: none;"></div>
+            </div>
+            <div class="contact-group">
+              <label class="contact-label" for="lastName">Last Name</label>
+              <input type="text" class="contact-input" id="lastName" name="lastName" placeholder="Enter your last name" required>
+              <div class="field-error" id="lastNameError" style="display: none;"></div>
+            </div>
+          </div>
+          
+          <div class="contact-group">
+            <label class="contact-label" for="email">Email Address</label>
+            <input type="email" class="contact-input" id="email" name="email" placeholder="Enter your email address" required>
+            <div class="field-error" id="emailError" style="display: none;"></div>
+          </div>
+          
+          <div class="contact-group">
+            <label class="contact-label" for="phone">Phone Number</label>
+            <input type="tel" class="contact-input" id="phone" name="phone" placeholder="Enter your phone number" required>
+            <div class="field-error" id="phoneError" style="display: none;"></div>
+          </div>
+          
+          <div class="contact-group" id="regularAddressGroup">
+            <label class="contact-label" for="address">Service Address</label>
+            <input type="text" class="contact-input" id="address" name="address" placeholder="Enter your address" required>
+            <div class="field-error" id="addressError" style="display: none;"></div>
+          </div>
+          
+          <div class="contact-group">
+            <label class="contact-label" for="notes">Additional Notes (Optional)</label>
+            <textarea class="contact-input contact-textarea" id="notes" name="notes" placeholder="Any additional notes, questions or preferred sitter"></textarea>
+          </div>
+        </div>
+
+        <div class="policy-checkbox">
+          <input type="checkbox" id="policyAgreement" name="policyAgreement" required>
+          <label for="policyAgreement" class="policy-text">
+            I agree to the <a href="/terms" target="_blank" rel="noopener noreferrer" style="color: var(--primary); text-decoration: underline;">Terms of Service</a> and <a href="/privacy" target="_blank" rel="noopener noreferrer" style="color: var(--primary); text-decoration: underline;">Privacy Policy</a>, and I consent to receive SMS text messages from Snout Pet Care regarding my booking, including confirmations, reminders, and updates. Message and data rates may apply. Reply STOP to opt out at any time.
+          </label>
+          <div class="field-error" id="policyError" style="display: none;"></div>
+        </div>
+        </form>
+
+        <div class="button-group">
+          <button class="btn btn-secondary back-btn" id="backBtn6" data-automation="back-button-step6">
+            <i class="fas fa-arrow-left"></i>
+            Back
+          </button>
+          <button class="btn btn-primary" id="submitBtn" data-automation="complete-booking" disabled>
+            Complete Booking
+            <i class="fas fa-check"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 7: Confirmation -->
+      <div class="form-section" id="step7">
+        <div class="confirmation-message">
+          <h3><i class="fas fa-check-circle" style="color: var(--primary); margin-right: 8px;"></i>Booking Confirmed!</h3>
+          <p>Thank you for choosing Snout Services! We've received your booking request and will contact you within 24 hours to confirm all details.</p>
+        </div>
+
+        <button class="btn btn-secondary" id="startNewBooking">
+          <i class="fas fa-plus"></i>
+          Book Another Service
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Time Selection Modal -->
+  <div id="timeModal" class="time-modal">
+    <div class="time-modal-content">
+      <div class="time-modal-header">
+        <h3 class="time-modal-title" id="modalDateTitle">Select Times</h3>
+        <button class="time-modal-close" onclick="closeTimeModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="time-modal-date">
+        <div class="time-modal-date-text" id="modalDateDisplay"></div>
+      </div>
+      <div class="time-slots-container" id="timeSlotsContainer">
+        <!-- Time slots will be generated by JavaScript -->
+      </div>
+      <div class="time-modal-actions">
+        <button class="btn btn-secondary" onclick="closeTimeModal()">
+          Done
+        </button>
+      </div>
+    </div>
+  </div>
+  </div> <!-- Close form-wrapper -->
+
+  <script>
+    // ===== FORM CONFIGURATION (variant support for owner/client portals) =====
+    const FORM_CONFIG = (() => {
+      const params = new URLSearchParams(window.location.search);
+      return {
+        variant: params.get('variant') || 'public', // 'public' | 'owner' | 'client'
+        clientId: params.get('clientId') || null,
+        clientName: params.get('clientName') || null,
+        clientEmail: params.get('clientEmail') || null,
+        clientPhone: params.get('clientPhone') || null,
+        clientAddress: params.get('clientAddress') || null,
+        returnUrl: params.get('returnUrl') || null,
+      };
+    })();
+
+    // Strip outer container styling when embedded in owner/client portal
+    if (FORM_CONFIG.variant !== 'public') {
+      document.addEventListener('DOMContentLoaded', () => {
+        const wrapper = document.querySelector('.form-wrapper');
+        if (wrapper) {
+          wrapper.style.boxShadow = 'none';
+          wrapper.style.maxWidth = '100%';
+        }
+        document.body.style.padding = '0';
+        document.body.style.margin = '0';
+        document.body.style.minHeight = 'auto';
+      });
+    }
+
+    // ===== BOOKING FORM STATE MANAGEMENT =====
+    class BookingFormState {
+      constructor() {
+        // Initialize fresh state first (Safari iframe may block localStorage)
+        this.currentStep = 1;
+        this.selectedService = null;
+        this.selectedType = null;
+        this.pets = { dogs: 0, cats: 0, farm: 0, reptiles: 0, birds: 0, other: 0 };
+        this.selectedDates = [];
+        this.dateTimes = {};
+        this.contactInfo = {};
+        this.isValid = false;
+        this.isHouseSitting = false;
+        this.is24SevenCare = false;
+        this.saveTimer = null;
+
+        // Try to restore from auto-save (may fail in Safari iframes)
+        try {
+          const savedState = this.loadState();
+          if (savedState) {
+            Object.assign(this, savedState);
+          }
+        } catch (e) {
+          console.warn('Could not restore form state:', e);
+        }
+      }
+
+      saveState() {
+        // Clear existing timer
+        if (this.saveTimer) {
+          clearTimeout(this.saveTimer);
+        }
+        
+        // Debounce state saves to improve performance
+        this.saveTimer = setTimeout(() => {
+          try {
+            const stateToSave = {
+              currentStep: this.currentStep,
+              selectedService: this.selectedService,
+              selectedType: this.selectedType,
+              pets: this.pets,
+              selectedDates: this.selectedDates,
+              dateTimes: this.dateTimes,
+              contactInfo: this.contactInfo,
+              isHouseSitting: this.isHouseSitting,
+              is24SevenCare: this.is24SevenCare,
+              timestamp: Date.now()
+            };
+            localStorage.setItem('snoutBookingForm', JSON.stringify(stateToSave));
+          } catch (e) {
+            // Silently fail - localStorage might be disabled
+          }
+        }, 300); // Debounce by 300ms
+      }
+
+      loadState() {
+        try {
+          const saved = localStorage.getItem('snoutBookingForm');
+          if (saved) {
+            const state = JSON.parse(saved);
+            // Only restore if less than 24 hours old
+            if (Date.now() - state.timestamp < 24 * 60 * 60 * 1000) {
+              delete state.timestamp;
+              return state;
+            } else {
+              // Clear old save
+              this.clearState();
+            }
+          }
+        } catch (e) {
+          console.error('Failed to load form state:', e);
+        }
+        return null;
+      }
+
+      clearState() {
+        try {
+          localStorage.removeItem('snoutBookingForm');
+        } catch (e) {
+          console.error('Failed to clear form state:', e);
+        }
+      }
+
+      updateProgress() {
+        const progressFill = document.getElementById('progressFill');
+        const progressSteps = document.querySelectorAll('.progress-step');
+        
+        // Calculate total steps (6 for pet-taxi, 5 for others)
+        const totalSteps = this.selectedService === 'pet-taxi' ? 6 : 5;
+        
+        if (progressFill) {
+          progressFill.style.width = `${(this.currentStep / totalSteps) * 100}%`;
+        }
+
+        progressSteps.forEach((step, index) => {
+          const stepNumber = index + 1;
+          step.classList.remove('current', 'completed');
+          
+          if (stepNumber < this.currentStep) {
+            step.classList.add('completed');
+          } else if (stepNumber === this.currentStep) {
+            step.classList.add('current');
+          }
+        });
+      }
+
+      validateStep(step) {
+        switch (step) {
+          case 1:
+            return this.selectedService !== null;
+          case 2:
+            return this.selectedType !== null && this.getTotalPets() > 0;
+          case 3:
+            return this.selectedDates.length > 0;
+          case 4:
+            // For house sitting, allow proceeding with at least one time on first date
+            if (this.selectedService === 'pet-sitting') {
+              const firstDate = this.selectedDates[0];
+              return firstDate && this.dateTimes[firstDate] && this.dateTimes[firstDate].length > 0;
+            }
+            // For other services, require times on all dates
+            return this.selectedDates.every(date => 
+              this.dateTimes[date] && this.dateTimes[date].length > 0
+            );
+          case 5:
+            return this.isPetTaxiFormValid();
+          case 6:
+            return this.isContactFormValid();
+          default:
+            return false;
+        }
+      }
+
+      getTotalPets() {
+        return this.pets.dogs + this.pets.cats + this.pets.farm + this.pets.reptiles + this.pets.birds + this.pets.other;
+      }
+
+      isContactFormValid() {
+        const policyAgreed = document.getElementById('policyAgreement')?.checked;
+        
+        // Check basic required fields
+        const firstName = document.getElementById('firstName')?.value.trim();
+        const lastName = document.getElementById('lastName')?.value.trim();
+        const email = document.getElementById('email')?.value.trim();
+        const phone = document.getElementById('phone')?.value.trim();
+        
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const phoneRegex = /^[\d\s\-\(\)+]+$/;
+        
+        if (!firstName || !lastName || !email || !emailRegex.test(email) || !phone || phone.length < 10 || !phoneRegex.test(phone) || !policyAgreed) {
+          return false;
+        }
+        
+        // Check address (only for non-pet-taxi and non-house-sitting services)
+        const isPetTaxi = this.selectedService === 'pet-taxi';
+        const isHouseSitting = this.selectedService === 'pet-sitting';
+        if (!isPetTaxi && !isHouseSitting) {
+          const address = document.getElementById('address')?.value.trim();
+          return !!address;
+        }
+        return true; // Pet taxi and house sitting don't require address in step 6
+      }
+
+      isPetTaxiFormValid() {
+        const pickupAddress = document.getElementById('pickupAddress')?.value.trim();
+        const dropoffAddress = document.getElementById('dropoffAddress')?.value.trim();
+        return pickupAddress && dropoffAddress;
+      }
+    }
+
+    // ===== BOOKING FORM CONTROLLER =====
+    class BookingFormController {
+      constructor() {
+        // Set global reference early so CalendarController.render() can
+        // access state during setupStep() (Safari iframe fix)
+        window.bookingForm = this;
+
+        this.state = new BookingFormState();
+        this.elements = this.initializeElements();
+        this.calendar = new CalendarController();
+        this.timeModal = new TimeModalController();
+        // Track conversion events before step setup to avoid race conditions on restored step 7
+        this.metaPixelLeadFired = false;
+        this.googleAdsConversionFired = false;
+        this.initializeEventListeners();
+        this.restoreVisualState();
+        this.setupStep(this.state.currentStep || 1);
+
+        // Report height to parent for dynamic iframe sizing
+        if (window.parent !== window) {
+          const reportHeight = () => {
+            const h = document.querySelector('.form-wrapper')?.scrollHeight || document.body.scrollHeight;
+            window.parent.postMessage({ type: 'formHeight', height: h }, '*');
+          };
+          if (typeof ResizeObserver !== 'undefined') {
+            const ro = new ResizeObserver(reportHeight);
+            ro.observe(document.querySelector('.form-wrapper') || document.body);
+          }
+          window.addEventListener('load', reportHeight);
+          setInterval(reportHeight, 1000); // Fallback polling
+        }
+      }
+      
+      restoreVisualState() {
+        try {
+          // Restore service selection
+          if (this.state.selectedService) {
+            this.elements.serviceCards.forEach(card => {
+              if (card.dataset.service === this.state.selectedService) {
+                card.classList.add('selected');
+              }
+            });
+          }
+          
+          // Restore 24/7 care option state
+          if (this.state.is24SevenCare && this.elements.houseSittingOption) {
+            this.elements.houseSittingOption.classList.add('selected');
+          }
+          
+          // Restore pet counts
+          Object.keys(this.state.pets).forEach(type => {
+            const input = document.getElementById(`${type}Count`);
+            if (input) {
+              input.value = this.state.pets[type] || 0;
+            }
+          });
+          
+          // Restore contact form values
+          if (this.state.contactInfo) {
+            Object.keys(this.state.contactInfo).forEach(key => {
+              const input = document.getElementById(key);
+              if (input && this.state.contactInfo[key]) {
+                input.value = this.state.contactInfo[key];
+              }
+            });
+          }
+        } catch (error) {
+          console.error('Error restoring visual state:', error);
+          // Silently fail - visual state restoration is not critical
+        }
+      }
+
+      initializeElements() {
+        return {
+          steps: Array.from(document.querySelectorAll('.form-section')),
+          nextButtons: {
+            1: document.getElementById('nextBtn1'),
+            2: document.getElementById('nextBtn2'),
+            3: document.getElementById('nextBtn3'),
+            4: document.getElementById('nextBtn4'),
+            5: document.getElementById('nextBtn5'),
+          },
+          backButtons: {
+            1: document.getElementById('backBtn1'),
+            2: document.getElementById('backBtn2'),
+            3: document.getElementById('backBtn3'),
+            4: document.getElementById('backBtn4'),
+            5: document.getElementById('backBtn5'),
+            6: document.getElementById('backBtn6'),
+          },
+          submitBtn: document.getElementById('submitBtn'),
+          startNewBtn: document.getElementById('startNewBooking'),
+          serviceCards: document.querySelectorAll('.service-card'),
+          typeCards: document.querySelectorAll('.type-card'),
+          houseSittingOption: document.querySelector('.care-option'),
+          petDropdown: {
+            trigger: document.getElementById('petDropdownTrigger'),
+            panel: document.getElementById('petDropdownPanel'),
+          },
+          petCounters: document.querySelectorAll('.pet-counter-btn'),
+          selectedPetsSummary: document.getElementById('selectedPetsSummary'),
+          selectedDatesList2: document.getElementById('selectedDatesList2'),
+          selectedDateCountNum2: document.getElementById('selectedDateCountNum2'),
+          applyAllBtn: document.getElementById('applyAllBtn'),
+          contactInputs: document.querySelectorAll('.contact-input'),
+          policyCheckbox: document.getElementById('policyAgreement'),
+        };
+      }
+
+      initializeEventListeners() {
+        // Service selection
+        this.elements.serviceCards.forEach(card => {
+          const service = card.dataset.service;
+          if (service) {
+            card.addEventListener('click', (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              this.selectService(service);
+            });
+          }
+        });
+
+        // Booking type selection
+        this.elements.typeCards.forEach(card => {
+          card.addEventListener('click', () => this.selectType(card.dataset.type));
+        });
+
+        // House sitting 24/7 care option
+        if (this.elements.houseSittingOption) {
+          this.elements.houseSittingOption.addEventListener('click', () => this.toggle24SevenCare());
+        }
+
+        // Pet counter buttons
+        this.elements.petCounters.forEach(btn => {
+          btn.addEventListener('click', (e) => this.updatePetCount(
+            e.target.dataset.type,
+            e.target.dataset.action
+          ));
+        });
+
+        // Pet dropdown
+        this.elements.petDropdown.trigger.addEventListener('click', () => {
+          this.togglePetDropdown();
+        });
+
+        // Next buttons
+        Object.values(this.elements.nextButtons).forEach(btn => {
+          if (btn) btn.addEventListener('click', () => this.nextStep());
+        });
+
+        // Back buttons
+        Object.values(this.elements.backButtons).forEach(btn => {
+          if (btn) btn.addEventListener('click', () => this.prevStep());
+        });
+
+        // Submit button
+        if (this.elements.submitBtn) {
+          this.elements.submitBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.submitForm().catch(error => {
+              showCustomAlert('An error occurred while submitting. Please try again.', 'fa-circle-exclamation');
+              if (this.elements.submitBtn) {
+                this.elements.submitBtn.classList.remove('loading');
+                this.elements.submitBtn.disabled = false;
+              }
+            });
+          });
+        }
+
+        // Start new booking
+        this.elements.startNewBtn.addEventListener('click', () => this.startNewBooking());
+
+        // Apply all dates button
+        if (this.elements.applyAllBtn) {
+          this.elements.applyAllBtn.addEventListener('click', () => this.applyFirstDateTimesToAll());
+        }
+
+        // Contact form validation and auto-save
+        this.elements.contactInputs.forEach(input => {
+          input.addEventListener('input', () => {
+            this.validateContactForm();
+            // Auto-save contact info
+            if (!this.state.contactInfo) {
+              this.state.contactInfo = {};
+            }
+            this.state.contactInfo[input.id] = input.value;
+            this.state.saveState();
+          });
+        });
+
+        this.elements.policyCheckbox.addEventListener('change', () => {
+          this.validateContactForm();
+          this.state.saveState();
+        });
+
+        // Pet taxi form validation and auto-save
+        const pickupAddressInput = document.getElementById('pickupAddress');
+        const dropoffAddressInput = document.getElementById('dropoffAddress');
+        if (pickupAddressInput) {
+          pickupAddressInput.addEventListener('input', () => {
+            this.validatePetTaxiForm();
+            if (!this.state.contactInfo) {
+              this.state.contactInfo = {};
+            }
+            this.state.contactInfo.pickupAddress = pickupAddressInput.value;
+            this.state.saveState();
+          });
+        }
+        if (dropoffAddressInput) {
+          dropoffAddressInput.addEventListener('input', () => {
+            this.validatePetTaxiForm();
+            if (!this.state.contactInfo) {
+              this.state.contactInfo = {};
+            }
+            this.state.contactInfo.dropoffAddress = dropoffAddressInput.value;
+            this.state.saveState();
+          });
+        }
+
+        // Close pet dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+          if (!e.target.closest('.pet-dropdown')) {
+            this.closePetDropdown();
+          }
+        });
+      }
+
+      setupStep(step) {
+        try {
+          this.state.currentStep = step;
+          this.state.updateProgress();
+
+          // Hide all steps
+          this.elements.steps.forEach(s => s.classList.remove('active'));
+
+          // Show current step
+          const currentStepElement = document.getElementById(`step${step}`);
+          if (currentStepElement) {
+            currentStepElement.classList.add('active');
+          }
+
+          // Fire Google Ads conversion event when step 7 (confirmation) is shown
+          if (step === 7) {
+            this.fireGoogleAdsConversion();
+          }
+        } catch (error) {
+          console.error('Error setting up step:', error);
+          // Fallback: show step 1
+          this.state.currentStep = 1;
+          const step1Element = document.getElementById('step1');
+          if (step1Element) {
+            step1Element.classList.add('active');
+          }
+        }
+
+        // Show/hide house sitting options in step 2
+        if (step === 2) {
+          const houseSittingOptions = document.getElementById('houseSittingOptions');
+          if (houseSittingOptions) {
+            houseSittingOptions.style.display = this.state.isHouseSitting ? 'block' : 'none';
+          }
+          // Restore 24/7 care option state
+          if (this.elements.houseSittingOption) {
+            this.elements.houseSittingOption.classList.toggle('selected', this.state.is24SevenCare);
+          }
+        }
+
+        // Show/hide apply all section in step 4 (hide for house sitting)
+        if (step === 4) {
+          const applyAllSection = document.querySelector('.apply-all-section');
+          if (applyAllSection) {
+            const isHouseSitting = this.state.selectedService === 'pet-sitting';
+            applyAllSection.style.display = isHouseSitting ? 'none' : 'block';
+          }
+        }
+
+        // Show/hide step 5 (Pet Taxi Transportation) based on service and current step
+        const step5Element = document.getElementById('step5');
+        if (step5Element) {
+          const isPetTaxi = this.state.selectedService === 'pet-taxi';
+          // Only show step 5 if it's the current step and service is pet-taxi
+          if (step === 5 && isPetTaxi) {
+            step5Element.style.display = 'block';
+          } else if (step !== 5) {
+            // Hide step 5 when not on it
+            step5Element.style.display = 'none';
+          }
+        }
+        
+        // Show/hide regular address field in step 6 (hide for pet-taxi)
+        if (step === 6) {
+          const regularAddressGroup = document.getElementById('regularAddressGroup');
+          if (regularAddressGroup) {
+            const isPetTaxi = this.state.selectedService === 'pet-taxi';
+            regularAddressGroup.style.display = isPetTaxi ? 'none' : 'block';
+          }
+        }
+
+        // Show/hide back button on step 1
+        if (this.elements.backButtons[1]) {
+          this.elements.backButtons[1].style.display = step > 1 ? 'flex' : 'none';
+        }
+
+        // Update button states
+        this.updateButtonStates();
+
+        // Auto-save progress
+        this.state.saveState();
+
+        // Setup step-specific functionality
+        switch (step) {
+          case 3:
+            this.calendar.render();
+            break;
+          case 4:
+            this.updateSelectedDatesDisplay();
+            break;
+          case 5:
+            // Validate pet taxi addresses when entering step 5
+            this.validatePetTaxiForm();
+            break;
+          case 6:
+            // Variant-specific contact step behavior
+            if (FORM_CONFIG.variant === 'client') {
+              // Auto-fill contact fields from URL params, make read-only
+              const clientFields = {
+                firstName: FORM_CONFIG.clientName?.split(' ')[0] || '',
+                lastName: FORM_CONFIG.clientName?.split(' ').slice(1).join(' ') || '',
+                email: FORM_CONFIG.clientEmail || '',
+                phone: FORM_CONFIG.clientPhone || '',
+                address: FORM_CONFIG.clientAddress || '',
+              };
+              Object.entries(clientFields).forEach(([id, val]) => {
+                const el = document.getElementById(id);
+                if (el && val) { el.value = val; el.readOnly = true; el.style.opacity = '0.7'; }
+              });
+              // Hide ToS checkbox for client variant
+              const policyBox = document.querySelector('.policy-checkbox');
+              if (policyBox) policyBox.style.display = 'none';
+              // Auto-check policy since client already agreed at signup
+              const policyInput = document.getElementById('policyAgreement');
+              if (policyInput) policyInput.checked = true;
+            }
+            if (FORM_CONFIG.variant === 'owner') {
+              // Hide ToS checkbox for owner variant
+              const policyBox = document.querySelector('.policy-checkbox');
+              if (policyBox) policyBox.style.display = 'none';
+              const policyInput = document.getElementById('policyAgreement');
+              if (policyInput) policyInput.checked = true;
+              // Inject client search UI above contact fields
+              this.injectOwnerClientSearch();
+            }
+            this.validateContactForm();
+            break;
+        }
+      }
+
+      selectService(service) {
+        try {
+          if (!service) {
+            console.error('selectService called without service parameter');
+            return;
+          }
+          
+          // Reset service-specific data when changing services
+          const previousService = this.state.selectedService;
+          if (previousService && previousService !== service) {
+            this.resetServiceSpecificData();
+          }
+          
+          this.state.selectedService = service;
+          
+          // Update visual state
+          this.elements.serviceCards.forEach(card => {
+            card.classList.remove('selected');
+            if (card.dataset.service === service) {
+              card.classList.add('selected');
+            }
+          });
+
+          // Store house sitting selection for step 2
+          this.state.isHouseSitting = service === 'pet-sitting';
+
+          this.updateButtonStates();
+          this.state.saveState(); // Auto-save
+        } catch (error) {
+          console.error('Error selecting service:', error);
+          showCustomAlert('An error occurred while selecting the service. Please try again.', 'fa-circle-exclamation');
+        }
+      }
+
+      resetServiceSpecificData() {
+        // Reset selected dates and times
+        this.state.selectedDates = [];
+        this.state.dateTimes = {};
+        
+        // Reset pet counts
+        this.state.pets = { dogs: 0, cats: 0, farm: 0, reptiles: 0, birds: 0, other: 0 };
+        
+        // Reset pet counter inputs
+        Object.keys(this.state.pets).forEach(type => {
+          const input = document.getElementById(`${type}Count`);
+          if (input) input.value = '0';
+        });
+        
+        // Reset 24/7 care option
+        this.state.is24SevenCare = false;
+        if (this.elements.houseSittingOption) {
+          this.elements.houseSittingOption.classList.remove('selected');
+        }
+        
+        // Update displays
+        this.updateSelectedDatesDisplay();
+        this.updateSelectedPetsSummary();
+        
+        // Reset calendar display
+        if (this.calendar) {
+          this.calendar.render();
+        }
+        
+        // If we're past step 2, go back to step 1 to select the new service
+        if (this.state.currentStep > 2) {
+          this.setupStep(1);
+        }
+      }
+
+      selectType(type) {
+        this.state.selectedType = type;
+        
+        // Update visual state
+        this.elements.typeCards.forEach(card => {
+          card.classList.remove('selected');
+          if (card.dataset.type === type) {
+            card.classList.add('selected');
+          }
+        });
+
+        this.updateButtonStates();
+        this.state.saveState(); // Auto-save
+      }
+
+      toggle24SevenCare() {
+        this.state.is24SevenCare = !this.state.is24SevenCare;
+        
+        // Update visual state
+        if (this.elements.houseSittingOption) {
+          this.elements.houseSittingOption.classList.toggle('selected', this.state.is24SevenCare);
+        }
+        
+        this.updateButtonStates();
+        this.state.saveState(); // Auto-save
+      }
+
+      updatePetCount(type, action) {
+        const currentCount = this.state.pets[type];
+        const newCount = action === 'increase' 
+          ? Math.min(currentCount + 1, 10) 
+          : Math.max(currentCount - 1, 0);
+
+        this.state.pets[type] = newCount;
+        
+        // Update UI
+        const counterInput = document.getElementById(`${type}Count`);
+        if (counterInput) {
+          counterInput.value = newCount;
+        }
+
+        this.updateSelectedPetsSummary();
+        this.updateButtonStates();
+        this.state.saveState(); // Auto-save
+      }
+
+      updateSelectedPetsSummary() {
+        const summary = this.elements.selectedPetsSummary;
+        summary.innerHTML = '';
+
+        const petTypeMap = {
+          dogs: { icon: 'dog', name: 'Dog', namePlural: 'Dogs' },
+          cats: { icon: 'cat', name: 'Cat', namePlural: 'Cats' },
+          farm: { icon: 'horse', name: 'Farm Animal', namePlural: 'Farm Animals' },
+          reptiles: { icon: 'dragon', name: 'Reptile', namePlural: 'Reptiles' },
+          birds: { icon: 'dove', name: 'Bird', namePlural: 'Birds' },
+          other: { icon: 'paw', name: 'Other', namePlural: 'Other' }
+        };
+
+        Object.entries(this.state.pets).forEach(([type, count]) => {
+          if (count > 0) {
+            const chip = document.createElement('div');
+            chip.className = 'pet-chip';
+            const petName = count === 1 ? petTypeMap[type].name : petTypeMap[type].namePlural;
+            chip.innerHTML = `
+              <i class="fas fa-${petTypeMap[type].icon}"></i>
+              ${count} ${petName}
+            `;
+            summary.appendChild(chip);
+          }
+        });
+      }
+
+      togglePetDropdown() {
+        const panel = this.elements.petDropdown.panel;
+        const trigger = this.elements.petDropdown.trigger;
+        
+        panel.classList.toggle('active');
+        trigger.classList.toggle('active');
+      }
+
+      closePetDropdown() {
+        this.elements.petDropdown.panel.classList.remove('active');
+        this.elements.petDropdown.trigger.classList.remove('active');
+      }
+
+      updateButtonStates() {
+        const isValid = this.state.validateStep(this.state.currentStep);
+        
+        // Update current step button
+        const currentButton = this.elements.nextButtons[this.state.currentStep];
+        if (currentButton) {
+          currentButton.disabled = !isValid;
+        }
+
+        // Update submit button (only on step 6 - contact info)
+        if (this.elements.submitBtn && this.state.currentStep === 6) {
+          this.elements.submitBtn.disabled = !isValid;
+        }
+
+        // Update apply all button (only on step 4)
+        if (this.elements.applyAllBtn && this.state.currentStep === 4) {
+          const firstDate = this.state.selectedDates[0];
+          const firstDateTimes = this.state.dateTimes[firstDate] || [];
+          const hasMultipleDates = this.state.selectedDates.length > 1;
+          const hasFirstDateTimes = firstDateTimes.length > 0;
+          this.elements.applyAllBtn.disabled = !(hasMultipleDates && hasFirstDateTimes);
+          
+          // Update button text with actual first date
+          if (firstDate) {
+            // Parse date correctly to avoid timezone issues
+            const [year, month, day] = firstDate.split('-').map(Number);
+            const firstDateObj = new Date(year, month - 1, day);
+            const dateStr = firstDateObj.toLocaleDateString('en-US', { 
+              weekday: 'short', 
+              month: 'short', 
+              day: 'numeric' 
+            });
+            this.elements.applyAllBtn.innerHTML = `Apply ${dateStr} Times to All`;
+          }
+        }
+      }
+
+      nextStep() {
+        try {
+          if (this.state.validateStep(this.state.currentStep)) {
+            let nextStep = this.state.currentStep + 1;
+            
+            // Skip step 5 (pet taxi) if not pet-taxi service
+            if (nextStep === 5 && this.state.selectedService !== 'pet-taxi') {
+              nextStep = 6; // Go directly to contact info
+            }
+            
+            this.setupStep(nextStep);
+          }
+        } catch (error) {
+          console.error('Error navigating to next step:', error);
+          showCustomAlert('An error occurred while navigating. Please try again.', 'fa-circle-exclamation');
+        }
+      }
+
+      prevStep() {
+        try {
+          if (this.state.currentStep > 1) {
+            let prevStep = this.state.currentStep - 1;
+            
+            // Skip step 5 (pet taxi) if not pet-taxi service when going back
+            if (prevStep === 5 && this.state.selectedService !== 'pet-taxi') {
+              prevStep = 4; // Go back to times
+            }
+            
+            this.setupStep(prevStep);
+          }
+        } catch (error) {
+          console.error('Error navigating to previous step:', error);
+          showCustomAlert('An error occurred while navigating. Please try again.', 'fa-circle-exclamation');
+        }
+      }
+
+      updateSelectedDatesDisplay() {
+        const list2 = this.elements.selectedDatesList2;
+        const count2 = this.elements.selectedDateCountNum2;
+
+        if (count2) count2.textContent = this.state.selectedDates.length;
+
+        // Update the times page list
+        const listElement = list2;
+        if (!listElement) return;
+        
+        // Use slim rows layout for times page
+        listElement.style.display = 'flex';
+        listElement.style.flexDirection = 'column';
+        listElement.style.gap = 'var(--space-xs)';
+        listElement.style.maxHeight = '300px';
+        listElement.style.overflowY = 'auto';
+        
+        listElement.innerHTML = '';
+        
+        // Sort all dates chronologically first
+        const sortedDates = [...this.state.selectedDates].sort();
+        
+        // For house sitting, show only first and last dates
+        let datesToShow = sortedDates;
+        if (this.state.selectedService === 'pet-sitting' && sortedDates.length > 1) {
+          datesToShow = [sortedDates[0], sortedDates[sortedDates.length - 1]];
+        }
+        
+        datesToShow.forEach(dateStr => {
+            // Parse date correctly to avoid timezone issues
+            const [year, month, day] = dateStr.split('-').map(Number);
+            const date = new Date(year, month - 1, day);
+            const times = this.state.dateTimes[dateStr] || [];
+            
+            const item = document.createElement('div');
+            item.className = 'selected-date-item';
+            
+            const dateInfo = document.createElement('div');
+            dateInfo.className = 'selected-date-info';
+            
+            // Show date with times for times page
+            dateInfo.innerHTML = `
+              <div class="date-display">${date.toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                month: 'long', 
+                day: 'numeric' 
+              })}</div>
+              <div class="times-display">
+                ${times.length > 0 
+                  ? this.formatTimesForService(times, dateStr)
+                  : '<span class="no-times">No times selected</span>'
+                }
+              </div>
+            `;
+            
+            const removeDateBtn = document.createElement('button');
+            removeDateBtn.className = 'remove-date-btn';
+            removeDateBtn.innerHTML = '<i class="fas fa-times"></i>';
+            removeDateBtn.addEventListener('click', () => this.removeDate(dateStr));
+            
+            item.appendChild(dateInfo);
+            
+            // Add time button for times page
+            const addTimesBtn = document.createElement('button');
+            addTimesBtn.className = times.length > 0 ? 'add-times-btn disabled' : 'add-times-btn';
+            addTimesBtn.innerHTML = '<i class="fas fa-clock"></i>';
+            addTimesBtn.addEventListener('click', () => this.timeModal.open(dateStr));
+            item.appendChild(addTimesBtn);
+            
+            item.appendChild(removeDateBtn);
+            listElement.appendChild(item);
+          });
+      }
+
+      async removeDate(dateStr) {
+        // Parse date for display
+        const [year, month, day] = dateStr.split('-').map(Number);
+        const date = new Date(year, month - 1, day);
+        const dateDisplay = date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+        
+        // Confirm before removing
+        const confirmed = await showConfirmDialog(
+          `Are you sure you want to remove ${dateDisplay}? Any times selected for this date will also be removed.`,
+          'fa-calendar-xmark'
+        );
+        
+        if (confirmed) {
+          this.state.selectedDates = this.state.selectedDates.filter(d => d !== dateStr);
+          delete this.state.dateTimes[dateStr];
+          this.calendar.render();
+          this.updateSelectedDatesDisplay();
+          this.updateButtonStates();
+          this.state.saveState(); // Auto-save after removal
+        }
+      }
+
+      applyFirstDateTimesToAll() {
+        if (this.state.selectedDates.length < 2) return;
+        
+        const firstDate = this.state.selectedDates[0];
+        const firstDateTimes = this.state.dateTimes[firstDate] || [];
+        
+        if (firstDateTimes.length === 0) return;
+        
+        // Apply first date times to all other dates
+        this.state.selectedDates.slice(1).forEach(dateStr => {
+          this.state.dateTimes[dateStr] = [...firstDateTimes];
+        });
+        
+        this.updateSelectedDatesDisplay();
+        this.updateButtonStates();
+      }
+
+      formatTimesForService(times, dateStr) {
+        if (this.state.selectedService === 'pet-sitting' && times.length === 2) {
+          // For house sitting with 2 times, show as range
+          const sortedTimes = times.sort((a, b) => a.time.localeCompare(b.time));
+          const startTime = sortedTimes[0].time;
+          const endTime = sortedTimes[1].time;
+          return `${startTime} - ${endTime}`;
+        } else if (this.state.selectedService === 'pet-sitting' || this.state.selectedService === 'pet-taxi') {
+          // For house sitting and pet taxi, show times without duration
+          return times.map(t => t.time).join(', ');
+        } else {
+          // For other services, show individual times with duration
+          return times.map(t => `${t.time} (${t.duration}min)`).join(', ');
+        }
+      }
+
+      showFieldError(fieldId, message) {
+        const errorElement = document.getElementById(`${fieldId}Error`);
+        const inputElement = document.getElementById(fieldId);
+        if (errorElement) {
+          errorElement.textContent = message;
+          errorElement.style.display = 'block';
+          errorElement.classList.add('show');
+        }
+        if (inputElement) {
+          inputElement.classList.add('invalid');
+          inputElement.classList.remove('valid');
+        }
+      }
+
+      hideFieldError(fieldId) {
+        const errorElement = document.getElementById(`${fieldId}Error`);
+        const inputElement = document.getElementById(fieldId);
+        if (errorElement) {
+          errorElement.textContent = '';
+          errorElement.style.display = 'none';
+          errorElement.classList.remove('show');
+        }
+        if (inputElement) {
+          inputElement.classList.remove('invalid');
+        }
+      }
+
+      clearAllErrors() {
+        const errorFields = ['firstName', 'lastName', 'email', 'phone', 'address', 'pickupAddress', 'dropoffAddress', 'policy'];
+        errorFields.forEach(fieldId => this.hideFieldError(fieldId));
+      }
+
+      validateContactForm() {
+        // Validate required fields
+        const firstName = document.getElementById('firstName')?.value.trim() || '';
+        const lastName = document.getElementById('lastName')?.value.trim() || '';
+        const email = document.getElementById('email')?.value.trim() || '';
+        const phone = document.getElementById('phone')?.value.trim() || '';
+        const policyAgreed = document.getElementById('policyAgreement')?.checked || false;
+        
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const phoneRegex = /^[\d\s\-\(\)+]+$/;
+        
+        // Clear all errors first
+        this.clearAllErrors();
+        
+        // Validate first name
+        const firstNameInput = document.getElementById('firstName');
+        if (firstName) {
+          this.hideFieldError('firstName');
+          firstNameInput?.classList.remove('invalid');
+          firstNameInput?.classList.add('valid');
+        } else if (firstNameInput?.value) {
+          this.showFieldError('firstName', 'First name is required');
+        }
+        
+        // Validate last name
+        const lastNameInput = document.getElementById('lastName');
+        if (lastName) {
+          this.hideFieldError('lastName');
+          lastNameInput?.classList.remove('invalid');
+          lastNameInput?.classList.add('valid');
+        } else if (lastNameInput?.value) {
+          this.showFieldError('lastName', 'Last name is required');
+        }
+        
+        // Validate email
+        const emailInput = document.getElementById('email');
+        if (email && emailRegex.test(email)) {
+          this.hideFieldError('email');
+          emailInput?.classList.remove('invalid');
+          emailInput?.classList.add('valid');
+        } else if (emailInput?.value) {
+          this.showFieldError('email', email ? 'Please enter a valid email address' : 'Email is required');
+        }
+        
+        // Validate phone
+        const phoneInput = document.getElementById('phone');
+        if (phone && phone.length >= 10 && phoneRegex.test(phone)) {
+          this.hideFieldError('phone');
+          phoneInput?.classList.remove('invalid');
+          phoneInput?.classList.add('valid');
+        } else if (phoneInput?.value) {
+          this.showFieldError('phone', phone.length < 10 ? 'Phone number must be at least 10 digits' : 'Phone is required');
+        }
+        
+        // Validate address (only for non-pet-taxi and non-house-sitting services)
+        const isPetTaxi = this.state.selectedService === 'pet-taxi';
+        const isHouseSitting = this.state.selectedService === 'pet-sitting';
+        if (!isPetTaxi && !isHouseSitting) {
+          const address = document.getElementById('address')?.value.trim() || '';
+          const addressInput = document.getElementById('address');
+          if (address) {
+            this.hideFieldError('address');
+            addressInput?.classList.remove('invalid');
+            addressInput?.classList.add('valid');
+          } else if (addressInput?.value) {
+            this.showFieldError('address', 'Service address is required');
+          }
+        }
+        
+        // Validate policy agreement
+        const policyError = document.getElementById('policyError');
+        if (!policyAgreed) {
+          if (policyError) {
+            policyError.textContent = 'You must agree to the Terms of Service and Privacy Policy';
+            policyError.style.display = 'block';
+            policyError.classList.add('show');
+          }
+        } else {
+          if (policyError) {
+            policyError.textContent = '';
+            policyError.style.display = 'none';
+            policyError.classList.remove('show');
+          }
+        }
+        
+        let isValid = firstName && lastName && email && emailRegex.test(email) && phone && phone.length >= 10 && phoneRegex.test(phone) && policyAgreed;
+        if (!isPetTaxi && !isHouseSitting) {
+          const address = document.getElementById('address')?.value.trim() || '';
+          isValid = isValid && address;
+        }
+        
+        this.state.isValid = isValid;
+        this.updateButtonStates();
+        this.state.saveState(); // Auto-save
+      }
+
+      validatePetTaxiForm() {
+        const pickupAddress = document.getElementById('pickupAddress')?.value.trim() || '';
+        const dropoffAddress = document.getElementById('dropoffAddress')?.value.trim() || '';
+        
+        // Clear errors first
+        this.hideFieldError('pickupAddress');
+        this.hideFieldError('dropoffAddress');
+        
+        // Real-time validation for pickup address
+        const pickupInput = document.getElementById('pickupAddress');
+        if (pickupAddress) {
+          this.hideFieldError('pickupAddress');
+          pickupInput?.classList.remove('invalid');
+          pickupInput?.classList.add('valid');
+        } else if (pickupInput?.value) {
+          this.showFieldError('pickupAddress', 'Pickup address is required');
+        }
+        
+        // Real-time validation for dropoff address
+        const dropoffInput = document.getElementById('dropoffAddress');
+        if (dropoffAddress) {
+          this.hideFieldError('dropoffAddress');
+          dropoffInput?.classList.remove('invalid');
+          dropoffInput?.classList.add('valid');
+        } else if (dropoffInput?.value) {
+          this.showFieldError('dropoffAddress', 'Dropoff address is required');
+        }
+        
+        const isValid = pickupAddress && dropoffAddress;
+        this.state.isValid = isValid;
+        this.updateButtonStates();
+        this.state.saveState(); // Auto-save
+      }
+
+      /**
+       * Fire Meta Pixel Lead event on successful booking submission
+       * Tries to call fbq directly, falls back to postMessage if in iframe
+       */
+      fireMetaPixelLead() {
+        // Prevent double-firing
+        if (this.metaPixelLeadFired) {
+          return;
+        }
+        this.metaPixelLeadFired = true;
+
+        try {
+          // Try to fire fbq directly if available in iframe
+          if (typeof window.fbq === 'function') {
+            window.fbq('track', 'Lead');
+            console.log('Meta Pixel Lead event fired directly');
+            return;
+          }
+
+          // Fallback: Use postMessage to notify parent page
+          if (window.parent && window.parent !== window) {
+            window.parent.postMessage({ type: 'SNOOT_LEAD' }, '*');
+            console.log('Meta Pixel Lead event sent via postMessage to parent');
+          } else {
+            console.warn('Meta Pixel Lead: fbq not available and not in iframe');
+          }
+        } catch (error) {
+          console.error('Error firing Meta Pixel Lead event:', error);
+        }
+      }
+
+      /**
+       * Fire Google Ads conversion event
+       * Prevents double-firing using a flag
+       */
+      fireGoogleAdsConversion() {
+        // Prevent double-firing
+        if (this.googleAdsConversionFired) {
+          return;
+        }
+        // Prevent duplicate firing across re-initialization/re-renders
+        if (typeof window !== 'undefined' && window.__snoutGoogleAdsConversionFired) {
+          this.googleAdsConversionFired = true;
+          return;
+        }
+        this.googleAdsConversionFired = true;
+        if (typeof window !== 'undefined') {
+          window.__snoutGoogleAdsConversionFired = true;
+        }
+
+        try {
+          // Fire Google Ads conversion event
+          if (typeof window.gtag === 'function') {
+            window.gtag('event', 'conversion', {
+              'send_to': 'AW-11558191297/81slCKHb0PEbEMGBsIcr'
+            });
+            console.log('Google Ads conversion event fired');
+          } else {
+            console.warn('Google Ads: gtag not available');
+          }
+        } catch (error) {
+          console.error('Error firing Google Ads conversion event:', error);
+        }
+      }
+
+      async submitForm() {
+        const isPetTaxi = this.state.selectedService === 'pet-taxi';
+        const currentStep = this.state.currentStep;
+        
+        // Validate current step (should be 6 for contact info)
+        if (!this.state.validateStep(currentStep)) {
+          // Show inline errors for all missing fields
+          const firstName = document.getElementById('firstName')?.value.trim() || '';
+          const lastName = document.getElementById('lastName')?.value.trim() || '';
+          const email = document.getElementById('email')?.value.trim() || '';
+          const phone = document.getElementById('phone')?.value.trim() || '';
+          const policyAgreed = document.getElementById('policyAgreement')?.checked || false;
+          
+          if (!firstName) this.showFieldError('firstName', 'First name is required');
+          if (!lastName) this.showFieldError('lastName', 'Last name is required');
+          if (!email) this.showFieldError('email', 'Email is required');
+          if (!phone) this.showFieldError('phone', 'Phone is required');
+          if (!policyAgreed) {
+            const policyError = document.getElementById('policyError');
+            if (policyError) {
+              policyError.textContent = 'You must agree to the Terms of Service and Privacy Policy';
+              policyError.style.display = 'block';
+              policyError.classList.add('show');
+            }
+          }
+          
+          if (!isPetTaxi) {
+            const address = document.getElementById('address')?.value.trim() || '';
+            if (!address) this.showFieldError('address', 'Service address is required');
+          } else {
+            const pickupAddress = document.getElementById('pickupAddress')?.value.trim() || '';
+            const dropoffAddress = document.getElementById('dropoffAddress')?.value.trim() || '';
+            if (!pickupAddress) this.showFieldError('pickupAddress', 'Pickup address is required');
+            if (!dropoffAddress) this.showFieldError('dropoffAddress', 'Dropoff address is required');
+          }
+          
+          // Scroll to first error
+          const firstError = document.querySelector('.field-error.show');
+          if (firstError) {
+            firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+          
+          return;
+        }
+
+        // Collect contact information
+        this.state.contactInfo = {
+          firstName: document.getElementById('firstName').value,
+          lastName: document.getElementById('lastName').value,
+          email: document.getElementById('email').value,
+          phone: document.getElementById('phone').value,
+          address: isPetTaxi ? null : document.getElementById('address')?.value || null,
+          pickupAddress: isPetTaxi ? document.getElementById('pickupAddress')?.value || null : null,
+          dropoffAddress: isPetTaxi ? document.getElementById('dropoffAddress')?.value || null : null,
+          notes: document.getElementById('notes')?.value || null,
+        };
+
+        // Show loading state
+        this.elements.submitBtn.classList.add('loading');
+        this.elements.submitBtn.disabled = true;
+
+        // Map service names to API format
+        // Map service, checking for 24/7 care option
+        let serviceName;
+        if (this.state.selectedService === 'pet-sitting' && this.state.is24SevenCare) {
+          serviceName = '24/7 Care';
+        } else {
+          const serviceMap = {
+            'dog-walking': 'Dog Walking',
+            'pet-sitting': 'Housesitting',
+            'drop-in': 'Drop-ins',
+            'pet-taxi': 'Pet Taxi'
+          };
+          serviceName = serviceMap[this.state.selectedService] || 'Drop-ins';
+        }
+
+        // Get first selected date and time
+        const firstDate = this.state.selectedDates[0];
+        const firstTime = this.state.dateTimes[firstDate]?.[0];
+        
+        // Build pets array from selected pets
+        const pets = [];
+        const petTypeMap = {
+          dogs: 'Dog',
+          cats: 'Cat',
+          farm: 'Farm Animal',
+          reptiles: 'Reptile',
+          birds: 'Bird',
+          other: 'Other'
+        };
+        
+        Object.entries(this.state.pets).forEach(([type, count]) => {
+          for (let i = 0; i < count; i++) {
+            pets.push({
+              name: `${petTypeMap[type]} ${i + 1}`,
+              species: petTypeMap[type]
+            });
+          }
+        });
+
+        // Helper to convert 12-hour time to 24-hour format
+        const convertTo24Hour = (time12h) => {
+          if (!time12h) return '09:00:00';
+          const [time, modifier] = time12h.split(' ');
+          let [hours, minutes] = time.split(':');
+          if (hours === '12') hours = '00';
+          if (modifier === 'PM') hours = parseInt(hours, 10) + 12;
+          return `${String(hours).padStart(2, '0')}:${minutes}:00`;
+        };
+
+        // Convert time and create ISO dates
+        const time24h = convertTo24Hour(firstTime?.time || '09:00 AM');
+        const startDateTime = `${firstDate}T${time24h}`;
+        const duration = firstTime?.duration || 30;
+        
+        // For house sitting and 24/7 care, calculate endAt based on last selected date
+        let endDateTime;
+        let quantity;
+        const isHouseSittingService = serviceName === 'Housesitting' || serviceName === '24/7 Care';
+        
+        if (isHouseSittingService && this.state.selectedDates.length > 1) {
+          // For house sitting, use the last selected date as end date
+          const sortedDates = [...this.state.selectedDates].sort();
+          const lastDate = sortedDates[sortedDates.length - 1];
+          // Get the last time from the last date, or use end of day
+          const lastDateTimes = this.state.dateTimes[lastDate] || [];
+          const lastTime = lastDateTimes.length > 0 ? lastDateTimes[lastDateTimes.length - 1] : null;
+          
+          if (lastTime && lastTime.time) {
+            const lastTime24h = convertTo24Hour(lastTime.time);
+            endDateTime = new Date(`${lastDate}T${lastTime24h}`).toISOString();
+          } else {
+            // Use end of day for last date
+            endDateTime = new Date(`${lastDate}T23:59:59`).toISOString();
+          }
+          
+          // Quantity for house sitting is number of nights (number of days - 1)
+          quantity = sortedDates.length - 1;
+        } else {
+          // For other services, calculate endAt based on duration
+          endDateTime = new Date(new Date(startDateTime).getTime() + duration * 60000).toISOString();
+          
+          // Quantity for other services is total time slots
+          quantity = this.state.selectedDates.length > 0 ? (() => {
+            // Count total time slots across all dates
+            return this.state.selectedDates.reduce((total, date) => {
+              return total + (this.state.dateTimes[date]?.length || 0);
+            }, 0);
+          })() : 1;
+        }
+
+        // Build API payload
+        const runtimeParams = new URLSearchParams(window.location.search);
+        const createdFromParam = runtimeParams.get('createdFrom');
+        const apiUrlParam = runtimeParams.get('apiUrl');
+
+        const payload = {
+          firstName: this.state.contactInfo.firstName,
+          lastName: this.state.contactInfo.lastName,
+          phone: this.state.contactInfo.phone,
+          email: this.state.contactInfo.email || undefined,
+          address: this.state.contactInfo.address || undefined,
+          pickupAddress: this.state.contactInfo.pickupAddress || undefined,
+          dropoffAddress: this.state.contactInfo.dropoffAddress || undefined,
+          service: serviceName,
+          minutes: duration,
+          quantity: quantity,
+          startAt: new Date(startDateTime).toISOString(),
+          endAt: endDateTime,
+          pets: pets.length > 0 ? pets : [{ name: 'Pet', species: 'Dog' }],
+          selectedDates: this.state.selectedDates,
+          dateTimes: this.state.dateTimes,
+          // Get notes from multiple sources to ensure we capture it
+          // Always read directly from DOM to ensure we have the latest value
+          notes: (() => {
+            const notesInput = document.getElementById('notes');
+            const notesValue = notesInput?.value || this.state.contactInfo.notes || null;
+            // Return the value if it exists, otherwise null (not undefined)
+            return notesValue && notesValue.trim() ? notesValue.trim() : null;
+          })(),
+          afterHours: false,
+          holiday: false,
+          smsConsent: true,
+          createdFrom: FORM_CONFIG.variant === 'owner' ? 'owner-portal'
+                     : FORM_CONFIG.variant === 'client' ? 'client-portal'
+                     : createdFromParam || 'Webflow'
+        };
+
+        // Add clientId for client variant
+        if (FORM_CONFIG.variant === 'client' && FORM_CONFIG.clientId) {
+          payload.clientId = FORM_CONFIG.clientId;
+        }
+
+        try {
+          // Determine API URL based on variant
+          let apiUrl;
+
+          if (FORM_CONFIG.variant === 'client') {
+            // Client portal submits to the client bookings endpoint
+            apiUrl = window.location.origin + '/api/client/bookings';
+          } else if (apiUrlParam) {
+            // 1. Check URL param override (for embedded portals)
+            apiUrl = apiUrlParam;
+          } else {
+            // 2. Check for data attribute on form container
+            const formContainer = document.querySelector('.booking-container, .form-wrapper, .booking-form');
+            if (formContainer && formContainer.dataset.apiUrl) {
+              apiUrl = formContainer.dataset.apiUrl;
+            }
+          }
+          // 3. Check for global variable
+          if (!apiUrl && window.BOOKING_FORM_API_URL) {
+            apiUrl = window.BOOKING_FORM_API_URL;
+          }
+          // 4. Check for meta tag
+          if (!apiUrl) {
+            const metaTag = document.querySelector('meta[name="booking-api-url"]');
+            if (metaTag && metaTag.content) {
+              apiUrl = metaTag.content;
+            }
+          }
+
+          // 5. Fallback to window.location.origin (for same-origin requests)
+          if (!apiUrl) {
+            apiUrl = window.location.origin + '/api/form';
+          } else {
+            // Ensure the URL ends with /api/form if only base URL provided
+            if (!apiUrlParam && !apiUrl.includes('/api/form')) {
+              apiUrl = apiUrl.replace(/\/$/, '') + '/api/form';
+            }
+          }
+          
+          // Debug: Log the payload to see if notes are included
+          console.log('Submitting booking with payload:', {
+            ...payload,
+            notes: payload.notes,
+            notesType: typeof payload.notes,
+            notesLength: payload.notes ? payload.notes.length : 0,
+          });
+
+          const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload)
+          });
+
+          let data;
+          try {
+            data = await response.json();
+          } catch (jsonError) {
+            throw new Error('Invalid response from server. Please try again.');
+          }
+
+          if (response.ok) {
+            // Fire Meta Pixel Lead event on successful submission
+            this.fireMetaPixelLead();
+
+            // Clear auto-save after successful submission
+            this.state.clearState();
+
+            // Pay-first: redirect to Stripe Checkout if payment URL provided
+            if (data.paymentUrl && FORM_CONFIG.variant !== 'owner') {
+              // Non-owner variants: redirect directly to Stripe Checkout
+              window.location.href = data.paymentUrl;
+              return;
+            } else if (data.paymentUrl && FORM_CONFIG.variant === 'owner') {
+              // Owner variant: include payment URL in the message for owner to copy/send
+              if (window.parent !== window) {
+                window.parent.postMessage({
+                  type: 'bookingCreated',
+                  bookingId: data?.booking?.id || data?.id,
+                  booking: data,
+                  payload: payload,
+                  paymentUrl: data.paymentUrl,
+                }, '*');
+              }
+              // Show a brief message with payment link info
+              const step6 = document.getElementById('step6');
+              if (step6) {
+                step6.innerHTML = '<div style="text-align:center;padding:40px 20px;"><div style="font-size:24px;margin-bottom:8px;">&#x2705;</div><p style="font-size:16px;font-weight:600;color:#432f21;">Booking created!</p><p style="font-size:14px;color:#888;margin-top:4px;">Payment link generated. Redirecting...</p></div>';
+              }
+              return;
+            }
+
+            // No payment URL — existing flow
+            // Notify parent window if embedded in iframe
+            if (window.parent !== window) {
+              const bookingId = data?.booking?.id || data?.id;
+              window.parent.postMessage({
+                type: 'bookingCreated',
+                bookingId: bookingId,
+                booking: data,
+                payload: payload,
+              }, '*');
+              // Also send legacy event type for backward compat
+              window.parent.postMessage({
+                type: 'BOOKING_FORM_SUBMIT',
+                booking: data,
+                payload: payload,
+              }, window.location.origin);
+            }
+
+            // For owner/client variants, let the parent handle navigation.
+            // For public variant, show the confirmation step.
+            if (FORM_CONFIG.variant !== 'public') {
+              // Show a brief "Booking created!" message while parent redirects
+              const step6 = document.getElementById('step6');
+              if (step6) {
+                step6.innerHTML = '<div style="text-align:center;padding:40px 20px;"><div style="font-size:24px;margin-bottom:8px;">&#x2705;</div><p style="font-size:16px;font-weight:600;color:#432f21;">Booking created!</p><p style="font-size:14px;color:#888;margin-top:4px;">Redirecting...</p></div>';
+              }
+              return;
+            }
+            this.setupStep(7); // Step 7 is confirmation (public only)
+            // Update iframe height for confirmation page
+            setTimeout(() => {
+              if (typeof sendHeightToParent === 'function') {
+                sendHeightToParent();
+              }
+            }, 50);
+          } else if (response.status === 402 && data?.error === 'outstanding_balance') {
+            // Outstanding balance — show payment-required message
+            const amount = data.message || 'You have an outstanding balance.';
+            let balanceHtml = `<div style="text-align:left;max-width:400px;margin:0 auto;"><p style="font-weight:600;margin-bottom:8px;">${amount}</p>`;
+            if (Array.isArray(data.outstandingBookings) && data.outstandingBookings.length > 0) {
+              balanceHtml += '<div style="margin-top:8px;">';
+              for (const b of data.outstandingBookings) {
+                const dateStr = new Date(b.startAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                balanceHtml += `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #eee;">`;
+                balanceHtml += `<span>${b.service} · ${dateStr} · $${b.totalPrice.toFixed(2)}</span>`;
+                if (b.paymentLink) {
+                  balanceHtml += `<a href="${b.paymentLink}" target="_blank" style="color:#432f21;font-weight:600;text-decoration:underline;margin-left:8px;">Pay</a>`;
+                }
+                balanceHtml += `</div>`;
+              }
+              balanceHtml += '</div>';
+            }
+            balanceHtml += '</div>';
+            showCustomAlert(balanceHtml, 'fa-credit-card');
+
+            // Notify parent (iframe variants)
+            if (window.parent !== window) {
+              window.parent.postMessage({ type: 'outstandingBalance', ...data }, '*');
+            }
+            this.elements.submitBtn.classList.remove('loading');
+            this.elements.submitBtn.disabled = false;
+          } else {
+            const errorMessage = data?.error || data?.details || 'Unknown error occurred. Please try again.';
+            const debugInfo = window.location.hostname === 'localhost' || window.location.hostname.includes('staging')
+              ? `\n\nAPI URL: ${apiUrl}`
+              : '';
+            showCustomAlert(`Booking failed: ${errorMessage}${debugInfo}`, 'fa-circle-exclamation');
+            this.elements.submitBtn.classList.remove('loading');
+            this.elements.submitBtn.disabled = false;
+          }
+        } catch (error) {
+          let errorMessage = 'Network error. Please check your connection and try again.';
+          if (error instanceof TypeError && error.message.includes('fetch')) {
+            errorMessage = 'Unable to connect to server. Please check your connection and try again.';
+            // Include API URL in error for debugging (only in development)
+            if (window.location.hostname === 'localhost' || window.location.hostname.includes('staging')) {
+              errorMessage += `\n\nAPI URL attempted: ${apiUrl}`;
+            }
+          } else if (error instanceof Error) {
+            errorMessage = error.message;
+          }
+          showCustomAlert(errorMessage, 'fa-wifi');
+          this.elements.submitBtn.classList.remove('loading');
+          this.elements.submitBtn.disabled = false;
+        }
+      }
+
+      startNewBooking() {
+        // Reset state
+        this.state = new BookingFormState();
+        
+        // Reset UI
+        this.elements.serviceCards.forEach(card => card.classList.remove('selected'));
+        this.elements.typeCards.forEach(card => card.classList.remove('selected'));
+        this.elements.selectedPetsSummary.innerHTML = '';
+        
+        // Reset pet counters
+        Object.keys(this.state.pets).forEach(type => {
+          const input = document.getElementById(`${type}Count`);
+          if (input) input.value = '0';
+        });
+
+        // Reset contact form
+        this.elements.contactInputs.forEach(input => {
+          input.value = '';
+          input.classList.remove('valid', 'invalid');
+        });
+        this.elements.policyCheckbox.checked = false;
+
+        // Reset submit button state
+        if (this.elements.submitBtn) {
+          this.elements.submitBtn.classList.remove('loading');
+          this.elements.submitBtn.disabled = false;
+        }
+
+        // Clear calendar selection
+        if (this.calendar) {
+          this.calendar.render();
+        }
+
+        // Start over
+        this.setupStep(1);
+        
+        // Update iframe height when starting new booking
+        setTimeout(() => {
+          if (typeof sendHeightToParent === 'function') {
+            sendHeightToParent();
+          }
+        }, 100);
+      }
+
+      // Owner variant: inject client search UI above contact fields
+      injectOwnerClientSearch() {
+        if (document.getElementById('ownerClientSearch')) return; // Already injected
+        const contactGrid = document.querySelector('#step6 .contact-grid');
+        if (!contactGrid) return;
+
+        const searchContainer = document.createElement('div');
+        searchContainer.id = 'ownerClientSearch';
+        searchContainer.style.cssText = 'margin-bottom: 16px; position: relative;';
+        searchContainer.innerHTML = `
+          <label class="contact-label" style="margin-bottom: 4px;">Search existing clients</label>
+          <input type="text" class="contact-input" id="clientSearchInput" placeholder="Search by name, email, or phone..." autocomplete="off" style="margin-bottom: 4px;">
+          <div id="clientSearchResults" style="position:absolute;top:100%;left:0;right:0;background:white;border:1px solid #e2e8f0;border-radius:8px;max-height:200px;overflow-y:auto;z-index:100;display:none;box-shadow:0 4px 12px rgba(0,0,0,0.1);"></div>
+          <div style="margin-top:4px;font-size:12px;color:#666;">Or fill in the fields below manually</div>
+        `;
+        contactGrid.insertBefore(searchContainer, contactGrid.firstChild);
+
+        const searchInput = document.getElementById('clientSearchInput');
+        const resultsDiv = document.getElementById('clientSearchResults');
+        let searchTimer = null;
+
+        searchInput.addEventListener('input', () => {
+          clearTimeout(searchTimer);
+          const query = searchInput.value.trim();
+          if (query.length < 2) { resultsDiv.style.display = 'none'; return; }
+          searchTimer = setTimeout(() => {
+            // Ask parent window to search clients
+            window.parent.postMessage({ type: 'searchClients', query }, '*');
+          }, 300);
+        });
+
+        // Listen for client search results from parent
+        window.addEventListener('message', (event) => {
+          if (event.data?.type === 'clientResults' && Array.isArray(event.data.clients)) {
+            const clients = event.data.clients;
+            if (clients.length === 0) {
+              resultsDiv.innerHTML = '<div style="padding:12px;color:#888;font-size:14px;">No clients found</div>';
+              resultsDiv.style.display = 'block';
+              return;
+            }
+            resultsDiv.innerHTML = clients.map(c => `
+              <div class="client-result-row" data-client='${JSON.stringify(c).replace(/'/g, "&#39;")}' style="padding:10px 12px;cursor:pointer;border-bottom:1px solid #f0f0f0;font-size:14px;transition:background 0.15s;" onmouseover="this.style.background='#f8f8f8'" onmouseout="this.style.background='white'">
+                <div style="font-weight:600;color:#432f21;">${c.name || 'Unnamed'}</div>
+                <div style="font-size:12px;color:#888;">${c.email || ''} ${c.phone ? '· ' + c.phone : ''}</div>
+              </div>
+            `).join('');
+            resultsDiv.style.display = 'block';
+
+            resultsDiv.querySelectorAll('.client-result-row').forEach(row => {
+              row.addEventListener('click', () => {
+                const client = JSON.parse(row.dataset.client);
+                const nameParts = (client.name || '').split(' ');
+                const fields = {
+                  firstName: nameParts[0] || '',
+                  lastName: nameParts.slice(1).join(' ') || '',
+                  email: client.email || '',
+                  phone: client.phone || '',
+                  address: client.address || '',
+                };
+                Object.entries(fields).forEach(([id, val]) => {
+                  const el = document.getElementById(id);
+                  if (el) { el.value = val; el.dispatchEvent(new Event('input')); }
+                });
+                searchInput.value = client.name || '';
+                resultsDiv.style.display = 'none';
+                this.validateContactForm();
+                this.updateButtonStates();
+              });
+            });
+          }
+        });
+
+        // Close results when clicking outside
+        document.addEventListener('click', (e) => {
+          if (!searchContainer.contains(e.target)) resultsDiv.style.display = 'none';
+        });
+      }
+    }
+
+    // ===== CALENDAR CONTROLLER =====
+    class CalendarController {
+      constructor() {
+        this.currentDate = new Date();
+        this.currentMonth = this.currentDate.getMonth();
+        this.currentYear = this.currentDate.getFullYear();
+      }
+
+      render() {
+        const title = document.getElementById('calendarTitle');
+        const grid = document.getElementById('calendarGrid');
+        
+        if (!title || !grid) return;
+
+        title.textContent = new Date(this.currentYear, this.currentMonth).toLocaleDateString('en-US', {
+          month: 'long',
+          year: 'numeric'
+        });
+
+        grid.innerHTML = '';
+
+        // Add day headers
+        const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        dayHeaders.forEach(day => {
+          const header = document.createElement('div');
+          header.className = 'calendar-header-day';
+          header.textContent = day;
+          grid.appendChild(header);
+        });
+
+        // Get first day of month and number of days
+        const firstDay = new Date(this.currentYear, this.currentMonth, 1).getDay();
+        const daysInMonth = new Date(this.currentYear, this.currentMonth + 1, 0).getDate();
+
+        // Add empty cells for days before month starts
+        for (let i = 0; i < firstDay; i++) {
+          const empty = document.createElement('div');
+          empty.className = 'calendar-day other-month';
+          grid.appendChild(empty);
+        }
+
+        // Add days of month
+        for (let day = 1; day <= daysInMonth; day++) {
+          const dayElement = document.createElement('div');
+          dayElement.className = 'calendar-day';
+          dayElement.setAttribute('data-automation', `calendar-day-${day}`);
+          dayElement.textContent = day;
+          dayElement.dataset.day = day;
+
+          const dateStr = this.getDateString(day);
+          const today = new Date();
+          const isToday = day === today.getDate() && 
+                         this.currentMonth === today.getMonth() && 
+                         this.currentYear === today.getFullYear();
+          const isSelected = window.bookingForm?.state?.selectedDates?.includes(dateStr) ?? false;
+          const isPast = new Date(dateStr) < new Date(new Date().setHours(0, 0, 0, 0));
+
+          if (isToday) dayElement.classList.add('today');
+          if (isSelected) dayElement.classList.add('selected');
+          if (isPast) dayElement.classList.add('disabled');
+
+          if (!isPast) {
+            dayElement.addEventListener('click', () => this.selectDate(day));
+          }
+
+          grid.appendChild(dayElement);
+        }
+
+        // Setup navigation
+        this.setupNavigation();
+      }
+
+      getDateString(day) {
+        const date = new Date(this.currentYear, this.currentMonth, day);
+        return date.toISOString().split('T')[0];
+      }
+
+      selectDate(day) {
+        const dateStr = this.getDateString(day);
+        const index = window.bookingForm.state.selectedDates.indexOf(dateStr);
+
+        if (index > -1) {
+          // Remove date
+          window.bookingForm.state.selectedDates.splice(index, 1);
+          delete window.bookingForm.state.dateTimes[dateStr];
+        } else {
+          // For house sitting, validate consecutive dates
+          if (window.bookingForm.state.selectedService === 'pet-sitting') {
+            if (!this.isConsecutiveDate(dateStr)) {
+              showCustomAlert('House sitting requires consecutive dates. Please select dates in sequence.', 'fa-calendar-days');
+              return;
+            }
+          }
+          
+          // Add date
+          window.bookingForm.state.selectedDates.push(dateStr);
+          window.bookingForm.state.dateTimes[dateStr] = [];
+        }
+
+        this.render();
+        window.bookingForm.updateSelectedDatesDisplay();
+        window.bookingForm.updateButtonStates();
+        window.bookingForm.state.saveState(); // Auto-save
+      }
+
+      isConsecutiveDate(newDateStr) {
+        const selectedDates = window.bookingForm.state.selectedDates;
+        if (selectedDates.length === 0) return true;
+
+        const newDate = new Date(newDateStr);
+        const sortedDates = [...selectedDates].sort().map(dateStr => new Date(dateStr));
+        
+        // Check if new date is consecutive to any existing date
+        for (const date of sortedDates) {
+          const dayDiff = Math.abs(newDate - date) / (1000 * 60 * 60 * 24);
+          if (dayDiff === 1) return true;
+        }
+        
+        return false;
+      }
+
+      setupNavigation() {
+        const prevBtn = document.getElementById('prevMonth');
+        const nextBtn = document.getElementById('nextMonth');
+
+        if (prevBtn) {
+          prevBtn.onclick = () => {
+            this.currentMonth--;
+            if (this.currentMonth < 0) {
+              this.currentMonth = 11;
+              this.currentYear--;
+            }
+            this.render();
+          };
+        }
+
+        if (nextBtn) {
+          nextBtn.onclick = () => {
+            this.currentMonth++;
+            if (this.currentMonth > 11) {
+              this.currentMonth = 0;
+              this.currentYear++;
+            }
+            this.render();
+          };
+        }
+      }
+    }
+
+    // ===== TIME MODAL CONTROLLER =====
+    class TimeModalController {
+      constructor() {
+        this.currentDate = null;
+        this.timeSlots = this.generateTimeSlots();
+        // Store event handlers so we can remove them
+        this.scrollHandler = null;
+        this.wheelHandler = null;
+        this.touchStartHandler = null;
+        this.touchMoveHandler = null;
+        this.touchEndHandler = null;
+        this.scrollTimeout = null;
+        this.isScrolling = false;
+      }
+
+      generateTimeSlots() {
+        const slots = [];
+        for (let hour = 6; hour <= 22; hour++) {
+          for (let minute = 0; minute < 60; minute += 30) {
+            // Stop at 10:30 PM (22:30)
+            if (hour === 22 && minute > 30) break;
+            const timeStr = this.formatTime(hour, minute);
+            slots.push(timeStr);
+          }
+        }
+        return slots;
+      }
+
+      formatTime(hour, minute) {
+        const period = hour >= 12 ? 'PM' : 'AM';
+        const displayHour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+        const displayMinute = minute.toString().padStart(2, '0');
+        return `${displayHour}:${displayMinute} ${period}`;
+      }
+
+      open(dateStr) {
+        this.currentDate = dateStr;
+        const modal = document.getElementById('timeModal');
+        const title = document.getElementById('modalDateTitle');
+        const dateDisplay = document.getElementById('modalDateDisplay');
+        const container = document.getElementById('timeSlotsContainer');
+
+        if (!modal || !title || !dateDisplay || !container) return;
+        
+        // Clean up previous event listeners before setting up new ones
+        this.cleanupEventListeners(container);
+
+        // For house sitting, show "Start Time" or "End Time"
+        const isHouseSitting = window.bookingForm.state.selectedService === 'pet-sitting';
+        const selectedDates = window.bookingForm.state.selectedDates;
+        
+        if (isHouseSitting && selectedDates.length > 0) {
+          const firstDate = selectedDates[0];
+          const lastDate = selectedDates[selectedDates.length - 1];
+          
+          if (dateStr === firstDate) {
+            title.textContent = 'Select Start Time';
+          } else if (dateStr === lastDate) {
+            title.textContent = 'Select End Time';
+          } else {
+            title.textContent = 'Select Times';
+          }
+        } else {
+          title.textContent = 'Select Times';
+        }
+        
+        // Parse date correctly to avoid timezone issues
+        const [year, month, day] = dateStr.split('-').map(Number);
+        const date = new Date(year, month - 1, day);
+        dateDisplay.textContent = date.toLocaleDateString('en-US', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
+
+        // Reset scroll position to top when opening for a new date
+        container.scrollTop = 0;
+        
+        this.renderTimeSlots(container, dateStr);
+        modal.classList.add('active');
+        document.body.classList.add('modal-open');
+        
+        // Set up scroll bounds to prevent scrolling past last item (10:30 PM)
+        this.setupScrollBounds(container);
+      }
+      
+      cleanupEventListeners(container) {
+        // Remove all previous event listeners if they exist
+        if (this.scrollHandler) {
+          container.removeEventListener('scroll', this.scrollHandler);
+          this.scrollHandler = null;
+        }
+        if (this.wheelHandler) {
+          container.removeEventListener('wheel', this.wheelHandler);
+          this.wheelHandler = null;
+        }
+        if (this.touchStartHandler) {
+          container.removeEventListener('touchstart', this.touchStartHandler);
+          this.touchStartHandler = null;
+        }
+        if (this.touchMoveHandler) {
+          container.removeEventListener('touchmove', this.touchMoveHandler);
+          this.touchMoveHandler = null;
+        }
+        if (this.touchEndHandler) {
+          container.removeEventListener('touchend', this.touchEndHandler);
+          this.touchEndHandler = null;
+        }
+        if (this.scrollTimeout) {
+          clearTimeout(this.scrollTimeout);
+          this.scrollTimeout = null;
+        }
+        this.isScrolling = false;
+      }
+      
+      setupScrollBounds(container) {
+        // Wait for DOM to render
+        setTimeout(() => {
+          const grid = container.querySelector('.time-slots-grid');
+          if (!grid) return;
+          
+          // Helper to get max scroll position
+          const getMaxScroll = () => {
+            const scrollHeight = grid.scrollHeight;
+            const clientHeight = container.clientHeight;
+            return Math.max(0, scrollHeight - clientHeight);
+          };
+          
+          // Disable momentum scrolling and prevent bouncing
+          let lastScrollTop = 0;
+          let isUserScrolling = false;
+          
+          // Throttled scroll handler to prevent bouncing - only check at end of scroll
+          this.scrollHandler = () => {
+            if (this.isScrolling) return;
+            
+            const scrollTop = container.scrollTop;
+            const maxScroll = getMaxScroll();
+            
+            // If past max scroll, immediately snap back without smooth behavior
+            if (scrollTop > maxScroll) {
+              this.isScrolling = true;
+              container.scrollTop = maxScroll; // Direct assignment, no smooth
+              setTimeout(() => {
+                this.isScrolling = false;
+              }, 50);
+              return;
+            }
+            
+            // If past top, snap back
+            if (scrollTop < 0) {
+              this.isScrolling = true;
+              container.scrollTop = 0;
+              setTimeout(() => {
+                this.isScrolling = false;
+              }, 50);
+              return;
+            }
+            
+            lastScrollTop = scrollTop;
+            
+            // Check if scroll ended
+            if (this.scrollTimeout) clearTimeout(this.scrollTimeout);
+            isUserScrolling = true;
+            
+            this.scrollTimeout = setTimeout(() => {
+              isUserScrolling = false;
+              // Final check when scroll ends
+              if (!this.isScrolling) {
+                const finalScrollTop = container.scrollTop;
+                const finalMaxScroll = getMaxScroll();
+                if (finalScrollTop > finalMaxScroll) {
+                  container.scrollTop = finalMaxScroll;
+                }
+              }
+            }, 100);
+          };
+          
+          container.addEventListener('scroll', this.scrollHandler, { passive: true });
+          
+          // Prevent wheel scroll past bounds - more aggressive
+          this.wheelHandler = (e) => {
+            if (this.isScrolling) {
+              e.preventDefault();
+              return false;
+            }
+            
+            const scrollTop = container.scrollTop;
+            const maxScroll = getMaxScroll();
+            
+            // If at or near bottom and trying to scroll down, prevent it
+            if (scrollTop >= maxScroll - 1 && e.deltaY > 0) {
+              e.preventDefault();
+              e.stopPropagation();
+              container.scrollTop = maxScroll;
+              return false;
+            }
+            
+            // If at or near top and trying to scroll up, prevent it
+            if (scrollTop <= 1 && e.deltaY < 0) {
+              e.preventDefault();
+              e.stopPropagation();
+              container.scrollTop = 0;
+              return false;
+            }
+          };
+          
+          container.addEventListener('wheel', this.wheelHandler, { passive: false });
+          
+          // Prevent touch scrolling past bounds on mobile - more aggressive
+          let touchStartY = 0;
+          let touchStartScroll = 0;
+          let lastTouchY = 0;
+          let touchMoved = false;
+          
+          this.touchStartHandler = (e) => {
+            if (this.isScrolling) {
+              e.preventDefault();
+              return false;
+            }
+            touchStartY = e.touches[0].clientY;
+            touchStartScroll = container.scrollTop;
+            lastTouchY = touchStartY;
+            touchMoved = false;
+          };
+          
+          container.addEventListener('touchstart', this.touchStartHandler, { passive: true });
+          
+          this.touchMoveHandler = (e) => {
+            if (this.isScrolling) {
+              e.preventDefault();
+              return false;
+            }
+            
+            touchMoved = true;
+            const scrollTop = container.scrollTop;
+            const maxScroll = getMaxScroll();
+            const touchY = e.touches[0].clientY;
+            const scrollDelta = touchStartScroll + (touchStartY - touchY);
+            
+            // If at bottom and trying to scroll down past bounds
+            if (scrollTop >= maxScroll - 1 && scrollDelta > maxScroll) {
+              e.preventDefault();
+              e.stopPropagation();
+              container.scrollTop = maxScroll;
+              return false;
+            }
+            // If at top and trying to scroll up past bounds
+            else if (scrollTop <= 1 && scrollDelta < 0) {
+              e.preventDefault();
+              e.stopPropagation();
+              container.scrollTop = 0;
+              return false;
+            }
+            
+            lastTouchY = touchY;
+          };
+          
+          container.addEventListener('touchmove', this.touchMoveHandler, { passive: false });
+          
+          this.touchEndHandler = () => {
+            if (touchMoved) {
+              const scrollTop = container.scrollTop;
+              const maxScroll = getMaxScroll();
+              
+              // Final snap check
+              if (scrollTop > maxScroll) {
+                container.scrollTop = maxScroll;
+              } else if (scrollTop < 0) {
+                container.scrollTop = 0;
+              }
+            }
+            touchMoved = false;
+          };
+          
+          container.addEventListener('touchend', this.touchEndHandler, { passive: true });
+        }, 100);
+      }
+
+      renderTimeSlots(container, dateStr) {
+        container.innerHTML = '';
+
+        const grid = document.createElement('div');
+        grid.className = 'time-slots-grid';
+
+        const existingTimes = window.bookingForm.state.dateTimes[dateStr] || [];
+        const selectedService = window.bookingForm.state.selectedService;
+        const showDurationToggle = selectedService !== 'pet-sitting' && selectedService !== 'pet-taxi';
+
+        this.timeSlots.forEach(time => {
+          const slot = document.createElement('div');
+          slot.className = 'time-slot';
+          slot.setAttribute('data-automation', `time-slot-${time.replace(':', '')}`);
+          
+          const timeDisplay = document.createElement('span');
+          timeDisplay.className = 'time-display';
+          timeDisplay.textContent = time;
+          
+          slot.appendChild(timeDisplay);
+          
+          // Only add duration toggle for services that need it
+          if (showDurationToggle) {
+            const durationToggle = document.createElement('div');
+            durationToggle.className = 'duration-toggle';
+            
+             const chip30 = document.createElement('span');
+             chip30.className = 'duration-chip';
+             chip30.setAttribute('data-automation', `duration-chip-30-${time.replace(':', '')}`);
+             chip30.setAttribute('aria-label', '30 minutes duration');
+             chip30.textContent = '30 min';
+             chip30.onclick = (e) => {
+               e.stopPropagation();
+               this.setDuration(time, dateStr, 30);
+             };
+             
+             const chip60 = document.createElement('span');
+             chip60.className = 'duration-chip';
+             chip60.setAttribute('data-automation', `duration-chip-60-${time.replace(':', '')}`);
+             chip60.setAttribute('aria-label', '60 minutes duration');
+             chip60.textContent = '60 min';
+             chip60.onclick = (e) => {
+               e.stopPropagation();
+               this.setDuration(time, dateStr, 60);
+             };
+            
+            durationToggle.appendChild(chip30);
+            durationToggle.appendChild(chip60);
+            slot.appendChild(durationToggle);
+            
+            // Check if this time is already selected
+            const existingEntry = existingTimes.find(entry => entry.time === time);
+            
+            if (existingEntry) {
+              slot.classList.add('selected');
+              if (existingEntry.duration === 60) {
+                chip60.classList.add('active');
+              } else {
+                chip30.classList.add('active');
+              }
+            } else {
+              chip30.classList.add('active');
+            }
+          } else {
+            // For house sitting and pet taxi, check if time is selected
+            const existingEntry = existingTimes.find(entry => entry.time === time);
+            if (existingEntry) {
+              slot.classList.add('selected');
+            }
+          }
+          
+          slot.onclick = () => this.selectTimeSlot(time, dateStr);
+          grid.appendChild(slot);
+        });
+
+        container.appendChild(grid);
+      }
+
+      selectTimeSlot(time, dateStr) {
+        if (!window.bookingForm.state.dateTimes[dateStr]) {
+          window.bookingForm.state.dateTimes[dateStr] = [];
+        }
+
+        const existingIndex = window.bookingForm.state.dateTimes[dateStr].findIndex(entry => entry.time === time);
+        
+        if (existingIndex > -1) {
+          // Remove time
+          window.bookingForm.state.dateTimes[dateStr].splice(existingIndex, 1);
+        } else {
+          // For house sitting, limit to 1 time per date (start time and end time on separate dates)
+          if (window.bookingForm.state.selectedService === 'pet-sitting' && 
+              window.bookingForm.state.dateTimes[dateStr].length >= 1) {
+            showCustomAlert('House sitting allows only 1 time per date. Select a start time on the first date and an end time on the last date.', 'fa-clock');
+            return;
+          }
+          
+          // Add time with appropriate default duration
+          const selectedService = window.bookingForm.state.selectedService;
+          const defaultDuration = (selectedService === 'pet-sitting' || selectedService === 'pet-taxi') ? 60 : 30;
+          window.bookingForm.state.dateTimes[dateStr].push({ time: time, duration: defaultDuration });
+        }
+
+        // Update visual state without regenerating entire container
+        this.updateTimeSlotVisualState(time, dateStr);
+        window.bookingForm.updateSelectedDatesDisplay();
+        window.bookingForm.updateButtonStates();
+        window.bookingForm.state.saveState(); // Auto-save
+      }
+
+      updateTimeSlotVisualState(time, dateStr) {
+        const container = document.getElementById('timeSlotsContainer');
+        if (!container) return;
+
+        const slots = container.querySelectorAll('.time-slot');
+        slots.forEach(slot => {
+          const timeDisplay = slot.querySelector('.time-display');
+          if (timeDisplay) {
+            // Extract just the time from textContent (in case anything was added)
+            const currentText = timeDisplay.textContent.trim();
+            const timeMatch = currentText.match(/^(\d{1,2}:\d{2}\s*(?:AM|PM))(?:\s*[-–—].*)?$/i);
+            const cleanTime = timeMatch ? timeMatch[1] : time;
+            
+            if (cleanTime === time || currentText === time) {
+              const dateTimes = (window.bookingForm.state.dateTimes && window.bookingForm.state.dateTimes[dateStr]) || [];
+              const isSelected = dateTimes.some(entry => entry.time === time);
+              slot.classList.toggle('selected', isSelected);
+
+              // Force time display to show ONLY the time, never a range or calculated text
+              timeDisplay.textContent = time;
+
+              // Remove any other text elements that might have been added (except duration chips)
+              const allChildren = Array.from(slot.children);
+              allChildren.forEach(child => {
+                if (!child.classList.contains('time-display') && 
+                    !child.classList.contains('duration-toggle') &&
+                    !child.classList.contains('duration-chip')) {
+                  // Remove any unexpected elements
+                  child.remove();
+                }
+              });
+
+              const chip30 = slot.querySelector('.duration-chip:first-child');
+              const chip60 = slot.querySelector('.duration-chip:last-child');
+
+              // Only update duration chips if they exist (not for house sitting/pet taxi)
+              if (chip30 && chip60) {
+                // Ensure chips only show duration, nothing else
+                if (chip30.textContent.trim() !== '30 min') {
+                  chip30.textContent = '30 min';
+                }
+                if (chip60.textContent.trim() !== '60 min') {
+                  chip60.textContent = '60 min';
+                }
+                
+                if (isSelected) {
+                  const entry = window.bookingForm.state.dateTimes[dateStr].find(e => e.time === time);
+                  if (entry) {
+                    if (entry.duration === 60) {
+                      chip60.classList.add('active');
+                      chip30.classList.remove('active');
+                    } else {
+                      chip30.classList.add('active');
+                      chip60.classList.remove('active');
+                    }
+                  }
+                } else {
+                  // Reset duration chips when time is unselected
+                  chip30.classList.remove('active');
+                  chip60.classList.remove('active');
+                }
+              }
+            }
+          }
+        });
+      }
+
+      setDuration(time, dateStr, duration) {
+        if (!window.bookingForm.state.dateTimes[dateStr]) {
+          window.bookingForm.state.dateTimes[dateStr] = [];
+        }
+
+        const existingIndex = window.bookingForm.state.dateTimes[dateStr].findIndex(entry => entry.time === time);
+        
+        if (existingIndex > -1) {
+          window.bookingForm.state.dateTimes[dateStr][existingIndex].duration = duration;
+        } else {
+          window.bookingForm.state.dateTimes[dateStr].push({ time: time, duration: duration });
+        }
+
+        // Update visual state without regenerating entire container
+        this.updateTimeSlotVisualState(time, dateStr);
+        window.bookingForm.updateSelectedDatesDisplay();
+        window.bookingForm.updateButtonStates();
+        window.bookingForm.state.saveState(); // Auto-save
+      }
+
+      close() {
+        const modal = document.getElementById('timeModal');
+        const container = document.getElementById('timeSlotsContainer');
+        
+        if (container) {
+          // Clean up event listeners when closing
+          this.cleanupEventListeners(container);
+        }
+        
+        if (modal) {
+          modal.classList.remove('active');
+          document.body.classList.remove('modal-open');
+          document.body.style.position = '';
+          document.body.style.width = '';
+        }
+      }
+    }
+
+    // ===== GLOBAL FUNCTIONS =====
+    function closeTimeModal() {
+      if (window.bookingForm && window.bookingForm.timeModal) {
+        window.bookingForm.timeModal.close();
+      }
+    }
+
+    // Custom Alert Function with Pink Styling
+    function showCustomAlert(message, icon = 'fa-circle-exclamation') {
+      // Remove any existing alert
+      const existingAlert = document.querySelector('.custom-alert');
+      const existingOverlay = document.querySelector('.custom-alert-overlay');
+      if (existingAlert) existingAlert.remove();
+      if (existingOverlay) existingOverlay.remove();
+
+      // Find the active form section
+      const activeSection = document.querySelector('.form-section.active');
+      if (!activeSection) {
+        console.error('No active form section found');
+        return;
+      }
+
+      // Create overlay
+      const overlay = document.createElement('div');
+      overlay.className = 'custom-alert-overlay';
+      
+      // Create alert
+      const alertBox = document.createElement('div');
+      alertBox.className = 'custom-alert';
+      alertBox.innerHTML = `
+        <div class="custom-alert-icon"><i class="fa-solid ${icon}"></i></div>
+        <div class="custom-alert-message">${message}</div>
+        <button class="custom-alert-button" onclick="closeCustomAlert()">Got it!</button>
+      `;
+
+      // Add to active form section
+      activeSection.appendChild(overlay);
+      activeSection.appendChild(alertBox);
+
+      // Trigger animation
+      setTimeout(() => {
+        overlay.classList.add('show');
+        alertBox.classList.add('show');
+      }, 10);
+
+      // Close on overlay click
+      overlay.onclick = closeCustomAlert;
+
+      // Close on ESC key
+      const escHandler = (e) => {
+        if (e.key === 'Escape') {
+          closeCustomAlert();
+          document.removeEventListener('keydown', escHandler);
+        }
+      };
+      document.addEventListener('keydown', escHandler);
+    }
+
+    function closeCustomAlert() {
+      const alert = document.querySelector('.custom-alert');
+      const overlay = document.querySelector('.custom-alert-overlay');
+      
+      if (alert && overlay) {
+        alert.classList.remove('show');
+        overlay.classList.remove('show');
+        
+        setTimeout(() => {
+          if (alert.parentNode) alert.remove();
+          if (overlay.parentNode) overlay.remove();
+        }, 300);
+      }
+    }
+
+    // Confirmation Dialog
+    function showConfirmDialog(message, icon = 'fa-circle-question') {
+      return new Promise((resolve) => {
+        // Remove any existing dialog
+        const existingAlert = document.querySelector('.custom-alert');
+        const existingOverlay = document.querySelector('.custom-alert-overlay');
+        if (existingAlert) existingAlert.remove();
+        if (existingOverlay) existingOverlay.remove();
+
+        // Find the active form section
+        const activeSection = document.querySelector('.form-section.active');
+        if (!activeSection) {
+          console.error('No active form section found');
+          resolve(false);
+          return;
+        }
+
+        // Create overlay
+        const overlay = document.createElement('div');
+        overlay.className = 'custom-alert-overlay';
+        
+        // Create dialog
+        const dialog = document.createElement('div');
+        dialog.className = 'custom-alert';
+        dialog.innerHTML = `
+          <div class="custom-alert-icon"><i class="fa-solid ${icon}"></i></div>
+          <div class="custom-alert-message">${message}</div>
+          <div class="confirm-dialog-buttons">
+            <button class="confirm-btn confirm-btn-no" onclick="resolveConfirm(false)">Cancel</button>
+            <button class="confirm-btn confirm-btn-yes" onclick="resolveConfirm(true)">Yes, Remove</button>
+          </div>
+        `;
+
+        // Add to active form section
+        activeSection.appendChild(overlay);
+        activeSection.appendChild(dialog);
+
+        // Trigger animation
+        setTimeout(() => {
+          overlay.classList.add('show');
+          dialog.classList.add('show');
+        }, 10);
+
+        // Store resolve function globally
+        window.confirmResolve = resolve;
+
+        // Close on overlay click (resolves to false)
+        overlay.onclick = () => {
+          resolve(false);
+          closeConfirmDialog();
+        };
+      });
+    }
+
+    function resolveConfirm(result) {
+      if (window.confirmResolve) {
+        window.confirmResolve(result);
+        closeConfirmDialog();
+      }
+    }
+
+    function closeConfirmDialog() {
+      const alert = document.querySelector('.custom-alert');
+      const overlay = document.querySelector('.custom-alert-overlay');
+      
+      if (alert && overlay) {
+        alert.classList.remove('show');
+        overlay.classList.remove('show');
+        
+        setTimeout(() => {
+          if (alert.parentNode) alert.remove();
+          if (overlay.parentNode) overlay.remove();
+        }, 300);
+      }
+    }
+
+    // Tooltip Management
+    let tooltipBubble = null;
+    let tooltipOverlay = null;
+
+    function showTooltip(message) {
+      // Remove existing tooltip if any
+      hideTooltip();
+
+      // Find the active form section
+      const activeSection = document.querySelector('.form-section.active');
+      if (!activeSection) {
+        console.error('No active form section found');
+        return;
+      }
+
+      // Create overlay
+      tooltipOverlay = document.createElement('div');
+      tooltipOverlay.className = 'tooltip-overlay';
+      
+      // Create tooltip bubble
+      tooltipBubble = document.createElement('div');
+      tooltipBubble.className = 'tooltip-bubble';
+      tooltipBubble.textContent = message;
+
+      // Add to active form section
+      activeSection.appendChild(tooltipOverlay);
+      activeSection.appendChild(tooltipBubble);
+
+      // Trigger animation
+      requestAnimationFrame(() => {
+        tooltipOverlay.classList.add('show');
+        tooltipBubble.classList.add('show');
+      });
+
+      // Close on overlay click
+      tooltipOverlay.onclick = hideTooltip;
+    }
+
+    function hideTooltip() {
+      if (tooltipBubble) {
+        tooltipBubble.classList.remove('show');
+        tooltipOverlay.classList.remove('show');
+        
+        setTimeout(() => {
+          if (tooltipBubble && tooltipBubble.parentNode) tooltipBubble.remove();
+          if (tooltipOverlay && tooltipOverlay.parentNode) tooltipOverlay.remove();
+          tooltipBubble = null;
+          tooltipOverlay = null;
+        }, 200);
+      }
+    }
+
+    // Confetti Animation
+    function triggerConfetti() {
+      const colors = ['#fce1ef', '#f8b4d9', '#432f21', '#e2b0d5'];
+      const confettiCount = 50;
+
+      for (let i = 0; i < confettiCount; i++) {
+        setTimeout(() => {
+          const confetti = document.createElement('div');
+          confetti.className = 'confetti';
+          confetti.style.left = Math.random() * 100 + '%';
+          confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+          confetti.style.animationDelay = Math.random() * 0.3 + 's';
+          confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+          document.body.appendChild(confetti);
+
+          setTimeout(() => confetti.remove(), 3500);
+        }, i * 30);
+      }
+    }
+
+    // ===== INITIALIZE APPLICATION =====
+    let bookingForm;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      try {
+        bookingForm = new BookingFormController();
+        // window.bookingForm is already set inside the constructor
+      } catch (error) {
+        console.error('Failed to initialize booking form:', error);
+        const errorMessage = document.createElement('div');
+        errorMessage.className = 'error-message';
+        errorMessage.style.cssText = 'padding: 20px; text-align: center; color: #ef4444; background: #fee; border-radius: 8px; margin: 20px;';
+        errorMessage.textContent = 'Form error: ' + (error.message || String(error));
+        document.body.appendChild(errorMessage);
+      }
+    });
+
+    // ===== ACCESSIBILITY ENHANCEMENTS =====
+    document.addEventListener('keydown', (e) => {
+      // ESC key closes modals and tooltips
+      if (e.key === 'Escape') {
+        hideTooltip();
+        closeTimeModal();
+        if (window.bookingForm) {
+          window.bookingForm.closePetDropdown();
+        }
+      }
+      
+      // Enter key on service/type cards
+      if (e.key === 'Enter' && e.target.classList.contains('service-card')) {
+        e.target.click();
+      }
+      
+      if (e.key === 'Enter' && e.target.classList.contains('type-card')) {
+        e.target.click();
+      }
+    });
+
+    // ===== TOUCH OPTIMIZATIONS =====
+    document.addEventListener('touchstart', () => {}, { passive: true });
+    document.addEventListener('touchmove', () => {}, { passive: true });
+
+    // ===== IFRAME DYNAMIC HEIGHT RESIZING =====
+    // This script sends the form height to the parent window for smooth iframe resizing
+    function sendHeightToParent() {
+      try {
+        // Get the actual height of the content
+        const wrapper = document.querySelector('.form-wrapper');
+        if (!wrapper) return;
+        
+        const height = wrapper.scrollHeight + 40; // Add padding
+        
+        // Send height to parent window (Webflow)
+        if (window.parent !== window) {
+          window.parent.postMessage({
+            type: 'iframe-resize',
+            height: height
+          }, '*');
+        }
+      } catch (error) {
+        // Silently fail - iframe resizing is not critical
+      }
+    }
+
+    // Initialize ResizeObserver for dynamic height tracking
+    if (typeof ResizeObserver !== 'undefined') {
+      try {
+        const wrapper = document.querySelector('.form-wrapper');
+        if (wrapper) {
+          const resizeObserver = new ResizeObserver(() => {
+            sendHeightToParent();
+          });
+          resizeObserver.observe(wrapper);
+        }
+      } catch (error) {
+        // Silently fail - ResizeObserver is not critical
+      }
+    }
+
+    // Fallback: Send height on various events
+    window.addEventListener('load', sendHeightToParent);
+    window.addEventListener('resize', sendHeightToParent);
+    
+    // Send height when form content changes
+    const bookingContent = document.querySelector('.booking-content');
+    if (bookingContent) {
+      try {
+        const contentObserver = new MutationObserver(() => {
+          setTimeout(sendHeightToParent, 100);
+        });
+        contentObserver.observe(bookingContent, {
+          childList: true,
+          subtree: true,
+          attributes: true,
+          characterData: true
+        });
+      } catch (error) {
+        // Silently fail - MutationObserver is not critical
+      }
+    }
+
+    // Send initial height
+    setTimeout(sendHeightToParent, 100);
+    setTimeout(sendHeightToParent, 500);
+  </script>
+</body>
+</html>

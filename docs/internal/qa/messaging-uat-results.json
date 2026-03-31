@@ -1,0 +1,325 @@
+{
+  "generatedAt": "2026-03-15T04:41:11.574Z",
+  "envSetup": {
+    "baseUrl": "https://snout-os-staging.onrender.com",
+    "e2eAuthMode": "api/ops/e2e-login with staging key",
+    "orgId": "default",
+    "ownerUserId": "5570d9fe-ebfc-41be-a6d1-4a4ad0e784e1",
+    "clientUserId": "1a989cf9-ef32-40e8-bcc4-a27344872a31",
+    "sitterUserId": "a1246bf6-4156-42e5-b16f-1354bfa7ad3b",
+    "sitterId": "04217d1e-1b7a-4614-aed6-efd18d907661"
+  },
+  "readiness": {
+    "setupReadiness": {
+      "provider": {
+        "ready": true,
+        "message": "Provider connected"
+      },
+      "numbers": {
+        "ready": true,
+        "message": "Numbers configured"
+      },
+      "webhooks": {
+        "ready": true,
+        "message": "Webhooks installed"
+      },
+      "overall": true,
+      "checkedAt": "2026-03-15T04:40:56.634Z"
+    },
+    "providerStatus": {
+      "connected": true,
+      "accountSid": "ACdf...57aa",
+      "hasAuthToken": true,
+      "lastTestedAt": null,
+      "testResult": null,
+      "checkedAt": "2026-03-15T04:40:56.818Z",
+      "verified": true
+    },
+    "providerTest": {
+      "success": true,
+      "message": "Connection successful. Account: My first Twilio account"
+    },
+    "webhookStatus": {
+      "installed": true,
+      "url": "https://snout-os-staging.onrender.com/api/messages/webhook/twilio",
+      "lastReceivedAt": null,
+      "status": "installed",
+      "checkedAt": "2026-03-15T04:40:57.896Z",
+      "verified": true,
+      "webhookTarget": "incoming_phone_numbers",
+      "numbersFetchedCount": 4,
+      "accountSidMasked": "ACdf...57aa",
+      "firstTwilioError": null,
+      "webhookUrlExpected": "https://snout-os-staging.onrender.com/api/messages/webhook/twilio",
+      "matchedNumbers": [
+        {
+          "phoneNumberSid": "PN45154cd9f01d3ab0d0cd4cb7eb6f3b52",
+          "e164": "+12562039373",
+          "smsUrl": "https://snout-os-staging.onrender.com/api/messages/webhook/twilio",
+          "verified": true
+        },
+        {
+          "phoneNumberSid": "PN300beb86684dcf2e688dc66590541256",
+          "e164": "+12566176077",
+          "smsUrl": "https://snout-os-staging.onrender.com/api/messages/webhook/twilio",
+          "verified": true
+        },
+        {
+          "phoneNumberSid": "PN059dda5de4615a79b4a8d05ecfb9a825",
+          "e164": "+18558193451",
+          "smsUrl": "https://snout-os-staging.onrender.com/api/messages/webhook/twilio",
+          "verified": true
+        },
+        {
+          "phoneNumberSid": "PNef1801f076bff179358bb9fada8a5da2",
+          "e164": "+12569739424",
+          "smsUrl": "https://snout-os-staging.onrender.com/api/messages/webhook/twilio",
+          "verified": true
+        }
+      ],
+      "unmatchedNumbers": []
+    },
+    "numberSync": {
+      "success": true,
+      "message": "Synced 4 number(s). First is front_desk, rest are pool.",
+      "synced": 4
+    },
+    "poolHealth": "Not Found\n",
+    "health": {
+      "status": "ok",
+      "db": "ok",
+      "redis": "ok",
+      "version": "27f95b4a8f574ea1e83205048c7c930e81816ccb",
+      "commitSha": "27f95b4",
+      "buildTime": "2026-03-15T04:41:02.817Z",
+      "envName": "staging",
+      "runtimeDiagnostics": {
+        "nodeVersion": "v22.16.0",
+        "platform": "linux",
+        "uptimeSec": 757,
+        "pid": 185,
+        "memoryMb": {
+          "rss": 341.6,
+          "heapUsed": 215.4,
+          "heapTotal": 230.9
+        },
+        "eventLoop": {
+          "activeHandles": 11,
+          "activeRequests": 0
+        },
+        "capacityConfig": {
+          "webConcurrency": 2,
+          "uvThreadpoolSize": null,
+          "authTrafficLimitPerMin": 1800,
+          "authSessionCheckLimitPerMin": 3600,
+          "authSessionAnonLimitPerMin": 240,
+          "authMutationLimitPerMin": 80,
+          "authReadLimitPerMin": 240,
+          "messageWorkerConcurrency": 24
+        }
+      },
+      "infraRecommendations": [
+        "Increase staging web service to at least 2 instances or next Render plan tier to reduce 502 saturation under high concurrency.",
+        "Keep message provider dispatch on separate worker service and pin worker concurrency independently from web concurrency.",
+        "Tune WEB_CONCURRENCY and UV_THREADPOOL_SIZE explicitly so Node process parallelism is predictable under burst.",
+        "Raise and segment auth/session limits for valid session checks; keep mutation limits strict.",
+        "Confirm database connection pool sizing (Prisma + PostgreSQL max_connections) so web + worker pools do not contend."
+      ],
+      "timestamp": "2026-03-15T04:41:02.817Z"
+    }
+  },
+  "fixtureChecks": {
+    "sitterCount": 3,
+    "sitterIds": [
+      "sitter-verify-payroll",
+      "20bd46cf-2157-4eb3-aaf3-3f1044651426",
+      "04217d1e-1b7a-4614-aed6-efd18d907661"
+    ],
+    "hasAtLeast3Sitters": true,
+    "hasAtLeast2Clients": true,
+    "orgCountVerified": false,
+    "labelingConvention": "Bookings seeded with messaging-UAT prefix in names/notes/emails"
+  },
+  "scenarios": [
+    {
+      "id": "S1",
+      "name": "website form -> owner intake -> sitter availability -> M&G -> approval -> service",
+      "pass": false,
+      "laneType": null,
+      "twilioNumberUsed": null,
+      "maskedBehavior": "Not verified",
+      "ownerOutcome": "Failed",
+      "clientOutcome": "Failed",
+      "sitterOutcome": "Failed",
+      "timelineEvents": [],
+      "deliveryStatuses": [],
+      "queueNotes": "N/A",
+      "automations": "N/A",
+      "bugsOrGaps": [
+        "createWebsiteFormBooking failed: 400 {\"error\":\"Missing required fields: firstName, lastName, phone, service, startAt, and endAt are required\"}"
+      ]
+    },
+    {
+      "id": "S2",
+      "name": "client portal booking flow",
+      "pass": false,
+      "laneType": null,
+      "twilioNumberUsed": null,
+      "maskedBehavior": "Not verified",
+      "ownerOutcome": "Failed",
+      "clientOutcome": "Failed",
+      "sitterOutcome": "Failed",
+      "timelineEvents": [],
+      "deliveryStatuses": [],
+      "queueNotes": "N/A",
+      "automations": "N/A",
+      "bugsOrGaps": [
+        "thread lookup failed for fa68e23a-5345-41b3-9da0-08304e39b143: 200 {\"items\":[],\"nextCursor\":null,\"hasMore\":false,\"pageSize\":100,\"sort\":{\"field\":\"lastMessageAt\",\"direction\":\"desc\"},\"filters\":{\"sitterId\":null,\"clientId\":null,\"status\":null,\"unreadOnly\":null,\"scope\":null,\"inbox\":null,\"bookingId\":\"fa68e23a-5345-41b3-9da0-08304e39b143\",\"participant\":null,\"from\":null,\"to\":null}}"
+      ]
+    },
+    {
+      "id": "S3",
+      "name": "same sitter rebook",
+      "pass": false,
+      "laneType": null,
+      "twilioNumberUsed": null,
+      "maskedBehavior": "Not verified",
+      "ownerOutcome": "Failed",
+      "clientOutcome": "Failed",
+      "sitterOutcome": "Failed",
+      "timelineEvents": [],
+      "deliveryStatuses": [],
+      "queueNotes": "N/A",
+      "automations": "N/A",
+      "bugsOrGaps": [
+        "thread lookup failed for 2e22af11-4948-4d6a-981a-d4df88bf2201: 200 {\"items\":[],\"nextCursor\":null,\"hasMore\":false,\"pageSize\":100,\"sort\":{\"field\":\"lastMessageAt\",\"direction\":\"desc\"},\"filters\":{\"sitterId\":null,\"clientId\":null,\"status\":null,\"unreadOnly\":null,\"scope\":null,\"inbox\":null,\"bookingId\":\"2e22af11-4948-4d6a-981a-d4df88bf2201\",\"participant\":null,\"from\":null,\"to\":null}}"
+      ]
+    },
+    {
+      "id": "S4",
+      "name": "different sitter rebook / rotating sitter",
+      "pass": false,
+      "laneType": null,
+      "twilioNumberUsed": null,
+      "maskedBehavior": "Not verified",
+      "ownerOutcome": "Failed",
+      "clientOutcome": "Failed",
+      "sitterOutcome": "Failed",
+      "timelineEvents": [],
+      "deliveryStatuses": [],
+      "queueNotes": "N/A",
+      "automations": "N/A",
+      "bugsOrGaps": [
+        "thread lookup failed for ad43856e-a5bc-4987-80aa-6b5af35503f8: 200 {\"items\":[],\"nextCursor\":null,\"hasMore\":false,\"pageSize\":100,\"sort\":{\"field\":\"lastMessageAt\",\"direction\":\"desc\"},\"filters\":{\"sitterId\":null,\"clientId\":null,\"status\":null,\"unreadOnly\":null,\"scope\":null,\"inbox\":null,\"bookingId\":\"ad43856e-a5bc-4987-80aa-6b5af35503f8\",\"participant\":null,\"from\":null,\"to\":null}}"
+      ]
+    },
+    {
+      "id": "S5",
+      "name": "M&G scheduled but one approval missing",
+      "pass": false,
+      "laneType": null,
+      "twilioNumberUsed": null,
+      "maskedBehavior": "Not verified",
+      "ownerOutcome": "Failed",
+      "clientOutcome": "Failed",
+      "sitterOutcome": "Failed",
+      "timelineEvents": [],
+      "deliveryStatuses": [],
+      "queueNotes": "N/A",
+      "automations": "N/A",
+      "bugsOrGaps": [
+        "thread lookup failed for b9c7de3b-87a7-4f1a-a4e0-f58389d2e776: 200 {\"items\":[],\"nextCursor\":null,\"hasMore\":false,\"pageSize\":100,\"sort\":{\"field\":\"lastMessageAt\",\"direction\":\"desc\"},\"filters\":{\"sitterId\":null,\"clientId\":null,\"status\":null,\"unreadOnly\":null,\"scope\":null,\"inbox\":null,\"bookingId\":\"b9c7de3b-87a7-4f1a-a4e0-f58389d2e776\",\"participant\":null,\"from\":null,\"to\":null}}"
+      ]
+    },
+    {
+      "id": "S6",
+      "name": "post-service grace + expiry reroute",
+      "pass": false,
+      "laneType": null,
+      "twilioNumberUsed": null,
+      "maskedBehavior": "Not verified",
+      "ownerOutcome": "Failed",
+      "clientOutcome": "Failed",
+      "sitterOutcome": "Failed",
+      "timelineEvents": [],
+      "deliveryStatuses": [],
+      "queueNotes": "N/A",
+      "automations": "N/A",
+      "bugsOrGaps": [
+        "Scenario 2 artifacts unavailable"
+      ]
+    },
+    {
+      "id": "S7",
+      "name": "masking integrity test",
+      "pass": false,
+      "laneType": null,
+      "twilioNumberUsed": null,
+      "maskedBehavior": "Not verified",
+      "ownerOutcome": "Failed",
+      "clientOutcome": "Failed",
+      "sitterOutcome": "Failed",
+      "timelineEvents": [],
+      "deliveryStatuses": [],
+      "queueNotes": "N/A",
+      "automations": "N/A",
+      "bugsOrGaps": [
+        "No thread for masking test"
+      ]
+    },
+    {
+      "id": "S8",
+      "name": "anti-poaching soft detection",
+      "pass": false,
+      "laneType": null,
+      "twilioNumberUsed": null,
+      "maskedBehavior": "Not verified",
+      "ownerOutcome": "Failed",
+      "clientOutcome": "Failed",
+      "sitterOutcome": "Failed",
+      "timelineEvents": [],
+      "deliveryStatuses": [],
+      "queueNotes": "N/A",
+      "automations": "N/A",
+      "bugsOrGaps": [
+        "No thread for anti-poaching test"
+      ]
+    },
+    {
+      "id": "S9",
+      "name": "booking automation chain",
+      "pass": false,
+      "laneType": null,
+      "twilioNumberUsed": null,
+      "maskedBehavior": "Not verified",
+      "ownerOutcome": "Failed",
+      "clientOutcome": "Failed",
+      "sitterOutcome": "Failed",
+      "timelineEvents": [],
+      "deliveryStatuses": [],
+      "queueNotes": "N/A",
+      "automations": "N/A",
+      "bugsOrGaps": [
+        "thread lookup failed for 98c0b41a-813a-40cc-8df2-37d3e68b343d: 200 {\"items\":[],\"nextCursor\":null,\"hasMore\":false,\"pageSize\":100,\"sort\":{\"field\":\"lastMessageAt\",\"direction\":\"desc\"},\"filters\":{\"sitterId\":null,\"clientId\":null,\"status\":null,\"unreadOnly\":null,\"scope\":null,\"inbox\":null,\"bookingId\":\"98c0b41a-813a-40cc-8df2-37d3e68b343d\",\"participant\":null,\"from\":null,\"to\":null}}"
+      ]
+    },
+    {
+      "id": "S10",
+      "name": "SaaS multi-tenant isolation",
+      "pass": false,
+      "laneType": null,
+      "twilioNumberUsed": null,
+      "maskedBehavior": "Not fully verifiable with available staging fixtures",
+      "ownerOutcome": "Second org session unavailable",
+      "clientOutcome": "N/A",
+      "sitterOutcome": "N/A",
+      "timelineEvents": [],
+      "deliveryStatuses": [],
+      "queueNotes": "N/A",
+      "automations": "N/A",
+      "bugsOrGaps": [
+        "No second-owner org session available via e2e-login probe"
+      ]
+    }
+  ]
+}

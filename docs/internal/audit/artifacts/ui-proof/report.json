@@ -1,0 +1,96 @@
+{
+  "baseUrl": "https://snout-os-staging.onrender.com",
+  "generatedAt": "2026-03-10T03:16:00.949Z",
+  "results": [
+    {
+      "role": "owner",
+      "route": "/dashboard",
+      "requestedUrl": "https://snout-os-staging.onrender.com/dashboard",
+      "finalUrl": "https://snout-os-staging.onrender.com/dashboard",
+      "title": "Snout OS - Pet Care Management System",
+      "status": "VERIFIED",
+      "screenshot": "/Users/leahhudson/Desktop/final form/snout-os/artifacts/ui-proof/owner-dashboard.png"
+    },
+    {
+      "role": "owner",
+      "route": "/bookings",
+      "requestedUrl": "https://snout-os-staging.onrender.com/bookings",
+      "finalUrl": "https://snout-os-staging.onrender.com/bookings",
+      "title": "Bookings - Snout OS",
+      "status": "VERIFIED",
+      "screenshot": "/Users/leahhudson/Desktop/final form/snout-os/artifacts/ui-proof/owner-bookings.png"
+    },
+    {
+      "role": "owner",
+      "route": "/calendar",
+      "requestedUrl": "https://snout-os-staging.onrender.com/calendar",
+      "finalUrl": "https://snout-os-staging.onrender.com/calendar",
+      "title": "Calendar - Snout OS",
+      "status": "VERIFIED",
+      "screenshot": "/Users/leahhudson/Desktop/final form/snout-os/artifacts/ui-proof/owner-calendar.png"
+    },
+    {
+      "role": "owner",
+      "route": "/automations",
+      "requestedUrl": "https://snout-os-staging.onrender.com/automations",
+      "finalUrl": "https://snout-os-staging.onrender.com/automations",
+      "title": "Snout OS - Pet Care Management System",
+      "status": "VERIFIED",
+      "screenshot": "/Users/leahhudson/Desktop/final form/snout-os/artifacts/ui-proof/owner-automations.png"
+    },
+    {
+      "role": "client",
+      "route": "/client/home",
+      "requestedUrl": "https://snout-os-staging.onrender.com/client/home",
+      "finalUrl": "https://snout-os-staging.onrender.com/client/home",
+      "title": "Client Portal - Snout OS",
+      "status": "VERIFIED",
+      "screenshot": "/Users/leahhudson/Desktop/final form/snout-os/artifacts/ui-proof/client-home.png"
+    },
+    {
+      "role": "client",
+      "route": "/client/bookings",
+      "requestedUrl": "https://snout-os-staging.onrender.com/client/bookings",
+      "finalUrl": "https://snout-os-staging.onrender.com/client/bookings",
+      "title": "Client Portal - Snout OS",
+      "status": "VERIFIED",
+      "screenshot": "/Users/leahhudson/Desktop/final form/snout-os/artifacts/ui-proof/client-bookings.png"
+    },
+    {
+      "role": "client",
+      "route": "/client/bookings/new",
+      "requestedUrl": "https://snout-os-staging.onrender.com/client/bookings/new",
+      "finalUrl": "https://snout-os-staging.onrender.com/client/bookings/new",
+      "title": "Client Portal - Snout OS",
+      "status": "VERIFIED",
+      "screenshot": "/Users/leahhudson/Desktop/final form/snout-os/artifacts/ui-proof/client-bookings-new.png"
+    },
+    {
+      "role": "sitter",
+      "route": "/sitter/today",
+      "requestedUrl": "https://snout-os-staging.onrender.com/sitter/today",
+      "finalUrl": "https://snout-os-staging.onrender.com/sitter/today",
+      "title": "Sitter Dashboard - Snout OS",
+      "status": "VERIFIED",
+      "screenshot": "/Users/leahhudson/Desktop/final form/snout-os/artifacts/ui-proof/sitter-today.png"
+    },
+    {
+      "role": "sitter",
+      "route": "/sitter/bookings",
+      "requestedUrl": "https://snout-os-staging.onrender.com/sitter/bookings",
+      "finalUrl": "https://snout-os-staging.onrender.com/sitter/bookings",
+      "title": "Sitter Dashboard - Snout OS",
+      "status": "VERIFIED",
+      "screenshot": "/Users/leahhudson/Desktop/final form/snout-os/artifacts/ui-proof/sitter-bookings.png"
+    },
+    {
+      "role": "sitter",
+      "route": "/sitter/bookings/8f48c06f-abf0-4bbc-bcd8-fce7542ea01c",
+      "requestedUrl": "https://snout-os-staging.onrender.com/sitter/bookings/8f48c06f-abf0-4bbc-bcd8-fce7542ea01c",
+      "finalUrl": "https://snout-os-staging.onrender.com/sitter/bookings/8f48c06f-abf0-4bbc-bcd8-fce7542ea01c",
+      "title": "Sitter Dashboard - Snout OS",
+      "status": "VERIFIED",
+      "screenshot": "/Users/leahhudson/Desktop/final form/snout-os/artifacts/ui-proof/sitter-booking-detail.png"
+    }
+  ]
+}

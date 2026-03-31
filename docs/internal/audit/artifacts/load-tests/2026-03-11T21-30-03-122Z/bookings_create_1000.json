@@ -1,0 +1,29 @@
+{
+  "gate": "bookings_create_1000",
+  "mode": "mock",
+  "operationCount": 1000,
+  "concurrency": 1000,
+  "durationMs": 663.899083,
+  "throughputRps": 1506.253021891883,
+  "successCount": 990,
+  "errorCount": 10,
+  "errorRate": 0.01,
+  "observedDuplicateCount": 98,
+  "duplicateCount": 0,
+  "duplicateRate": 0,
+  "retryCount": 0,
+  "deadLetterCount": 0,
+  "latencies": {
+    "p50": 132.83150048475636,
+    "p95": 171.42825205175004,
+    "p99": 175.66759060246204,
+    "max": 659.4092601363739,
+    "min": 95.02378292884259
+  },
+  "pass": true,
+  "failures": [],
+  "notes": [
+    "10% replay traffic with repeated idempotency keys",
+    "Duplicate metric ignores expected same-key replay collisions"
+  ]
+}

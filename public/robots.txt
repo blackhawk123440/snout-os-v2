@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /client/
+Disallow: /sitter/
+Disallow: /dashboard
+Disallow: /command-center
+Disallow: /settings
+Disallow: /login
+
+Sitemap: https://snoutservices.com/sitemap.xml

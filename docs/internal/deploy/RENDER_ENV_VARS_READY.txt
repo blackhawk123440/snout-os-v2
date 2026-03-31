@@ -1,0 +1,37 @@
+==========================================
+WEB SERVICE ENVIRONMENT VARIABLES
+==========================================
+
+Copy and paste these into Render Dashboard → Web Service → Environment tab:
+
+NEXTAUTH_URL=https://snout-os-web.onrender.com
+NEXTAUTH_SECRET=JeBctxnIua976KOMQvZDg9qjF/4Xy3ncp/quiknbXBPKy5nFiOvsErmxIXtq+18a
+NEXT_PUBLIC_ENABLE_MESSAGING_V1=true
+NEXT_PUBLIC_API_URL=https://snout-os-api.onrender.com
+
+==========================================
+API SERVICE ENVIRONMENT VARIABLES
+==========================================
+
+Copy and paste these into Render Dashboard → API Service → Environment tab:
+
+DATABASE_URL=postgresql://user:password@host:port/database?sslmode=require
+REDIS_URL=redis://default:password@host:port
+JWT_SECRET=R7ZWUNSSXR+sR23+vx7FeatXxgsfuFwuIzqKfH34welEJ4FcCCNLU3TKAr35yv89
+ENCRYPTION_KEY=PKPEn8ZbZ3LSV1XtinBd/BNY82USc+qAqggRiIxvpyc=
+PROVIDER_MODE=mock
+ENABLE_MESSAGING_V1=true
+ALLOW_DEV_SEED=true
+
+==========================================
+IMPORTANT NOTES
+==========================================
+
+1. Replace "snout-os-web.onrender.com" with your actual web service URL
+2. Replace "snout-os-api.onrender.com" with your actual API service URL
+3. Replace DATABASE_URL with your actual Render PostgreSQL connection string
+4. Replace REDIS_URL with your actual Render Redis connection string
+5. After pasting, click "Save Changes" in Render
+6. Services will auto-redeploy
+
+==========================================

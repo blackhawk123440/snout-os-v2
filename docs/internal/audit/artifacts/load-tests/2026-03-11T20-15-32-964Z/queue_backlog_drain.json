@@ -1,0 +1,25 @@
+{
+  "gate": "queue_backlog_drain",
+  "mode": "mock",
+  "operationCount": 10000,
+  "concurrency": 120,
+  "durationMs": 739.845292,
+  "throughputRps": 13516.339305163816,
+  "successCount": 10000,
+  "errorCount": 0,
+  "errorRate": 0,
+  "duplicateCount": 0,
+  "duplicateRate": 0,
+  "retryCount": 0,
+  "deadLetterCount": 0,
+  "latencies": {
+    "p50": 9.073377546068514,
+    "p95": 14.348819635422842,
+    "p99": 14.860990551635041,
+    "max": 14.99988218938779,
+    "min": 3.0011970141131314
+  },
+  "pass": true,
+  "failures": [],
+  "notes": []
+}

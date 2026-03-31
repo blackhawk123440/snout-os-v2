@@ -1,0 +1,28 @@
+{
+  "gate": "session_validation_burst",
+  "mode": "mock",
+  "operationCount": 1200,
+  "concurrency": 1200,
+  "durationMs": 700.5417499999994,
+  "throughputRps": 1712.9600055956707,
+  "successCount": 1194,
+  "errorCount": 6,
+  "errorRate": 0.005,
+  "observedDuplicateCount": 0,
+  "duplicateCount": 0,
+  "duplicateRate": 0,
+  "retryCount": 0,
+  "deadLetterCount": 0,
+  "latencies": {
+    "p50": 85.06936986368964,
+    "p95": 106.24854458116079,
+    "p99": 455.6421891428872,
+    "max": 697.0676148474995,
+    "min": 60.0241159591169
+  },
+  "pass": true,
+  "failures": [],
+  "notes": [
+    "Requests are spread across owner/sitter/client session cookies when provided"
+  ]
+}

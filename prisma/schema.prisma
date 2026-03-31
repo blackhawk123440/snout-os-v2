@@ -1,0 +1,2636 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Org {
+  id             String          @id
+  name           String
+  mode           String          @default("personal") // personal | saas
+  brandingJson   String?         @db.Text
+  clientContacts ClientContact[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+}
+
+model Rate {
+  id        String    @id @default(uuid())
+  service   String
+  duration  Int
+  baseRate  Float
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @default(now()) @updatedAt
+
+  @@unique([service, duration], name: "service_duration")
+}
+
+model Booking {
+  id                      String                      @id @default(uuid())
+  orgId                   String                      @default("default")
+  firstName               String
+  lastName                String
+  phone                   String
+  email                   String?
+  address                 String?
+  pickupAddress           String?
+  dropoffAddress          String?
+  service                 String
+  startAt                 DateTime
+  endAt                   DateTime
+  totalPrice              Float
+  pricingSnapshot         String?                     @db.Text
+  status                  String                      @default("pending")
+  assignmentType          String? // "direct" or "pool" - null means not yet assigned
+  dispatchStatus          String                      @default("auto") // auto | manual_required | manual_in_progress | assigned
+  manualDispatchReason    String?                     @db.Text
+  manualDispatchAt        DateTime?
+  conflictOverrideAt      DateTime?                   // Set when owner overrides a scheduling conflict
+  conflictOverrideBy      String?                     // User ID who performed the override
+  conflictOverrideReason  String?                     @db.Text
+  notes                   String?
+  entryInstructions       String?
+  doorCode                String?
+  stripePaymentLinkUrl    String?
+  tipLinkUrl              String?
+  paymentStatus           String                      @default("unpaid")
+  stripeCheckoutSessionId String?
+  stripePaymentIntentId   String?
+  depositAmount           Float?                      @default(0)
+  balanceDueDate          DateTime?
+  paymentDeadline         DateTime?
+  cancellationReason      String?
+  cancelledAt             DateTime?
+  cancelledBy             String?
+  createdAt               DateTime                    @default(now())
+  updatedAt               DateTime                    @updatedAt
+  afterHours              Boolean                     @default(false)
+  holiday                 Boolean                     @default(false)
+  quantity                Int                         @default(1)
+  pets                    Pet[]
+  sitter                  Sitter?                     @relation(fields: [sitterId], references: [id], onDelete: SetNull)
+  sitterId                String?
+  timeSlots               TimeSlot[]
+  messages                Message[]
+  reports                 Report[]
+  offerEvents             OfferEvent[]
+  visitEvents             VisitEvent[]
+  assignmentWindows       AssignmentWindow[]
+  availabilityRequests    SitterAvailabilityRequest[]
+  sitterPoolOffers        SitterPoolOffer[]
+  sitterPool              BookingSitterPool[]         @relation("BookingSitterPool")
+  client                  Client?                     @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  clientId                String?
+  tags                    BookingTagAssignment[]
+  discountUsage           DiscountUsage?
+  customFields            CustomFieldValue[]
+  eventLogs               EventLog[]
+  statusHistory           BookingStatusHistory[]
+  calendarEvents          BookingCalendarEvent[] // Google Calendar event mappings
+  petHealthLogs           PetHealthLog[]
+  checklistItems          BookingChecklistItem[]
+  recurringSchedule       RecurringSchedule?          @relation(fields: [recurringScheduleId], references: [id], onDelete: SetNull)
+  recurringScheduleId     String?
+  estimatedMileage        Float?
+  actualMileage           Float?
+
+  @@index([sitterId])
+  @@index([recurringScheduleId])
+  @@index([orgId])
+  @@index([orgId, startAt])
+  @@index([orgId, createdAt(sort: Desc), id])
+  @@index([orgId, status, startAt, id])
+  @@index([orgId, paymentStatus, startAt, id])
+  @@index([orgId, sitterId])
+  @@index([orgId, status])
+  @@index([orgId, paymentStatus])
+  @@index([status])
+  @@index([createdAt])
+  @@index([clientId])
+  @@index([orgId, clientId, startAt])
+  @@index([orgId, sitterId, startAt])
+}
+
+model Pet {
+  id    String @id @default(uuid())
+  orgId String @default("default")
+
+  // Core identity
+  name        String
+  species     String
+  breed       String?
+  age         Int?
+  weight      Float?
+  gender      String?
+  birthday    DateTime?
+  color       String?
+  microchipId String?
+  isFixed     Boolean   @default(false)
+  photoUrl    String?
+
+  // Care instructions
+  feedingInstructions String? @db.Text
+  medicationNotes     String? @db.Text
+  behaviorNotes       String? @db.Text
+  houseRules          String? @db.Text
+  walkInstructions    String? @db.Text
+  medications         String? @db.Text // JSON: [{ name, dosage, frequency, time, instructions, active }]
+
+  // Vet info
+  vetName       String?
+  vetPhone      String?
+  vetAddress    String?
+  vetClinicName String?
+
+  // Status
+  isActive Boolean @default(true)
+
+  // Relationships
+  notes        String?
+  booking      Booking?           @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  bookingId    String?
+  clientId     String?
+  customFields     CustomFieldValue[]
+  healthLogs       PetHealthLog[]
+  emergencyVetAuth EmergencyVetAuth?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@index([bookingId])
+  @@index([orgId])
+  @@index([clientId])
+  @@index([orgId, clientId])
+}
+
+model TimeSlot {
+  id        String   @id @default(uuid())
+  orgId     String   @default("default")
+  startAt   DateTime
+  endAt     DateTime
+  duration  Int
+  booking   Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  bookingId String
+  createdAt DateTime @default(now())
+
+  @@index([bookingId])
+  @@index([orgId])
+}
+
+model Sitter {
+  id                    String                       @id @default(uuid())
+  orgId                 String                       @default("default")
+  firstName             String                       @default("")
+  lastName              String                       @default("")
+  phone                 String                       @default("")
+  email                 String                       @default("")
+  active                Boolean                      @default(true)
+  onboardingStatus      String                       @default("active")
+  commissionPercentage  Float                        @default(80.0) // Percentage of booking totalPrice (70-80%)
+  deletedAt             DateTime? // Soft delete - blocked from auth
+  createdAt             DateTime                     @default(now())
+  updatedAt             DateTime                     @updatedAt
+  bookings              Booking[]
+  personalPhone         String?
+  openphonePhone        String?
+  phoneType             String?
+  stripeAccountId       String?
+  sitterPoolOffers      SitterPoolOffer[]
+  bookingSitterPool     BookingSitterPool[]          @relation("SitterPoolMembers")
+  tierHistory           SitterTierHistory[]
+  currentTierId         String?
+  currentTier           SitterTier?                  @relation(fields: [currentTierId], references: [id])
+  customFields          CustomFieldValue[]
+  user                  User?
+  PayrollLineItem       PayrollLineItem[]
+  PayrollAdjustment     PayrollAdjustment[]
+  maskedNumber          SitterMaskedNumber?
+  assignmentWindows     AssignmentWindow[]
+  availabilityRequests  SitterAvailabilityRequest[]
+  googleAccessToken     String?                      @db.Text // Encrypted access token
+  googleRefreshToken    String?                      @db.Text // Encrypted refresh token
+  googleTokenExpiry     DateTime?
+  googleCalendarId      String?                      @default("primary")
+  calendarSyncEnabled   Boolean                      @default(false)
+  respectGoogleBusy     Boolean                      @default(false) // When true, block availability from Google busy
+  availabilityEnabled   Boolean                      @default(true) // Sitter-managed: available for new bookings
+  timezone              String?                      @default("America/Chicago") // IANA timezone for availability computation
+  // SRS System relations
+  tierSnapshots         SitterTierSnapshot[]
+  serviceEvents         SitterServiceEvent[]
+  timeOffs              SitterTimeOff[]
+  offerEvents           OfferEvent[]
+  visitEvents           VisitEvent[]
+  compensation          SitterCompensation?
+  metricsWindows        SitterMetricsWindow[]
+  calendarEvents        BookingCalendarEvent[]
+  messageThreads        MessageThread[]
+  petHealthLogs         PetHealthLog[]
+  verifications         SitterVerification[]
+  availabilityRules     SitterAvailabilityRule[]
+  availabilityOverrides SitterAvailabilityOverride[]
+  quietHours            SitterQuietHours?
+  mileageLogs           SitterMileageLog[]
+  stripeConnectAccount  SitterStripeAccount?
+  payoutTransfers       PayoutTransfer[]
+  earnings              SitterEarning[]
+
+  // @@unique([email])   // re-add after backfill
+  @@index([active])
+  @@index([orgId])
+  @@index([currentTierId])
+  @@index([deletedAt])
+}
+
+model SitterPoolOffer {
+  id               String   @id @default(uuid())
+  orgId            String   @default("default")
+  bookingId        String
+  sitterId         String?
+  sitterIds        String?
+  message          String?
+  expiresAt        DateTime
+  status           String   @default("active")
+  responses        String   @default("[]")
+  acceptedSitterId String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  booking          Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  sitter           Sitter?  @relation(fields: [sitterId], references: [id], onDelete: Cascade)
+
+  @@index([bookingId])
+  @@index([orgId])
+  @@index([sitterId])
+  @@index([status])
+}
+
+model BookingSitterPool {
+  id              String   @id @default(uuid())
+  orgId           String   @default("default")
+  bookingId       String
+  sitterId        String
+  createdAt       DateTime @default(now())
+  createdByUserId String?
+  booking         Booking  @relation("BookingSitterPool", fields: [bookingId], references: [id], onDelete: Cascade)
+  sitter          Sitter   @relation("SitterPoolMembers", fields: [sitterId], references: [id], onDelete: Cascade)
+
+  @@unique([bookingId, sitterId])
+  @@index([orgId])
+  @@index([bookingId])
+  @@index([sitterId])
+}
+
+model Message {
+  id        String   @id @default(uuid())
+  orgId     String   @default("default")
+  direction String   @default("outbound")
+  from      String   @default("")
+  to        String   @default("")
+  body      String   @default("")
+  status    String   @default("sent")
+  booking   Booking? @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  bookingId String?
+  createdAt DateTime @default(now())
+
+  @@index([bookingId])
+  @@index([orgId])
+  @@index([direction])
+}
+
+model Setting {
+  id        String   @id @default(uuid())
+  orgId     String   @default("default")
+  updatedAt DateTime @updatedAt
+  key       String
+  value     String
+  category  String?
+  label     String?
+  createdAt DateTime @default(now())
+
+  @@unique([orgId, key])
+  @@index([category])
+  @@index([orgId])
+}
+
+model Report {
+  id        String   @id @default(uuid())
+  orgId     String   @default("default")
+  bookingId String?
+  booking   Booking? @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  sitterId  String?
+  clientId  String?
+
+  // Structured visit data
+  content         String
+  walkDuration    Int?
+  pottyNotes      String?
+  foodNotes       String?
+  waterNotes      String?
+  medicationNotes String?
+  behaviorNotes   String?
+  personalNote    String? @db.Text
+  petReports      String? @db.Text // JSON: [{ petId, petName, walk, potty, food, water, meds, behavior }]
+
+  // Media
+  mediaUrls String?
+
+  // Visit timing
+  visitStarted   DateTime?
+  visitCompleted DateTime?
+  checkInLat     Float?
+  checkInLng     Float?
+  checkOutLat    Float?
+  checkOutLng    Float?
+
+  // Client feedback
+  clientRating   Int?
+  clientFeedback String?   @db.Text
+  ratedAt        DateTime?
+
+  // Status
+  sentToClient Boolean   @default(false)
+  sentAt       DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([bookingId])
+  @@index([orgId])
+  @@index([sitterId])
+  @@index([clientId])
+  @@index([orgId, clientId, createdAt(sort: Desc)])
+}
+
+model GoogleCalendarAccount {
+  id           String    @id @default(uuid())
+  email        String    @unique
+  provider     String    @default("google")
+  accessToken  String
+  refreshToken String?
+  expiresAt    DateTime?
+  calendarId   String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([email])
+}
+
+// ============================================
+// AUTOMATION CENTER MODELS (Enterprise Rebuild)
+// ============================================
+
+model Automation {
+  id          String   @id @default(uuid())
+  orgId       String   @default("default")
+  name        String
+  description String?
+  isEnabled   Boolean  @default(true)
+  scope       String   @default("global") // global, org, sitter, client
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   String? // User ID or system
+  updatedBy   String? // User ID or system
+  version     Int      @default(1)
+  status      String   @default("draft") // draft, active, paused, archived
+
+  // Relations
+  trigger         AutomationTrigger?
+  conditionGroups AutomationConditionGroup[]
+  actions         AutomationAction[]
+  templates       AutomationTemplate[]
+  runs            AutomationRun[]
+
+  @@index([isEnabled])
+  @@index([orgId])
+  @@index([status])
+  @@index([scope])
+  @@index([createdAt])
+}
+
+model AutomationTrigger {
+  id            String     @id @default(uuid())
+  automationId  String     @unique
+  automation    Automation @relation(fields: [automationId], references: [id], onDelete: Cascade)
+  triggerType   String // e.g., "booking.created", "booking.statusChanged", "time.scheduled"
+  triggerConfig String     @db.Text // JSON string with trigger-specific configuration
+
+  @@index([triggerType])
+}
+
+model AutomationConditionGroup {
+  id           String                @id @default(uuid())
+  automationId String
+  automation   Automation            @relation(fields: [automationId], references: [id], onDelete: Cascade)
+  operator     String                @default("all") // "all" or "any"
+  order        Int                   @default(0)
+  conditions   AutomationCondition[]
+
+  @@index([automationId])
+  @@index([order])
+}
+
+model AutomationCondition {
+  id              String                   @id @default(uuid())
+  groupId         String
+  group           AutomationConditionGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  conditionType   String // e.g., "booking.service", "booking.status", "client.isNew"
+  conditionConfig String                   @db.Text // JSON string with condition-specific configuration
+  order           Int                      @default(0)
+
+  @@index([groupId])
+  @@index([order])
+}
+
+model AutomationAction {
+  id           String     @id @default(uuid())
+  automationId String
+  automation   Automation @relation(fields: [automationId], references: [id], onDelete: Cascade)
+  actionType   String // e.g., "sendSMS", "sendEmail", "updateBookingStatus", "assignSitter"
+  actionConfig String     @db.Text // JSON string with action-specific configuration
+  order        Int        @default(0)
+
+  @@index([automationId])
+  @@index([order])
+}
+
+model AutomationTemplate {
+  id            String     @id @default(uuid())
+  automationId  String
+  automation    Automation @relation(fields: [automationId], references: [id], onDelete: Cascade)
+  templateType  String // "sms", "email", "internalMessage"
+  subject       String? // For emails
+  body          String     @db.Text
+  variablesUsed String?    @db.Text // JSON array of variable names
+  previewText   String?    @db.Text
+  updatedAt     DateTime   @updatedAt
+  updatedBy     String? // User ID
+
+  @@index([automationId])
+  @@index([templateType])
+}
+
+model AutomationRun {
+  id               String     @id @default(uuid())
+  orgId            String     @default("default")
+  automationId     String
+  automation       Automation @relation(fields: [automationId], references: [id], onDelete: Cascade)
+  triggeredAt      DateTime   @default(now())
+  status           String     @default("queued") // queued, running, success, failed, skipped, test
+  reason           String?    @db.Text // If skipped
+  targetEntityType String? // booking, client, sitter, payrollRun, payment, messageThread
+  targetEntityId   String?
+  idempotencyKey   String?    @unique
+  metadata         String?    @db.Text // JSON string
+  correlationId    String? // For EventLog correlation
+
+  // Relations
+  steps AutomationRunStep[]
+
+  @@index([automationId])
+  @@index([orgId])
+  @@index([status])
+  @@index([triggeredAt])
+  @@index([targetEntityType, targetEntityId])
+  @@index([correlationId])
+  @@index([idempotencyKey])
+}
+
+model AutomationRunStep {
+  id              String        @id @default(uuid())
+  orgId           String        @default("default")
+  automationRunId String
+  automationRun   AutomationRun @relation(fields: [automationRunId], references: [id], onDelete: Cascade)
+  stepType        String // "conditionCheck", "actionExecute"
+  status          String // "success", "failed", "skipped"
+  input           String?       @db.Text // JSON string
+  output          String?       @db.Text // JSON string
+  error           String?       @db.Text // JSON string
+  createdAt       DateTime      @default(now())
+
+  @@index([automationRunId])
+  @@index([orgId])
+  @@index([stepType])
+  @@index([status])
+}
+
+// ============================================
+// CUSTOM FIELD SYSTEM
+// ============================================
+
+model CustomField {
+  id               String             @id @default(uuid())
+  entityType       String // "client", "pet", "sitter", "booking"
+  label            String
+  fieldType        String // "string", "number", "boolean", "date", "list"
+  required         Boolean            @default(false)
+  visibleToOwner   Boolean            @default(true)
+  visibleToSitter  Boolean            @default(false)
+  visibleToClient  Boolean            @default(false)
+  editableBySitter Boolean            @default(false)
+  editableByClient Boolean            @default(false)
+  showInTemplates  Boolean            @default(false)
+  options          String? // JSON array for list type fields
+  defaultValue     String?
+  order            Int                @default(0)
+  values           CustomFieldValue[]
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+
+  @@index([entityType])
+}
+
+model CustomFieldValue {
+  id            String      @id @default(uuid())
+  orgId         String      @default("default")
+  customFieldId String
+  customField   CustomField @relation(fields: [customFieldId], references: [id], onDelete: Cascade)
+  entityId      String // ID of the client, pet, sitter, or booking
+  value         String
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  Pet           Pet?        @relation(fields: [petId], references: [id], onDelete: SetNull)
+  petId         String?
+  Sitter        Sitter?     @relation(fields: [sitterId], references: [id], onDelete: SetNull)
+  sitterId      String?
+  Client        Client?     @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  clientId      String?
+  Booking       Booking?    @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+  bookingId     String?
+
+  @@unique([customFieldId, entityId])
+  @@index([orgId])
+  @@index([entityId])
+  @@index([petId])
+  @@index([sitterId])
+  @@index([clientId])
+  @@index([bookingId])
+}
+
+// ============================================
+// SERVICE CONFIGURATION
+// ============================================
+
+model IncidentReport {
+  id          String    @id @default(uuid())
+  orgId       String
+  bookingId   String
+  sitterId    String
+  clientId    String?
+  petId       String?
+  type        String // injury, illness, escape, property_damage, bite, other
+  severity    String // low, medium, high, critical
+  description String    @db.Text
+  mediaUrls   String?
+  status      String    @default("open") // open, investigating, resolved
+  resolution  String?   @db.Text
+  resolvedAt  DateTime?
+  resolvedBy  String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([orgId, status])
+  @@index([bookingId])
+  @@index([sitterId])
+}
+
+model RecurringSchedule {
+  id       String  @id @default(uuid())
+  orgId    String
+  clientId String
+  sitterId String?
+
+  service    String
+  frequency  String // daily, weekly, biweekly, monthly
+  daysOfWeek String? // JSON array e.g. [1,2,3,4,5]
+  startTime  String // "09:00"
+  endTime    String // "09:30"
+  duration   Int?
+
+  effectiveFrom  DateTime
+  effectiveUntil DateTime?
+
+  address    String?
+  notes      String?
+  totalPrice Float
+  afterHours Boolean @default(false)
+  holiday    Boolean @default(false)
+
+  petIds String? // JSON array of pet IDs
+
+  status              String    @default("active") // active, paused, cancelled
+  lastGeneratedAt     DateTime?
+  lastPaymentDate     DateTime?
+  lastPaymentAmount   Float?
+  paymentFailureCount Int       @default(0)
+
+  invoicingMode String @default("per_visit") // per_visit, weekly, monthly
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  bookings Booking[]
+
+  @@index([orgId, status])
+  @@index([orgId, clientId])
+  @@index([orgId, clientId, status])
+  @@index([sitterId])
+}
+
+model ServiceConfig {
+  id                 String   @id @default(uuid())
+  orgId              String   @default("default")
+  serviceName        String
+  basePrice          Float?
+  defaultDuration    Int? // minutes
+  category           String? // e.g., "walking", "sitting", "care"
+  minBookingNotice   Int? // hours
+  gpsCheckInRequired Boolean  @default(false)
+  photosRequired     Boolean  @default(false)
+  allowedSitterTiers String? // JSON array of tier IDs
+  allowedSitterTypes String? // JSON array
+  weekendMultiplier  Float?   @default(1.0)
+  holidayMultiplier  Float?   @default(1.0)
+  timeOfDayRules     String? // JSON object with rules
+  holidayBehavior    String? // JSON object
+  enabled            Boolean  @default(true)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@unique([orgId, serviceName])
+  @@index([serviceName])
+  @@index([category])
+  @@index([orgId])
+}
+
+// ============================================
+// PRICING ENGINE
+// ============================================
+
+model PricingRule {
+  id          String   @id @default(uuid())
+  orgId       String   @default("default")
+  name        String
+  description String?
+  type        String // "fee", "discount", "multiplier"
+  conditions  String // JSON object with conditions
+  calculation String // JSON object with calculation logic
+  priority    Int      @default(0)
+  enabled     Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([enabled])
+  @@index([type])
+  @@index([orgId])
+}
+
+// ============================================
+// DISCOUNT ENGINE
+// ============================================
+
+model Discount {
+  id              String          @id @default(uuid())
+  orgId           String          @default("default")
+  code            String? // For discount codes; unique per org when set
+  name            String
+  type            String // "code", "firstTime", "loyalty", "referral", "automatic"
+  value           Float // Percentage or fixed amount
+  valueType       String // "percentage" or "fixed"
+  minBookingTotal Float?
+  maxDiscount     Float?
+  validFrom       DateTime?
+  validUntil      DateTime?
+  usageLimit      Int?
+  usageCount      Int             @default(0)
+  conditions      String? // JSON object with conditions
+  enabled         Boolean         @default(true)
+  bookings        DiscountUsage[]
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@unique([orgId, code])
+  @@index([code])
+  @@index([type])
+  @@index([enabled])
+  @@index([orgId])
+}
+
+model DiscountUsage {
+  id         String   @id @default(uuid())
+  orgId      String   @default("default")
+  discountId String
+  discount   Discount @relation(fields: [discountId], references: [id], onDelete: Cascade)
+  bookingId  String
+  booking    Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  amount     Float
+  usedAt     DateTime @default(now())
+
+  @@unique([bookingId]) // One discount per booking
+  @@index([orgId])
+  @@index([discountId])
+  @@index([bookingId])
+}
+
+// ============================================
+// BOOKING FORM BUILDER
+// ============================================
+
+model FormField {
+  id              String   @id @default(uuid())
+  serviceType     String? // null = applies to all services
+  label           String
+  fieldType       String // "text", "email", "phone", "date", "select", "textarea", "checkbox"
+  required        Boolean  @default(false)
+  order           Int      @default(0)
+  options         String? // JSON array for select fields
+  placeholder     String?
+  helpText        String?
+  visibleToSitter Boolean  @default(false)
+  visibleToClient Boolean  @default(true)
+  includeInReport Boolean  @default(false)
+  enabled         Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([serviceType])
+}
+
+// ============================================
+// TEMPLATE ENGINE
+// ============================================
+
+model MessageTemplate {
+  id          String            @id @default(uuid())
+  name        String
+  type        String // "sms", "email"
+  category    String // "client", "sitter", "owner", "report", "invoice", "onboarding"
+  templateKey String            @unique // e.g., "booking.confirmed.client.sms"
+  subject     String? // For emails
+  body        String
+  variables   String? // JSON array of available variables
+  version     Int               @default(1)
+  isActive    Boolean           @default(true)
+  history     TemplateHistory[]
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@index([category])
+  @@index([type])
+  @@index([templateKey])
+}
+
+model TemplateHistory {
+  id         String          @id @default(uuid())
+  templateId String
+  template   MessageTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  subject    String?
+  body       String
+  version    Int
+  changedBy  String? // User ID or system
+  changedAt  DateTime        @default(now())
+
+  @@index([templateId])
+}
+
+// ============================================
+// PERMISSION & ROLE SYSTEM
+// ============================================
+
+model Role {
+  id          String           @id @default(uuid())
+  name        String           @unique // "owner", "admin", "manager", "leadSitter", "sitter", "accountant"
+  displayName String
+  permissions RolePermission[]
+  users       UserRole[]
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+}
+
+model RolePermission {
+  id       String  @id @default(uuid())
+  roleId   String
+  role     Role    @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  resource String // e.g., "client.phone", "booking.edit", "sitter.payout"
+  action   String // "read", "write", "delete", "manage"
+  granted  Boolean @default(true)
+
+  @@unique([roleId, resource, action])
+  @@index([roleId])
+}
+
+model UserRole {
+  id        String   @id @default(uuid())
+  userId    String // References Sitter.id or a future User model
+  userType  String // "sitter" or "admin"
+  roleId    String
+  role      Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, userType, roleId])
+  @@index([userId, userType])
+}
+
+// ============================================
+// SITTER TIER & PERFORMANCE ENGINE
+// ============================================
+
+model SitterTier {
+  id                        String              @id @default(uuid())
+  orgId                     String              @default("default")
+  name                      String
+  pointTarget               Int
+  minCompletionRate         Float? // 0-100
+  minResponseRate           Float? // 0-100
+  benefits                  String? // JSON object
+  priorityLevel             Int                 @default(0) // Higher = more priority in routing
+  canTakeHouseSits          Boolean             @default(false)
+  canTakeTwentyFourHourCare Boolean             @default(false)
+  isDefault                 Boolean             @default(false)
+  // Canonical tier permissions (Enterprise Tier System)
+  canJoinPools              Boolean             @default(false) // Can join sitter pools
+  canAutoAssign             Boolean             @default(false) // Can be auto-assigned without owner approval
+  canOvernight              Boolean             @default(false) // Can handle overnight/extended care
+  canSameDay                Boolean             @default(false) // Can handle same-day emergency bookings
+  canHighValue              Boolean             @default(false) // Can handle high-value clients
+  canRecurring              Boolean             @default(false) // Can accept recurring clients
+  canLeadPool               Boolean             @default(false) // Can lead sitter pools (Elite only)
+  canOverrideDecline        Boolean             @default(false) // Can override certain decline rules (Elite only)
+  // Commission split (percentage sitter receives, e.g., 70 = 70% to sitter, 30% to owner)
+  commissionSplit           Float               @default(70.0) // Default commission percentage
+  // Visual properties
+  badgeColor                String? // Hex color for badge
+  badgeStyle                String? // "outline" | "filled" | "accent" - for visual differentiation
+  // Description and progression info
+  description               String? // What this tier means
+  progressionRequirements   String? // JSON object with requirements to advance
+  sitters                   SitterTierHistory[]
+  createdAt                 DateTime            @default(now())
+  updatedAt                 DateTime            @updatedAt
+  Sitter                    Sitter[]
+
+  @@unique([orgId, name])
+  @@index([orgId])
+  @@index([priorityLevel])
+}
+
+model SitterTierHistory {
+  id             String     @id @default(uuid())
+  orgId          String     @default("default")
+  sitterId       String
+  sitter         Sitter     @relation(fields: [sitterId], references: [id], onDelete: Cascade)
+  tierId         String
+  tier           SitterTier @relation(fields: [tierId], references: [id], onDelete: Cascade)
+  points         Int
+  completionRate Float?
+  responseRate   Float?
+  periodStart    DateTime
+  periodEnd      DateTime?
+  // Audit fields for tier changes
+  changedBy      String? // User ID who made the change (null if system/automation)
+  reason         String? // Reason for tier change (promotion/demotion)
+  metadata       String? // JSON string for additional context
+  createdAt      DateTime   @default(now())
+
+  @@index([orgId])
+  @@index([orgId, sitterId])
+  @@index([sitterId])
+  @@index([tierId])
+  @@index([periodStart])
+  @@index([createdAt])
+}
+
+model ServicePointWeight {
+  id        String   @id @default(uuid())
+  service   String
+  duration  Int? // null = applies to all durations
+  points    Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([service, duration])
+  @@index([service])
+}
+
+// ============================================
+// CLIENT MANAGEMENT
+// ============================================
+
+model Client {
+  id            String    @id @default(uuid())
+  orgId         String    @default("default")
+  firstName     String    @default("")
+  lastName      String    @default("")
+  phone         String    @default("")
+  email         String?
+  address       String?
+  tags          String? // JSON array
+  lifetimeValue Float     @default(0)
+  lastBookingAt DateTime?
+  notes         String?
+
+  // Key tracking
+  keyStatus     String?   @default("none") // none, with_client, with_sitter, with_owner, lockbox
+  keyHolder     String?
+  keyNotes      String?
+  keyGivenAt    DateTime?
+  keyReturnedAt DateTime?
+
+  // Home access info
+  keyLocation       String?
+  lockboxCode       String?
+  doorAlarmCode     String?
+  wifiNetwork       String?
+  wifiPassword      String?
+  entryInstructions String? @db.Text
+  parkingNotes      String?
+
+  // Stripe
+  stripeCustomerId       String? // Stripe Customer ID (cus_xxx) for saved payment methods
+  defaultPaymentMethodId String?
+
+  // Referral
+  referredBy   String?
+  referralCode String? @unique
+
+  deletedAt         DateTime? // Soft delete
+  customFields      CustomFieldValue[]
+  bookings          Booking[]
+  contacts          ClientContact[]
+  emergencyContacts ClientEmergencyContact[]
+  threads           MessageThread[]
+  loyaltyRewards      LoyaltyReward[]
+  emergencyVetAuths   EmergencyVetAuth[]
+  user              User?
+  createdAt         DateTime                 @default(now())
+  updatedAt         DateTime                 @updatedAt
+
+  @@unique([orgId, phone])
+  @@unique([phone])
+  @@index([phone])
+  @@index([email])
+  @@index([orgId])
+  @@index([orgId, lastBookingAt])
+  @@index([deletedAt])
+}
+
+model ClientContact {
+  id        String   @id @default(cuid())
+  orgId     String
+  clientId  String
+  e164      String
+  label     String?
+  verified  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  org    Org    @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@index([orgId, e164])
+  @@index([orgId, clientId])
+}
+
+model ClientEmergencyContact {
+  id           String   @id @default(uuid())
+  orgId        String
+  clientId     String
+  name         String
+  phone        String
+  relationship String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@index([orgId])
+  @@index([clientId])
+  @@index([orgId, clientId])
+}
+
+model BookingChecklistItem {
+  id        String    @id @default(uuid())
+  orgId     String
+  bookingId String
+  type      String
+  checkedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@unique([bookingId, type])
+  @@index([orgId])
+  @@index([bookingId])
+  @@index([orgId, bookingId])
+}
+
+// ============================================
+// BOOKING EXTENSIONS
+// ============================================
+
+model BookingTag {
+  id        String                 @id @default(uuid())
+  name      String                 @unique
+  color     String? // Hex color
+  bookings  BookingTagAssignment[]
+  createdAt DateTime               @default(now())
+  updatedAt DateTime               @updatedAt
+}
+
+model BookingTagAssignment {
+  id        String     @id @default(uuid())
+  orgId     String     @default("default")
+  bookingId String
+  tagId     String
+  tag       BookingTag @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  booking   Booking    @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  createdAt DateTime   @default(now())
+
+  @@unique([bookingId, tagId])
+  @@index([orgId])
+  @@index([bookingId])
+  @@index([tagId])
+}
+
+model BookingPipeline {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  order       Int      @default(0)
+  isDefault   Boolean  @default(false)
+  transitions String? // JSON array of allowed next statuses
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([order])
+}
+
+// ============================================
+// BUSINESS SETTINGS
+// ============================================
+
+model BusinessSettings {
+  id                 String   @id @default(uuid())
+  orgId              String   @unique @default("default")
+  businessName       String
+  businessPhone      String?
+  businessEmail      String?
+  businessAddress    String?
+  timeZone           String   @default("America/New_York")
+  operatingHours     String? // JSON object
+  holidays           String? // JSON array
+  taxSettings        String? // JSON object
+  contentBlocks      String? // JSON object with policies, terms, etc.
+  cancellationPolicy String?  @db.Text // JSON: { tiers: [{ hoursBeforeStart, feePercent }] }
+  sitterPolicies     String?  @db.Text
+  paymentHoldHours      Int      @default(2)
+  travelBufferMinutes   Int      @default(20)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@index([orgId])
+}
+
+// ============================================
+// ORG NOTIFICATION SETTINGS
+// ============================================
+
+model OrgNotificationSettings {
+  id                    String   @id @default(uuid())
+  orgId                 String   @unique @default("default")
+  smsEnabled            Boolean  @default(true)
+  emailEnabled          Boolean  @default(false)
+  ownerAlerts           Boolean  @default(true)
+  sitterNotifications   Boolean  @default(true)
+  clientReminders       Boolean  @default(true)
+  paymentReminders      Boolean  @default(true)
+  conflictNoticeEnabled Boolean  @default(true)
+  reminderTiming        String?  @default("24h") // e.g. "24h", "2h"
+  preferences           String? // JSON for extensibility
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@index([orgId])
+}
+
+// ============================================
+// ORG SERVICE AREAS (coverage / zones)
+// ============================================
+
+model OrgServiceArea {
+  id        String   @id @default(uuid())
+  orgId     String   @default("default")
+  name      String
+  type      String // "zip", "radius", "polygon"
+  config    String? // JSON: zips array, center+radius, or geojson
+  enabled   Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([orgId])
+}
+
+// ============================================
+// AUTHENTICATION MODELS
+// ============================================
+
+model User {
+  id                    String    @id @default(uuid())
+  orgId                 String    @default("default")
+  role                  String    @default("owner")
+  name                  String?
+  email                 String?   @unique
+  emailVerified         DateTime?
+  image                 String?
+  passwordHash          String? // For credentials provider
+  inviteToken           String?   @unique
+  inviteExpiresAt       DateTime?
+  welcomeToken          String?   @unique
+  welcomeTokenExpiresAt DateTime?
+  passwordResetToken    String?   @unique
+  passwordResetExpiresAt DateTime?
+  deletedAt             DateTime? // Soft delete - blocked from auth
+  passwordChangedAt     DateTime? // Set on password change — invalidates sessions issued before this time
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  accounts              Account[]
+  sessions              Session[]
+  // Link to Sitter if this user is a sitter (one-to-one relation)
+  sitterId              String?   @unique
+  sitter                Sitter?   @relation(fields: [sitterId], references: [id], onDelete: SetNull)
+  // Link to Client if this user is a client (one-to-one relation)
+  clientId              String?   @unique
+  client                Client?   @relation(fields: [clientId], references: [id], onDelete: SetNull)
+
+  @@index([email])
+  @@index([orgId])
+  @@index([sitterId])
+  @@index([clientId])
+  @@index([deletedAt])
+}
+
+model UserNotificationPreferences {
+  id               String  @id @default(uuid())
+  userId           String  @unique
+  pushMessages     Boolean @default(true)
+  pushVisitStarted Boolean @default(true)
+  pushReports      Boolean @default(true)
+  pushAssignments  Boolean @default(true)
+  pushCallouts     Boolean @default(true)
+  pushEnabled      Boolean @default(true)  // Master toggle
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model PushSubscription {
+  id        String   @id @default(uuid())
+  orgId     String   @default("default")
+  userId    String
+  endpoint  String   @db.Text
+  p256dh    String   // Public key
+  auth      String   // Auth secret
+  userAgent String?  // Browser/device info
+  createdAt DateTime @default(now())
+
+  @@unique([userId, endpoint])
+  @@index([orgId])
+  @@index([userId])
+}
+
+model Account {
+  id                String  @id @default(uuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([sessionToken])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ============================================
+// EXISTING UTILITY MODELS (referenced by code)
+// ============================================
+
+model BaselineSnapshot {
+  id                   String   @id @default(uuid())
+  orgId                String   @default("default")
+  bookingId            String
+  timestamp            DateTime @default(now())
+  bookingFormTotal     Float?
+  calendarViewTotal    Float?
+  sitterDashboardTotal Float?
+  ownerDashboardTotal  Float?
+  stripePaymentTotal   Float?
+  storedTotalPrice     Float?
+  calculatedBreakdown  String?  @db.Text // JSON string
+  notes                String?  @db.Text
+
+  @@index([orgId])
+  @@index([bookingId])
+  @@index([timestamp])
+}
+
+model FeatureFlag {
+  id          String   @id @default(uuid())
+  key         String   @unique
+  enabled     Boolean  @default(false)
+  description String?
+  metadata    String?  @db.Text // JSON string
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([key])
+  @@index([enabled])
+}
+
+// ============================================
+// EVENT LOG
+// ============================================
+
+model EventLog {
+  id             String   @id @default(uuid())
+  orgId          String   @default("default")
+  eventType      String // e.g., "automation.run", "booking.created", "payment.success"
+  automationType String? // Automation type if eventType is "automation.run" (e.g., "bookingConfirmation", "nightBeforeReminder")
+  status         String // "success", "failed", "skipped", "pending"
+  error          String?  @db.Text // Error message if status is "failed"
+  metadata       String?  @db.Text // JSON string for additional context (inputs, outputs, etc.)
+  bookingId      String?
+  booking        Booking? @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+  createdAt      DateTime @default(now())
+
+  @@index([orgId])
+  @@index([eventType])
+  @@index([automationType])
+  @@index([status])
+  @@index([bookingId])
+  @@index([createdAt])
+  @@index([orgId, eventType, createdAt])
+}
+
+// ============================================
+// QUEUE OBSERVABILITY
+// ============================================
+
+enum QueueJobStatus {
+  QUEUED
+  RUNNING
+  SUCCEEDED
+  FAILED
+  DEAD_LETTERED
+}
+
+model QueueJobRecord {
+  id                String         @id @default(uuid())
+  orgId             String         @default("default")
+  queueName         String
+  jobName           String
+  jobId             String
+  status            QueueJobStatus @default(QUEUED)
+  retryCount        Int            @default(0)
+  lastError         String?        @db.Text
+  providerErrorCode String?
+  subsystem         String
+  resourceType      String?
+  resourceId        String?
+  correlationId     String?
+  payloadJson       String?        @db.Text
+  startedAt         DateTime?
+  finishedAt        DateTime?
+  retryOfJobId      String?
+  lastRetryAt       DateTime?
+  lastRetryBy       String?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  @@unique([queueName, jobId])
+  @@index([orgId])
+  @@index([status])
+  @@index([subsystem])
+  @@index([resourceType, resourceId])
+  @@index([correlationId])
+  @@index([createdAt])
+  @@index([updatedAt])
+  @@index([retryOfJobId])
+}
+
+model CommandCenterAttentionState {
+  id           String    @id @default(uuid())
+  orgId        String    @default("default")
+  itemKey      String
+  handledAt    DateTime?
+  snoozedUntil DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@unique([orgId, itemKey])
+  @@index([orgId])
+  @@index([orgId, handledAt])
+  @@index([orgId, snoozedUntil])
+}
+
+// ============================================
+// BOOKING STATUS HISTORY
+// ============================================
+
+model BookingStatusHistory {
+  id         String   @id @default(uuid())
+  orgId      String   @default("default")
+  bookingId  String
+  booking    Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  fromStatus String? // Previous status (null for initial status)
+  toStatus   String // New status
+  changedBy  String? // User ID who made the change (null if system/automation)
+  reason     String?  @db.Text // Optional reason for status change
+  metadata   String?  @db.Text // JSON string for additional context
+  createdAt  DateTime @default(now())
+
+  @@index([orgId])
+  @@index([bookingId])
+  @@index([toStatus])
+  @@index([createdAt])
+  @@index([changedBy])
+}
+
+// Stripe Payment Read Models
+model StripeCharge {
+  id              String    @id // Stripe charge ID
+  orgId           String    @default("default")
+  amount          Int // Amount in cents
+  amountRefunded  Int       @default(0)
+  currency        String    @default("usd")
+  status          String // succeeded, pending, failed
+  lastError       String?   @db.Text // Error message when status=failed
+  description     String?   @db.Text
+  customerId      String? // Stripe customer ID
+  customerEmail   String?
+  customerName    String?
+  clientId        String? // Client ID from booking for billing history
+  paymentMethod   String? // card, bank_account, etc.
+  paymentIntentId String? // Stripe payment intent ID
+  invoiceId       String? // Stripe invoice ID
+  bookingId       String? // Linked booking ID
+  refunded        Boolean   @default(false)
+  refundedAt      DateTime?
+  createdAt       DateTime // Stripe created timestamp
+  syncedAt        DateTime  @default(now()) @updatedAt
+
+  @@index([orgId])
+  @@index([clientId])
+  @@index([customerId])
+  @@index([bookingId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([syncedAt])
+  @@index([orgId, bookingId])
+  @@index([orgId, clientId, createdAt])
+}
+
+model StripeRefund {
+  id              String   @id // Stripe refund ID
+  chargeId        String // Stripe charge ID
+  amount          Int // Amount in cents
+  currency        String   @default("usd")
+  reason          String? // duplicate, fraudulent, requested_by_customer
+  status          String // succeeded, pending, failed, canceled
+  paymentIntentId String? // Stripe payment intent ID
+  createdAt       DateTime // Stripe created timestamp
+  syncedAt        DateTime @default(now()) @updatedAt
+
+  @@index([chargeId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model StripePayout {
+  id                  String    @id // Stripe payout ID
+  amount              Int // Amount in cents
+  currency            String    @default("usd")
+  status              String // paid, pending, in_transit, canceled, failed
+  arrivalDate         DateTime? // When payout arrives
+  description         String?   @db.Text
+  statementDescriptor String?
+  createdAt           DateTime // Stripe created timestamp
+  syncedAt            DateTime  @default(now()) @updatedAt
+
+  @@index([status])
+  @@index([arrivalDate])
+  @@index([createdAt])
+}
+
+model StripeBalanceTransaction {
+  id          String   @id // Stripe balance transaction ID
+  amount      Int // Amount in cents (can be negative for fees)
+  currency    String   @default("usd")
+  type        String // charge, payment, refund, payout, etc.
+  description String?  @db.Text
+  fee         Int      @default(0) // Fee amount in cents
+  net         Int // Net amount after fees
+  chargeId    String? // Related charge ID
+  payoutId    String? // Related payout ID
+  createdAt   DateTime // Stripe created timestamp
+  syncedAt    DateTime @default(now()) @updatedAt
+
+  @@index([type])
+  @@index([chargeId])
+  @@index([payoutId])
+  @@index([createdAt])
+}
+
+// Stripe Connect (sitter payouts)
+model SitterStripeAccount {
+  id               String   @id @default(uuid())
+  orgId            String   @default("default")
+  sitterId         String   @unique
+  accountId        String // Stripe Connect account ID (acct_xxx)
+  onboardingStatus String   @default("pending") // pending, onboarding, complete
+  payoutsEnabled   Boolean  @default(false)
+  chargesEnabled   Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  sitter Sitter @relation(fields: [sitterId], references: [id], onDelete: Cascade)
+
+  @@index([orgId])
+  @@index([accountId])
+}
+
+model PayoutTransfer {
+  id               String   @id @default(uuid())
+  orgId            String   @default("default")
+  sitterId         String
+  bookingId        String?
+  stripeTransferId String? // Stripe Transfer ID (tr_xxx)
+  amount           Int // Amount in cents
+  amountReversed   Int      @default(0) // Cumulative reversed amount in cents
+  currency         String   @default("usd")
+  status           String   @default("pending") // pending, paid, failed, reversed, partial_reversal
+  lastError        String?  @db.Text
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  sitter Sitter @relation(fields: [sitterId], references: [id], onDelete: Cascade)
+
+  @@index([orgId])
+  @@index([sitterId])
+  @@index([bookingId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model SitterEarning {
+  id          String   @id @default(uuid())
+  orgId       String   @default("default")
+  sitterId    String
+  bookingId   String
+  amountGross Float
+  platformFee Float    @default(0)
+  tips        Float    @default(0)
+  netAmount   Float
+  createdAt   DateTime @default(now())
+
+  sitter Sitter @relation(fields: [sitterId], references: [id], onDelete: Cascade)
+
+  @@unique([orgId, sitterId, bookingId])
+  @@index([orgId])
+  @@index([sitterId])
+  @@index([bookingId])
+}
+
+// Payroll Models (org-scoped for multi-tenant)
+model PayrollRun {
+  id             String              @id @default(uuid())
+  orgId          String              @default("default")
+  payPeriodStart DateTime
+  payPeriodEnd   DateTime
+  status         String              @default("draft") // draft, pending, approved, paid, canceled
+  totalAmount    Float
+  totalSitters   Int
+  approvedBy     String? // User ID
+  approvedAt     DateTime?
+  paidAt         DateTime?
+  notes          String?             @db.Text
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+  lineItems      PayrollLineItem[]
+  adjustments    PayrollAdjustment[]
+
+  @@index([orgId])
+  @@index([orgId, payPeriodStart])
+  @@index([orgId, payPeriodEnd])
+  @@index([orgId, status])
+}
+
+model PayrollLineItem {
+  id               String     @id @default(uuid())
+  payrollRunId     String
+  payrollRun       PayrollRun @relation(fields: [payrollRunId], references: [id], onDelete: Cascade)
+  sitterId         String
+  sitter           Sitter     @relation(fields: [sitterId], references: [id])
+  payoutTransferId String?    @unique // Link to PayoutTransfer for audit; one line per transfer
+  bookingCount     Int
+  totalEarnings    Float
+  commissionRate   Float
+  commissionAmount Float
+  adjustments      Float      @default(0) // Sum of bonuses - deductions
+  netAmount        Float
+  notes            String?    @db.Text
+  createdAt        DateTime   @default(now())
+
+  @@index([payrollRunId])
+  @@index([sitterId])
+  @@index([payoutTransferId])
+}
+
+model PayrollAdjustment {
+  id           String     @id @default(uuid())
+  payrollRunId String
+  payrollRun   PayrollRun @relation(fields: [payrollRunId], references: [id], onDelete: Cascade)
+  sitterId     String
+  sitter       Sitter     @relation(fields: [sitterId], references: [id])
+  type         String // bonus, deduction
+  amount       Float
+  reason       String     @db.Text
+  createdBy    String? // User ID
+  createdAt    DateTime   @default(now())
+
+  @@index([payrollRunId])
+  @@index([sitterId])
+}
+
+// ============================================
+// MESSAGING SYSTEM (Messaging Master Spec V1)
+// ============================================
+
+model MessageAccount {
+  id                 String   @id @default(uuid())
+  orgId              String
+  provider           String // e.g., "twilio"
+  providerConfigJson String?  @db.Text // JSON string with provider-specific config
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@index([orgId])
+  @@index([provider])
+}
+
+model MessageNumber {
+  id                 String              @id @default(uuid())
+  orgId              String              @default("default")
+  provider           String              @default("twilio") // e.g., "twilio"
+  providerNumberSid  String              @default("") // Provider's number identifier
+  e164               String              @default("") // E.164 format phone number
+  market             String? // e.g., "US"
+  status             String              @default("active") // active, disabled
+  numberClass        String              @default("pool") // front_desk | sitter | pool
+  poolType           String              @default("company") // company | service
+  assignedSitterId   String? // For sitter numbers
+  assignedThreadId   String?
+  assignedAt         DateTime?
+  releasedAt         DateTime?
+  poolAlertedAt      DateTime?
+  ownerId            String? // For front desk numbers
+  isRotating         Boolean             @default(false) // For pool numbers
+  rotationPriority   Int? // For pool number rotation
+  lastAssignedAt     DateTime? // For pool rotation tracking
+  // Relations
+  sitterMaskedNumber SitterMaskedNumber?
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  MessageThread      MessageThread[]
+
+  @@index([orgId])
+  @@index([provider])
+  @@index([e164])
+  @@index([status])
+  @@index([numberClass])
+  @@index([poolType])
+  @@index([assignedSitterId])
+  @@index([assignedThreadId])
+}
+
+// Provider Credentials (encrypted at rest)
+model ProviderCredential {
+  id              String   @id @default(uuid())
+  orgId           String   @unique
+  providerType    String   @default("twilio") // 'twilio', 'openphone', etc.
+  encryptedConfig String   @db.Text // Encrypted JSON: { accountSid, authToken }
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([orgId])
+}
+
+model MessageThread {
+  id                      String    @id @default(uuid())
+  orgId                   String
+  scope                   String // client_booking, client_general, owner_sitter, internal
+  bookingId               String?
+  clientId                String?
+  assignedSitterId        String?
+  assignedRole            String    @default("front_desk") // front_desk | sitter | owner | automation
+  laneType                String    @default("company") // company | service
+  status                  String    @default("open") // open, closed, archived
+  lifecycleStatus         String    @default("active") // active | grace | expired | archived
+  activationStage         String    @default("intake") // intake | staffing | meet_and_greet | service | follow_up
+  providerSessionSid      String?
+  maskedNumberE164        String?
+  numberClass             String? // front_desk | sitter | pool
+  messageNumberId         String?
+  isOneTimeClient         Boolean   @default(false)
+  isMeetAndGreet          Boolean   @default(false)
+  meetAndGreetApprovedAt  DateTime?
+  meetAndGreetConfirmedAt DateTime?
+  clientApprovedAt        DateTime?
+  sitterApprovedAt        DateTime?
+  serviceApprovedAt       DateTime?
+  serviceWindowStart      DateTime?
+  serviceWindowEnd        DateTime?
+  graceEndsAt             DateTime?
+  assignmentWindowId      String?
+  lastMessageAt           DateTime?
+  lastClientMessageAt     DateTime?
+  lastSitterMessageAt     DateTime?
+  lastInboundAt           DateTime?
+  lastOutboundAt          DateTime?
+  ownerUnreadCount        Int       @default(0)
+  threadType              String? // use scope for semantics
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+
+  // Relations
+  client               Client?                     @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  sitter               Sitter?                     @relation(fields: [assignedSitterId], references: [id], onDelete: SetNull)
+  participants         MessageParticipant[]
+  events               MessageEvent[]
+  assignmentAudits     ThreadAssignmentAudit[]
+  responseRecords      ResponseRecord[]
+  messageNumber        MessageNumber?              @relation(fields: [messageNumberId], references: [id], onDelete: SetNull)
+  assignmentWindows    AssignmentWindow[]
+  AntiPoachingAttempt  AntiPoachingAttempt[]
+  conversationFlags    MessageConversationFlag[]
+  availabilityRequests SitterAvailabilityRequest[]
+  offerEvents          OfferEvent[]
+  visitEvents          VisitEvent[]
+  responseLinks        MessageResponseLink[]
+
+  @@index([orgId])
+  @@index([bookingId])
+  @@index([clientId])
+  @@index([assignedSitterId])
+  @@index([status])
+  @@index([lifecycleStatus])
+  @@index([activationStage])
+  @@index([laneType])
+  @@index([lastMessageAt])
+  @@index([graceEndsAt])
+  @@index([orgId, lastMessageAt])
+  @@index([orgId, laneType, activationStage, lifecycleStatus, lastMessageAt(sort: Desc), id(sort: Desc)])
+  @@index([orgId, status, lastMessageAt(sort: Desc), id(sort: Desc)])
+  @@index([orgId, assignedSitterId, status, lastMessageAt(sort: Desc), id(sort: Desc)])
+  @@index([orgId, clientId, status, lastMessageAt(sort: Desc), id(sort: Desc)])
+  @@index([numberClass])
+  @@index([messageNumberId])
+  @@index([assignmentWindowId])
+}
+
+model MessageParticipant {
+  id                     String   @id @default(uuid())
+  threadId               String
+  orgId                  String
+  role                   String // client, sitter, owner, system
+  userId                 String? // User ID if role is sitter/owner
+  clientId               String? // Client ID if role is client
+  displayName            String
+  realE164               String // Real phone number (stored securely)
+  providerParticipantSid String? // Provider's participant identifier
+  // Legacy fields for backward compatibility
+  entityType             String? // use role + userId/clientId
+  entityId               String?
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  // Relations
+  thread MessageThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+
+  @@index([threadId])
+  @@index([orgId])
+  @@index([role])
+  @@index([userId])
+  @@index([clientId])
+}
+
+model MessageEvent {
+  id                          String    @id @default(uuid())
+  threadId                    String
+  orgId                       String
+  direction                   String // inbound, outbound
+  actorType                   String // client, sitter, owner, system
+  actorUserId                 String?
+  actorClientId               String?
+  providerMessageSid          String? // Provider's message identifier
+  body                        String    @db.Text
+  mediaJson                   String?   @db.Text // JSON array of media URLs
+  createdAt                   DateTime  @default(now())
+  deliveryStatus              String    @default("queued") // queued, sent, delivered, failed, received
+  failureCode                 String?
+  failureDetail               String?   @db.Text
+  requiresResponse            Boolean   @default(false)
+  responseToMessageId         String? // FK to MessageEvent (the message this responds to)
+  responseSlaSeconds          Int?
+  responsibleSitterIdSnapshot String?
+  promptId                    String?
+  idempotencyKey              String?   @db.VarChar(128)
+  idempotencyFingerprint      String?   @db.VarChar(64)
+  routingDisposition          String    @default("normal") // normal | blocked | rerouted
+  metadataJson                String?   @db.Text // JSON object
+  correlationIds              String?   @db.Text // JSON array for audit trail
+  answeredAt                  DateTime? // When this message was answered (if requiresResponse=true)
+  // Legacy fields for backward compatibility (delivery retry)
+  attemptCount                Int?
+  lastAttemptAt               DateTime?
+  providerErrorCode           String?
+  providerErrorMessage        String?
+
+  // Relations
+  thread                    MessageThread               @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  AntiPoachingAttempt       AntiPoachingAttempt?
+  conversationFlags         MessageConversationFlag[]
+  responseTo                MessageEvent?               @relation("ResponseTo", fields: [responseToMessageId], references: [id], onDelete: SetNull)
+  responses                 MessageEvent[]              @relation("ResponseTo")
+  requiresResponseLinks     MessageResponseLink[]       @relation("RequiresResponse")
+  responseLinks             MessageResponseLink[]       @relation("Response")
+  availabilityRequestLinks  SitterAvailabilityRequest[] @relation("AvailabilityRequestMessage")
+  availabilityResponseLinks SitterAvailabilityRequest[] @relation("AvailabilityResponseMessage")
+
+  @@index([threadId])
+  @@index([orgId])
+  @@index([direction])
+  @@index([actorType])
+  @@index([deliveryStatus])
+  @@index([createdAt])
+  @@index([orgId, threadId, createdAt(sort: Desc)])
+  @@index([threadId, direction, createdAt(sort: Desc)])
+  @@index([providerMessageSid])
+  @@index([requiresResponse])
+  @@index([responseToMessageId])
+  @@index([answeredAt])
+  @@index([routingDisposition])
+  @@index([orgId, threadId, direction, actorType, idempotencyKey, createdAt(sort: Desc)])
+}
+
+model MessageConversationFlag {
+  id             String    @id @default(uuid())
+  orgId          String
+  threadId       String
+  messageEventId String?
+  type           String // anti_poaching | escalation | delivery_issue | policy
+  severity       String    @default("medium") // low | medium | high | critical
+  metadataJson   String?   @db.Text
+  createdAt      DateTime  @default(now())
+  resolvedAt     DateTime?
+
+  thread       MessageThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  messageEvent MessageEvent? @relation(fields: [messageEventId], references: [id], onDelete: SetNull)
+
+  @@index([orgId, threadId, createdAt(sort: Desc)])
+  @@index([orgId, type, severity, createdAt(sort: Desc)])
+  @@index([resolvedAt])
+}
+
+model SitterAvailabilityRequest {
+  id                     String    @id @default(uuid())
+  orgId                  String
+  threadId               String
+  bookingId              String?
+  sitterId               String
+  requestedByUserId      String?
+  status                 String    @default("pending") // pending | yes | no | expired
+  requestMessageEventId  String?
+  responseMessageEventId String?
+  responseText           String?
+  requestedAt            DateTime  @default(now())
+  respondedAt            DateTime?
+  responseLatencySec     Int?
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+
+  thread               MessageThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  booking              Booking?      @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+  sitter               Sitter        @relation(fields: [sitterId], references: [id], onDelete: Cascade)
+  requestMessageEvent  MessageEvent? @relation("AvailabilityRequestMessage", fields: [requestMessageEventId], references: [id], onDelete: SetNull)
+  responseMessageEvent MessageEvent? @relation("AvailabilityResponseMessage", fields: [responseMessageEventId], references: [id], onDelete: SetNull)
+
+  @@index([orgId, threadId, status, requestedAt(sort: Desc)])
+  @@index([orgId, sitterId, status, requestedAt(sort: Desc)])
+  @@index([orgId, bookingId])
+}
+
+model ThreadAssignmentAudit {
+  id           String   @id @default(uuid())
+  orgId        String
+  threadId     String
+  fromSitterId String?
+  toSitterId   String?
+  actorUserId  String // User ID who made the change
+  reason       String?  @db.Text
+  createdAt    DateTime @default(now())
+
+  // Relations
+  thread MessageThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+
+  @@index([orgId])
+  @@index([threadId])
+  @@index([actorUserId])
+  @@index([createdAt])
+}
+
+model OptOutState {
+  id        String   @id @default(uuid())
+  orgId     String
+  clientId  String?
+  phoneE164 String
+  state     String // opted_in, opted_out
+  source    String // inbound_keyword, admin_override, import
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([orgId, phoneE164])
+  @@index([orgId])
+  @@index([phoneE164])
+  @@index([state])
+}
+
+model ResponseRecord {
+  id                       String    @id @default(uuid())
+  orgId                    String
+  threadId                 String
+  bookingId                String?
+  inboundMessageEventId    String // ID of the inbound MessageEvent that triggered this
+  responsibleSitterId      String?
+  slaSeconds               Int?
+  inboundAt                DateTime
+  resolutionStatus         String    @default("pending") // pending, replied, escalated, expired, ignored
+  resolvedAt               DateTime?
+  resolvedByMessageEventId String?
+  responseSeconds          Int?
+  escalationReason         String?   @db.Text
+  ignoreReason             String?   @db.Text
+  createdAt                DateTime  @default(now())
+  updatedAt                DateTime  @updatedAt
+
+  // Relations
+  thread MessageThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+
+  @@index([orgId])
+  @@index([threadId])
+  @@index([bookingId])
+  @@index([responsibleSitterId])
+  @@index([resolutionStatus])
+  @@index([inboundAt])
+}
+
+// ============================================
+// NUMBER INFRASTRUCTURE
+// ============================================
+
+model SitterMaskedNumber {
+  id                     String    @id @default(uuid())
+  orgId                  String
+  sitterId               String    @unique
+  messageNumberId        String    @unique // FK to MessageNumber (unique for one-to-one relation)
+  providerParticipantSid String? // Provider's participant ID
+  status                 String    @default("active") // active, deactivated, reassigned
+  assignedAt             DateTime  @default(now())
+  deactivatedAt          DateTime?
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+
+  // Relations
+  sitter        Sitter        @relation(fields: [sitterId], references: [id], onDelete: Cascade)
+  messageNumber MessageNumber @relation(fields: [messageNumberId], references: [id], onDelete: Restrict)
+
+  @@index([orgId])
+  @@index([sitterId])
+  @@index([status])
+}
+
+// ============================================
+// ASSIGNMENT WINDOW
+// ============================================
+
+model AssignmentWindow {
+  id        String   @id @default(uuid())
+  orgId     String
+  threadId  String
+  bookingId String
+  sitterId  String
+  startAt   DateTime
+  endAt     DateTime
+  status    String   @default("active") // active, expired, closed
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  thread  MessageThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  booking Booking       @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  sitter  Sitter        @relation(fields: [sitterId], references: [id], onDelete: Cascade)
+
+  @@index([orgId])
+  @@index([threadId])
+  @@index([bookingId])
+  @@index([sitterId])
+  @@index([status])
+  @@index([startAt, endAt])
+}
+
+// ============================================
+// ANTI-POACHING
+// ============================================
+
+model AntiPoachingAttempt {
+  id               String    @id @default(uuid())
+  orgId            String
+  threadId         String
+  eventId          String    @unique // FK to MessageEvent
+  actorType        String // client | sitter
+  actorId          String?
+  violationType    String // phone_number | email | url | social_media
+  detectedContent  String    @db.Text // The flagged content
+  action           String    @default("blocked") // blocked | warned | flagged
+  ownerNotifiedAt  DateTime?
+  resolvedAt       DateTime?
+  resolvedByUserId String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  // Relations
+  thread MessageThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  event  MessageEvent  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([orgId])
+  @@index([threadId])
+  @@index([eventId])
+  @@index([action])
+}
+
+// ============================================
+// SITTER GROWTH LEVELS SYSTEM (SRS)
+// ============================================
+
+model SitterTierSnapshot {
+  id                      String    @id @default(uuid())
+  orgId                   String
+  sitterId                String
+  asOfDate                DateTime  @db.Date
+  rolling30dScore         Float // 0-100
+  rolling30dBreakdownJson String    @db.Text // JSON: { responsiveness, acceptance, timeliness, accuracy, engagement, conduct }
+  rolling26wScore         Float? // 0-100, nullable for new sitters
+  rolling26wBreakdownJson String?   @db.Text // JSON: same structure
+  tier                    String    @default("foundation") // foundation, reliant, trusted, preferred
+  provisional             Boolean   @default(false)
+  visits30d               Int       @default(0)
+  offers30d               Int       @default(0)
+  lastPromotionAt         DateTime?
+  lastDemotionAt          DateTime?
+  atRisk                  Boolean   @default(false)
+  atRiskReason            String?   @db.Text
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+
+  // Relations
+  sitter Sitter @relation(fields: [sitterId], references: [id], onDelete: Cascade)
+
+  @@unique([orgId, sitterId, asOfDate])
+  @@index([orgId, sitterId, asOfDate(sort: Desc)])
+  @@index([orgId, asOfDate])
+  @@index([sitterId, asOfDate(sort: Desc)])
+  @@index([tier])
+  @@index([atRisk])
+}
+
+model SitterServiceEvent {
+  id              String    @id @default(uuid())
+  orgId           String
+  sitterId        String
+  level           String // coaching, corrective, probation
+  reasonCode      String
+  notes           String?   @db.Text
+  effectiveFrom   DateTime
+  effectiveTo     DateTime?
+  createdByUserId String
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // Relations
+  sitter Sitter @relation(fields: [sitterId], references: [id], onDelete: Cascade)
+
+  @@index([orgId, sitterId, createdAt(sort: Desc)])
+  @@index([orgId, sitterId, effectiveFrom, effectiveTo])
+  @@index([level])
+  @@index([effectiveFrom, effectiveTo])
+}
+
+model SitterTimeOff {
+  id               String   @id @default(uuid())
+  orgId            String
+  sitterId         String
+  type             String // pto, medical
+  startsAt         DateTime
+  endsAt           DateTime
+  approvedByUserId String
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Relations
+  sitter Sitter @relation(fields: [sitterId], references: [id], onDelete: Cascade)
+
+  @@index([orgId, sitterId, startsAt, endsAt])
+  @@index([orgId, sitterId, startsAt(sort: Desc)])
+  @@index([type])
+  @@index([startsAt, endsAt])
+}
+
+model SitterAvailabilityRule {
+  id         String   @id @default(uuid())
+  orgId      String   @default("default")
+  sitterId   String
+  daysOfWeek String // JSON array: [0,1,2,3,4,5,6] 0=Sun, 6=Sat
+  startTime  String // HH:mm in sitter timezone
+  endTime    String // HH:mm in sitter timezone
+  timezone   String   @default("America/Chicago")
+  active     Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  sitter Sitter @relation(fields: [sitterId], references: [id], onDelete: Cascade)
+
+  @@index([orgId, sitterId])
+  @@index([sitterId, active])
+}
+
+model SitterAvailabilityOverride {
+  id          String   @id @default(uuid())
+  orgId       String   @default("default")
+  sitterId    String
+  date        DateTime @db.Date
+  startTime   String // HH:mm in sitter timezone
+  endTime     String // HH:mm in sitter timezone
+  isAvailable Boolean // true=add availability, false=blackout
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  sitter Sitter @relation(fields: [sitterId], references: [id], onDelete: Cascade)
+
+  @@unique([orgId, sitterId, date, startTime, endTime])
+  @@index([orgId, sitterId, date])
+}
+
+model OfferEvent {
+  id                 String    @id @default(uuid())
+  orgId              String
+  sitterId           String
+  threadId           String?
+  bookingId          String?
+  offeredAt          DateTime
+  expiresAt          DateTime? // When offer expires (for timeout tracking)
+  acceptedAt         DateTime?
+  declinedAt         DateTime?
+  declineReason      String? // enum + free text
+  source             String    @default("dashboard") // dashboard | sms
+  status             String    @default("sent") // sent | accepted | declined | expired
+  withinAvailability Boolean   @default(true)
+  leadTimeValid      Boolean   @default(true)
+  routingValid       Boolean   @default(true)
+  excluded           Boolean   @default(false)
+  excludedReason     String?   @db.Text
+  correlationIds     String?   @db.Text // JSON array
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  // Relations
+  sitter  Sitter         @relation(fields: [sitterId], references: [id], onDelete: Cascade)
+  booking Booking?       @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+  thread  MessageThread? @relation(fields: [threadId], references: [id], onDelete: SetNull)
+
+  @@index([orgId, sitterId, offeredAt(sort: Desc)])
+  @@index([orgId, sitterId, excluded])
+  @@index([orgId, sitterId, status])
+  @@index([bookingId])
+  @@index([threadId])
+  @@index([offeredAt])
+  @@index([expiresAt])
+}
+
+model VisitEvent {
+  id                   String    @id @default(uuid())
+  orgId                String
+  sitterId             String
+  clientId             String?
+  bookingId            String
+  threadId             String?
+  scheduledStart       DateTime
+  scheduledEnd         DateTime
+  checkInAt            DateTime?
+  checkOutAt           DateTime?
+  status               String // completed, late, missed, canceled
+  lateMinutes          Int?      @default(0)
+  checklistMissedCount Int       @default(0)
+  mediaMissingCount    Int       @default(0)
+  complaintVerified    Boolean   @default(false)
+  safetyFlag           Boolean   @default(false)
+  excluded             Boolean   @default(false)
+  excludedReason       String?   @db.Text
+  correlationIds       String?   @db.Text // JSON array
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  // Relations
+  sitter  Sitter         @relation(fields: [sitterId], references: [id], onDelete: Cascade)
+  booking Booking        @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  thread  MessageThread? @relation(fields: [threadId], references: [id], onDelete: SetNull)
+
+  @@index([orgId, sitterId, scheduledStart(sort: Desc)])
+  @@index([orgId, sitterId, excluded])
+  @@index([bookingId])
+  @@index([threadId])
+  @@index([scheduledStart])
+  @@index([status])
+}
+
+model SitterCompensation {
+  id              String    @id @default(uuid())
+  orgId           String
+  sitterId        String    @unique
+  basePay         Float     @default(12.50)
+  lastRaiseAt     DateTime?
+  lastRaiseAmount Float?
+  nextReviewDate  DateTime?
+  perkFlags       String?   @db.Text // JSON: { priority, multipliers, mentorship, reducedOversight }
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // Relations
+  sitter Sitter @relation(fields: [sitterId], references: [id], onDelete: Cascade)
+
+  @@index([orgId, sitterId])
+  @@index([nextReviewDate])
+}
+
+model SitterMetricsWindow {
+  id                    String    @id @default(uuid())
+  orgId                 String
+  sitterId              String
+  windowStart           DateTime
+  windowEnd             DateTime
+  windowType            String // daily | weekly_7d | monthly_30d
+  avgResponseSeconds    Float?
+  medianResponseSeconds Float?
+  responseRate          Float? // responded threads / total requiring response
+  offerAcceptRate       Float? // accepted / total offers
+  offerDeclineRate      Float? // declined / total offers
+  offerExpireRate       Float? // expired / total offers
+  lastOfferRespondedAt  DateTime?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  // Relations
+  sitter Sitter @relation(fields: [sitterId], references: [id], onDelete: Cascade)
+
+  @@unique([orgId, sitterId, windowStart, windowType])
+  @@index([orgId, sitterId, windowStart])
+  @@index([orgId, sitterId, windowEnd])
+  @@index([windowType])
+}
+
+model MessageResponseLink {
+  id                      String   @id @default(uuid())
+  orgId                   String
+  threadId                String
+  requiresResponseEventId String // FK to MessageEvent (the message requiring response)
+  responseEventId         String // FK to MessageEvent (the response)
+  responseMinutes         Int // Calculated response time in minutes
+  responseSeconds         Int? // More precise response time in seconds
+  withinAssignmentWindow  Boolean  @default(false)
+  excluded                Boolean  @default(false)
+  excludedReason          String?  @db.Text
+  createdAt               DateTime @default(now())
+
+  // Relations
+  requiresResponseEvent MessageEvent  @relation("RequiresResponse", fields: [requiresResponseEventId], references: [id], onDelete: Cascade)
+  responseEvent         MessageEvent  @relation("Response", fields: [responseEventId], references: [id], onDelete: Cascade)
+  thread                MessageThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+
+  @@unique([requiresResponseEventId]) // One response per requiring message
+  @@index([orgId, threadId, createdAt(sort: Desc)])
+  @@index([orgId, requiresResponseEventId])
+  @@index([responseEventId])
+  @@index([withinAssignmentWindow, excluded])
+}
+
+// ============================================
+// GOOGLE CALENDAR INTEGRATION
+// ============================================
+
+model BookingCalendarEvent {
+  id                    String    @id @default(uuid())
+  orgId                 String    @default("default")
+  bookingId             String
+  sitterId              String
+  googleCalendarEventId String? // null if not yet synced or event deleted
+  payloadChecksum       String? // Deterministic hash; skip update if unchanged
+  lastSyncedAt          DateTime?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  // Relations
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  sitter  Sitter  @relation(fields: [sitterId], references: [id], onDelete: Cascade)
+
+  @@unique([bookingId, sitterId]) // One event per booking-sitter pair
+  @@index([orgId])
+  @@index([bookingId])
+  @@index([sitterId])
+  @@index([googleCalendarEventId])
+}
+
+// ============================================
+// AI DOMINATION LAYER (Loyalty, Health, Verification, Analytics)
+// ============================================
+
+model LoyaltyReward {
+  id         String    @id @default(cuid())
+  orgId      String
+  clientId   String
+  points     Int       @default(0)
+  tier       String    @default("bronze") // bronze, silver, gold, platinum
+  lastEarned DateTime  @default(now())
+  expiresAt  DateTime?
+
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@unique([orgId, clientId])
+  @@index([orgId])
+  @@index([clientId])
+}
+
+model PetHealthLog {
+  id        String   @id @default(cuid())
+  orgId     String
+  petId     String
+  sitterId  String?
+  bookingId String?
+  note      String   @db.Text
+  type      String // "daily", "alert", "vet", "allergy"
+  createdAt DateTime @default(now())
+
+  pet     Pet      @relation(fields: [petId], references: [id], onDelete: Cascade)
+  sitter  Sitter?  @relation(fields: [sitterId], references: [id])
+  booking Booking? @relation(fields: [bookingId], references: [id])
+
+  @@index([petId])
+  @@index([sitterId])
+  @@index([bookingId])
+  @@index([orgId])
+  @@index([orgId, petId, createdAt(sort: Desc)])
+}
+
+model SitterVerification {
+  id              String    @id @default(cuid())
+  sitterId        String
+  status          String    @default("pending") // pending, approved, rejected
+  backgroundCheck DateTime?
+  insuranceProof  String?   @db.Text
+  reviewedBy      String?
+  notes           String?   @db.Text
+
+  sitter Sitter @relation(fields: [sitterId], references: [id], onDelete: Cascade)
+
+  @@index([sitterId])
+  @@index([status])
+}
+
+model AnalyticsInsight {
+  id          String   @id @default(cuid())
+  orgId       String
+  type        String // "revenue", "retention", "pet_health", "sitter_performance"
+  value       Json
+  generatedAt DateTime @default(now())
+  period      String // "daily", "weekly", "monthly"
+
+  @@index([orgId])
+  @@index([type])
+  @@index([generatedAt])
+}
+
+// AI Governance
+model OrgAISettings {
+  id                 String   @id @default(uuid())
+  orgId              String   @unique
+  enabled            Boolean  @default(true)
+  monthlyBudgetCents Int      @default(0) // 0 = unlimited (see docs/AI_GOVERNANCE.md)
+  hardStop           Boolean  @default(false)
+  allowedModels      Json? // optional array of model names
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@index([orgId])
+}
+
+model AIPromptTemplate {
+  id        String   @id @default(uuid())
+  orgId     String? // null = global template
+  key       String // e.g. daily_delight, sitter_match, pricing_suggestion
+  version   Int      @default(1)
+  template  String   @db.Text
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@index([orgId, key])
+  @@index([key])
+}
+
+model AIUsageLog {
+  id            String   @id @default(uuid())
+  orgId         String
+  userId        String?
+  featureKey    String
+  model         String
+  promptKey     String   @default("")
+  promptVersion Int      @default(0)
+  inputTokens   Int      @default(0)
+  outputTokens  Int      @default(0)
+  totalTokens   Int      @default(0)
+  costCents     Int      @default(0)
+  status        String   @default("succeeded") // succeeded | failed | blocked
+  error         String?  @db.Text
+  metadata      Json?
+  createdAt     DateTime @default(now())
+
+  @@index([orgId])
+  @@index([orgId, createdAt])
+  @@index([orgId, featureKey, createdAt])
+  @@index([featureKey])
+}
+
+// ============================================
+// LEDGER & RECONCILIATION
+// ============================================
+
+model LedgerEntry {
+  id          String   @id @default(cuid())
+  orgId       String
+  entryType   String // charge | refund | payout | fee | adjustment
+  source      String // stripe | internal
+  stripeId    String?  @unique // payment_intent/charge/refund/transfer id; unique when present
+  bookingId   String?
+  clientId    String?
+  sitterId    String?
+  amountCents Int // positive; refunds use entryType=refund
+  currency    String   @default("usd")
+  status      String   @default("succeeded") // succeeded | failed | pending
+  occurredAt  DateTime // timestamp from provider
+  createdAt   DateTime @default(now())
+
+  @@index([orgId, occurredAt])
+  @@index([orgId, entryType, occurredAt])
+}
+
+model ReconciliationRun {
+  id           String   @id @default(cuid())
+  orgId        String
+  rangeStart   DateTime
+  rangeEnd     DateTime
+  status       String   @default("succeeded") // succeeded | failed
+  totalsJson   Json? // sums by type
+  mismatchJson Json? // missingInDb, missingInStripe, amountDiffs
+  createdAt    DateTime @default(now())
+
+  @@index([orgId])
+  @@index([orgId, createdAt])
+}
+
+model BookingRequestIdempotency {
+  id                 String   @id @default(uuid())
+  orgId              String?
+  route              String
+  idempotencyKey     String
+  requestFingerprint String
+  reservationStatus  String   @default("reserved") // reserved | completed | failed
+  statusCode         Int?
+  responseBodyJson   String?  @db.Text
+  resourceType       String?
+  resourceId         String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@unique([orgId, route, idempotencyKey], name: "org_route_idempotency")
+  @@index([orgId, route])
+  @@index([resourceType, resourceId])
+  @@index([createdAt])
+}
+
+// ============================================
+// APP ERROR LOG (signup/bootstrap, integration failures)
+// ============================================
+
+model AppErrorLog {
+  id        String   @id @default(uuid())
+  code      String // e.g. "signup.bootstrap_failed", "oauth.callback_mismatch"
+  message   String   @db.Text
+  context   String?  @db.Text // JSON
+  createdAt DateTime @default(now())
+
+  @@index([code])
+  @@index([createdAt])
+}
+
+// ============================================
+// ORG INTEGRATION CONFIG (Settings → Integrations stack)
+// ============================================
+
+model OrgIntegrationConfig {
+  id                    String   @id @default(uuid())
+  orgId                 String   @unique
+
+  /// Messaging: "none" | "twilio" | "openphone"
+  messagingProvider     String   @default("none")
+  messagingConfigured   Boolean  @default(false)
+  messagingFallbackPhone String?
+
+  /// Payments: "stripe" | "square" | "none"
+  paymentProvider       String   @default("stripe")
+  paymentConfigured     Boolean  @default(false)
+
+  /// Calendar: "none" | "google"
+  calendarProvider      String   @default("none")
+  calendarConfigured    Boolean  @default(false)
+
+  /// Accounting: "none" | "quickbooks" | "xero"
+  accountingProvider    String   @default("none")
+  accountingConfigured  Boolean  @default(false)
+
+  /// Booking Intake: "embedded_form" | "client_portal" | "both"
+  bookingIntake         String   @default("embedded_form")
+
+  /// Provider-specific config (JSON extensibility)
+  providerMeta          String?  @db.Text
+
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@index([orgId])
+}
+
+// Signup idempotency: one row per email to prevent duplicate org/user creation
+model SignupIdempotency {
+  id             String   @id @default(uuid())
+  email          String   @unique
+  userId         String?
+  orgId          String?
+  idempotencyKey String? // optional client-provided key for replay
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([email])
+  @@index([createdAt])
+}
+
+model StripeWebhookEvent {
+  id            String   @id @default(uuid())
+  stripeEventId String   @unique
+  type          String
+  processedAt   DateTime @default(now())
+
+  @@index([stripeEventId])
+}
+
+model DailyOrgStats {
+  id                  String   @id @default(cuid())
+  orgId               String
+  date                DateTime
+  bookingsCreated     Int      @default(0)
+  bookingsConfirmed   Int      @default(0)
+  bookingsCompleted   Int      @default(0)
+  revenueTotal        Float    @default(0)
+  newClients          Int      @default(0)
+  notificationsSent   Int      @default(0)
+  createdAt           DateTime @default(now())
+
+  @@unique([orgId, date])
+  @@index([orgId, date])
+}
+
+model VisitCard {
+  id              String    @id @default(cuid())
+  orgId           String
+  bookingId       String    @unique
+  clientId        String
+  sitterId        String
+
+  checkInAt       DateTime
+  checkOutAt      DateTime
+  durationMinutes Int
+
+  checkInLat      Float?
+  checkInLng      Float?
+  checkOutLat     Float?
+  checkOutLng     Float?
+
+  photoUrls       String?   @db.Text
+  petChecklists   String?   @db.Text
+  sitterNote      String?   @db.Text
+
+  assembledAt     DateTime  @default(now())
+  sentToClient    Boolean   @default(false)
+  sentAt          DateTime?
+
+  @@index([orgId, clientId])
+  @@index([bookingId])
+}
+
+model SitterQuietHours {
+  id        String   @id @default(cuid())
+  orgId     String
+  sitterId  String   @unique
+  startTime String   // "22:00" in sitter's timezone
+  endTime   String   // "07:00" in sitter's timezone
+  enabled   Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  sitter Sitter @relation(fields: [sitterId], references: [id], onDelete: Cascade)
+
+  @@index([orgId, sitterId])
+}
+
+model SitterMileageLog {
+  id           String   @id @default(cuid())
+  orgId        String
+  sitterId     String
+  bookingId    String   @unique
+  month        String   // "2026-03" for grouping
+  estimatedMi  Float
+  actualMi     Float?
+  fromAddress  String?
+  toAddress    String?
+  createdAt    DateTime @default(now())
+
+  sitter Sitter @relation(fields: [sitterId], references: [id], onDelete: Cascade)
+
+  @@index([orgId, sitterId, month])
+}
+
+model EmergencyVetAuth {
+  id                     String   @id @default(cuid())
+  orgId                  String
+  petId                  String   @unique
+  clientId               String
+  authorizedUpToCents    Int
+  vetName                String?
+  vetPhone               String?
+  vetAddress             String?
+  additionalInstructions String?  @db.Text
+  signedAt               DateTime
+  signatureName          String
+  expiresAt              DateTime
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  pet    Pet    @relation(fields: [petId], references: [id], onDelete: Cascade)
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@index([orgId, clientId])
+  @@index([petId])
+}

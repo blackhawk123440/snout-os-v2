@@ -1,0 +1,31 @@
+{
+  "gate": "thread_reads",
+  "mode": "live",
+  "operationCount": 1500,
+  "concurrency": 500,
+  "durationMs": 84604.06541699998,
+  "throughputRps": 17.729644463380556,
+  "successCount": 1500,
+  "errorCount": 0,
+  "errorRate": 0,
+  "observedDuplicateCount": 0,
+  "duplicateCount": 0,
+  "duplicateRate": 0,
+  "retryCount": 0,
+  "deadLetterCount": 0,
+  "latencies": {
+    "p50": 6497.017374999996,
+    "p95": 66715.56162500003,
+    "p99": 69389.89633299998,
+    "max": 70210.62945800001,
+    "min": 826.6095830000122
+  },
+  "pass": false,
+  "failures": [
+    "p50 6497.0ms > 130ms",
+    "p95 66715.6ms > 500ms",
+    "p99 69389.9ms > 950ms",
+    "throughput 17.73 rps < 350 rps"
+  ],
+  "notes": []
+}

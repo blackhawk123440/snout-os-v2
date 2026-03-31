@@ -1,0 +1,48 @@
+═══════════════════════════════════════════
+  SIMPLE DEPLOYMENT - 3 STEPS
+═══════════════════════════════════════════
+
+STEP 1: Create GitHub Repo
+────────────────────────────
+1. Go to: https://github.com/new
+2. Name: snout-os
+3. Create it (don't add README)
+4. Copy the URL
+
+STEP 2: Push Code
+────────────────────────────
+Run in terminal:
+  cd "/Users/leahhudson/Desktop/final form/snout-os"
+  git add .
+  git commit -m "Ready"
+  git remote add origin YOUR_GITHUB_URL
+  git push -u origin main
+
+STEP 3: Deploy on Render
+────────────────────────────
+1. Go to: https://dashboard.render.com
+2. Click "New" → "Web Service"
+3. Connect GitHub → Select "snout-os"
+4. Click "Create Web Service"
+5. Add environment variables (see below)
+6. Wait 5 minutes
+7. Done! Your URL: https://snout-os.onrender.com
+
+ENVIRONMENT VARIABLES (add in Render):
+───────────────────────────────────────
+DATABASE_URL=your_postgres_url
+OPENPHONE_API_KEY=your_key
+OPENPHONE_NUMBER_ID=your_id
+STRIPE_SECRET_KEY=your_key
+STRIPE_PUBLISHABLE_KEY=your_key
+OWNER_PERSONAL_PHONE=+1234567890
+OWNER_OPENPHONE_PHONE=+1234567890
+NODE_ENV=production
+
+AFTER DEPLOYMENT:
+────────────────────────────
+Add to Webflow:
+  <iframe src="https://snout-os.onrender.com/booking-form.html" 
+          style="width:100%; height:800px; border:none;"></iframe>
+
+That's it! 🎉

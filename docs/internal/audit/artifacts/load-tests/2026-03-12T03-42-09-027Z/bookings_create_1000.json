@@ -1,0 +1,42 @@
+{
+  "gate": "bookings_create_1000",
+  "mode": "live",
+  "operationCount": 200,
+  "concurrency": 200,
+  "durationMs": 10593.614209,
+  "throughputRps": 18.87929804259686,
+  "successCount": 0,
+  "errorCount": 200,
+  "errorRate": 1,
+  "observedDuplicateCount": 0,
+  "duplicateCount": 0,
+  "duplicateRate": 0,
+  "retryCount": 0,
+  "deadLetterCount": 0,
+  "timeoutCount": 0,
+  "timeoutRate": 0,
+  "statusCounts": {
+    "403": 20,
+    "429": 180
+  },
+  "failureCategory": "config failure",
+  "latencies": {
+    "p50": 5101.455792,
+    "p95": 9228.681958,
+    "p99": 9377.587042,
+    "max": 10576.747415999998,
+    "min": 1408.8181249999998
+  },
+  "pass": false,
+  "failures": [
+    "p50 5101.5ms > 300ms",
+    "p95 9228.7ms > 1000ms",
+    "p99 9377.6ms > 2000ms",
+    "errorRate 100.00% > 2.00%",
+    "throughput 18.88 rps < 120 rps"
+  ],
+  "notes": [
+    "10% replay traffic with repeated idempotency keys",
+    "Duplicate metric ignores expected same-key replay collisions"
+  ]
+}

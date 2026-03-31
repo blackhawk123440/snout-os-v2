@@ -1,0 +1,40 @@
+{
+  "gate": "bookings_reads_paginated",
+  "mode": "live",
+  "operationCount": 140,
+  "concurrency": 42,
+  "durationMs": 18753.640582999997,
+  "throughputRps": 7.465217187051603,
+  "successCount": 140,
+  "errorCount": 0,
+  "errorRate": 0,
+  "observedDuplicateCount": 0,
+  "duplicateCount": 0,
+  "duplicateRate": 0,
+  "retryCount": 0,
+  "deadLetterCount": 0,
+  "timeoutCount": 0,
+  "timeoutRate": 0,
+  "statusCounts": {
+    "200": 140
+  },
+  "failureCategory": "DB/read bottleneck",
+  "latencies": {
+    "p50": 4883.021666999997,
+    "p95": 6237.960542000001,
+    "p99": 6668.059083,
+    "max": 6772.233458000002,
+    "min": 557.4001250000001
+  },
+  "pass": false,
+  "failures": [
+    "p50 4883.0ms > 120ms",
+    "p95 6238.0ms > 450ms",
+    "p99 6668.1ms > 900ms",
+    "throughput 7.47 rps < 400 rps"
+  ],
+  "notes": [
+    "ramp stage: low"
+  ],
+  "stage": "low"
+}

@@ -1,0 +1,292 @@
+{
+  "runId": "2026-03-11T20-15-32-964Z",
+  "startedAt": "2026-03-11T20:15:32.957Z",
+  "completedAt": "2026-03-11T20:15:39.326Z",
+  "mode": "mock",
+  "suite": "full",
+  "baseUrl": "http://localhost:3000",
+  "thresholds": {
+    "bookings_create_1000": {
+      "p50Ms": 300,
+      "p95Ms": 1000,
+      "p99Ms": 2000,
+      "maxErrorRate": 0.02,
+      "maxDuplicateRate": 0,
+      "minThroughputRps": 120
+    },
+    "messages_send_2000": {
+      "p50Ms": 180,
+      "p95Ms": 700,
+      "p99Ms": 1400,
+      "maxErrorRate": 0.025,
+      "minThroughputRps": 300
+    },
+    "bookings_reads_paginated": {
+      "p50Ms": 120,
+      "p95Ms": 450,
+      "p99Ms": 900,
+      "maxErrorRate": 0.01,
+      "minThroughputRps": 400
+    },
+    "thread_reads": {
+      "p50Ms": 130,
+      "p95Ms": 500,
+      "p99Ms": 950,
+      "maxErrorRate": 0.01,
+      "minThroughputRps": 350
+    },
+    "queue_backlog_drain": {
+      "p50Ms": 20,
+      "p95Ms": 100,
+      "p99Ms": 250,
+      "maxErrorRate": 0.01,
+      "minQueueDrainPerSec": 800
+    },
+    "session_validation_burst": {
+      "p50Ms": 140,
+      "p95Ms": 600,
+      "p99Ms": 1200,
+      "maxErrorRate": 0.03,
+      "minThroughputRps": 300
+    },
+    "queue_retry_failure_storm": {
+      "p50Ms": 30,
+      "p95Ms": 180,
+      "p99Ms": 350,
+      "maxErrorRate": 0.25,
+      "minQueueDrainPerSec": 500,
+      "maxDeadLetterCount": 150,
+      "maxRetryCount": 4000
+    }
+  },
+  "results": [
+    {
+      "gate": "bookings_create_1000",
+      "mode": "mock",
+      "operationCount": 1000,
+      "concurrency": 1000,
+      "durationMs": 678.3212920000001,
+      "throughputRps": 1474.2276437343496,
+      "successCount": 990,
+      "errorCount": 10,
+      "errorRate": 0.01,
+      "duplicateCount": 98,
+      "duplicateRate": 0.09898989898989899,
+      "retryCount": 0,
+      "deadLetterCount": 0,
+      "latencies": {
+        "p50": 139.50764762912513,
+        "p95": 184.9155906491177,
+        "p99": 189.9030477676024,
+        "max": 673.4357930824035,
+        "min": 95.0279799162854
+      },
+      "pass": false,
+      "failures": [
+        "duplicateRate 9.90% > 0.00%"
+      ],
+      "notes": [
+        "10% replay traffic with repeated idempotency keys"
+      ]
+    },
+    {
+      "gate": "messages_send_2000",
+      "mode": "mock",
+      "operationCount": 2000,
+      "concurrency": 2000,
+      "durationMs": 708.896917,
+      "throughputRps": 2821.284663592351,
+      "successCount": 1964,
+      "errorCount": 36,
+      "errorRate": 0.018,
+      "duplicateCount": 0,
+      "duplicateRate": 0,
+      "retryCount": 0,
+      "deadLetterCount": 0,
+      "latencies": {
+        "p50": 105.5980636957969,
+        "p95": 137.72935026963296,
+        "p99": 465.7374036006604,
+        "max": 705.067836699568,
+        "min": 70.02334688919291
+      },
+      "pass": true,
+      "failures": [],
+      "notes": []
+    },
+    {
+      "gate": "bookings_reads_paginated",
+      "mode": "mock",
+      "operationCount": 1800,
+      "concurrency": 600,
+      "durationMs": 1059.5349580000002,
+      "throughputRps": 1698.858528837705,
+      "successCount": 1798,
+      "errorCount": 2,
+      "errorRate": 0.0011111111111111111,
+      "duplicateCount": 0,
+      "duplicateRate": 0,
+      "retryCount": 0,
+      "deadLetterCount": 0,
+      "latencies": {
+        "p50": 127.82837334959368,
+        "p95": 166.82384751942664,
+        "p99": 468.76776256431185,
+        "max": 752.9933724214152,
+        "min": 85.01053661821516
+      },
+      "pass": false,
+      "failures": [
+        "p50 127.8ms > 120ms"
+      ],
+      "notes": []
+    },
+    {
+      "gate": "thread_reads",
+      "mode": "mock",
+      "operationCount": 1500,
+      "concurrency": 500,
+      "durationMs": 994.3099579999998,
+      "throughputRps": 1508.5839057844378,
+      "successCount": 1475,
+      "errorCount": 25,
+      "errorRate": 0.016666666666666666,
+      "duplicateCount": 0,
+      "duplicateRate": 0,
+      "retryCount": 0,
+      "deadLetterCount": 0,
+      "latencies": {
+        "p50": 113.78341234108582,
+        "p95": 146.97087068752808,
+        "p99": 450.9877003026986,
+        "max": 716.8672572681771,
+        "min": 75.0708166842287
+      },
+      "pass": false,
+      "failures": [
+        "errorRate 1.67% > 1.00%"
+      ],
+      "notes": []
+    },
+    {
+      "gate": "queue_backlog_drain",
+      "mode": "mock",
+      "operationCount": 10000,
+      "concurrency": 120,
+      "durationMs": 739.845292,
+      "throughputRps": 13516.339305163816,
+      "successCount": 10000,
+      "errorCount": 0,
+      "errorRate": 0,
+      "duplicateCount": 0,
+      "duplicateRate": 0,
+      "retryCount": 0,
+      "deadLetterCount": 0,
+      "latencies": {
+        "p50": 9.073377546068514,
+        "p95": 14.348819635422842,
+        "p99": 14.860990551635041,
+        "max": 14.99988218938779,
+        "min": 3.0011970141131314
+      },
+      "pass": true,
+      "failures": [],
+      "notes": []
+    },
+    {
+      "gate": "queue_retry_failure_storm",
+      "mode": "mock",
+      "operationCount": 6000,
+      "concurrency": 100,
+      "durationMs": 1389.9534169999997,
+      "throughputRps": 4316.691427652357,
+      "successCount": 5509,
+      "errorCount": 491,
+      "errorRate": 0.08183333333333333,
+      "duplicateCount": 0,
+      "duplicateRate": 0,
+      "retryCount": 5875,
+      "deadLetterCount": 491,
+      "latencies": {
+        "p50": 18.22333108911971,
+        "p95": 52.23293990091406,
+        "p99": 65.10934613052837,
+        "max": 79.27046658172367,
+        "min": 4.003445615675446
+      },
+      "pass": false,
+      "failures": [
+        "dead letters 491 > 150",
+        "retry count 5875 > 4000"
+      ],
+      "notes": [
+        "Uses synthetic storm profile (approx 8% dead-letter candidates, 27% transient retries)"
+      ]
+    },
+    {
+      "gate": "session_validation_burst",
+      "mode": "mock",
+      "operationCount": 1200,
+      "concurrency": 1200,
+      "durationMs": 709.4598750000005,
+      "throughputRps": 1691.4275807352728,
+      "successCount": 1194,
+      "errorCount": 6,
+      "errorRate": 0.005,
+      "duplicateCount": 0,
+      "duplicateRate": 0,
+      "retryCount": 0,
+      "deadLetterCount": 0,
+      "latencies": {
+        "p50": 91.33671232961206,
+        "p95": 117.81068072645098,
+        "p99": 461.5407018724727,
+        "max": 706.6556407425378,
+        "min": 60.03014494889612
+      },
+      "pass": true,
+      "failures": [],
+      "notes": [
+        "Requests are spread across owner/sitter/client session cookies when provided"
+      ]
+    }
+  ],
+  "topBottlenecks": [
+    {
+      "gate": "queue_retry_failure_storm",
+      "reason": "failed gate: dead letters 491 > 150; retry count 5875 > 4000",
+      "severity": 1443.3996065675806
+    },
+    {
+      "gate": "bookings_create_1000",
+      "reason": "failed gate: duplicateRate 9.90% > 0.00%",
+      "severity": 1214.9155906491178
+    },
+    {
+      "gate": "thread_reads",
+      "reason": "failed gate: errorRate 1.67% > 1.00%",
+      "severity": 230.3042040208614
+    },
+    {
+      "gate": "messages_send_2000",
+      "reason": "high p95 137.7ms, throughput 2821.3 rps",
+      "severity": 227.72935026963296
+    },
+    {
+      "gate": "bookings_reads_paginated",
+      "reason": "failed gate: p50 127.8ms > 120ms",
+      "severity": 172.37940307498218
+    }
+  ],
+  "failingGates": [
+    "bookings_create_1000",
+    "bookings_reads_paginated",
+    "thread_reads",
+    "queue_retry_failure_storm"
+  ],
+  "recommendations": [
+    "Bookings create path: add/create composite indexes for dominant search filters and review idempotency table write contention.",
+    "Read-heavy list endpoints: verify query plans for sort+filter indexes and enforce narrower includes to avoid row bloat.",
+    "Queue throughput: raise worker concurrency by queue class, tune retry backoff, and isolate storm-prone jobs into separate queues."
+  ]
+}

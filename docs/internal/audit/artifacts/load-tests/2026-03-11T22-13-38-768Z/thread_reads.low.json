@@ -1,0 +1,40 @@
+{
+  "gate": "thread_reads",
+  "mode": "live",
+  "operationCount": 122,
+  "concurrency": 42,
+  "durationMs": 7875.367292000003,
+  "throughputRps": 15.491340971986245,
+  "successCount": 122,
+  "errorCount": 0,
+  "errorRate": 0,
+  "observedDuplicateCount": 0,
+  "duplicateCount": 0,
+  "duplicateRate": 0,
+  "retryCount": 0,
+  "deadLetterCount": 0,
+  "timeoutCount": 0,
+  "timeoutRate": 0,
+  "statusCounts": {
+    "200": 122
+  },
+  "failureCategory": "DB/read bottleneck",
+  "latencies": {
+    "p50": 2386.4789999999994,
+    "p95": 4093.2596669999984,
+    "p99": 4261.214166999998,
+    "max": 4453.181457999999,
+    "min": 199.9801660000012
+  },
+  "pass": false,
+  "failures": [
+    "p50 2386.5ms > 130ms",
+    "p95 4093.3ms > 500ms",
+    "p99 4261.2ms > 950ms",
+    "throughput 15.49 rps < 350 rps"
+  ],
+  "notes": [
+    "ramp stage: low"
+  ],
+  "stage": "low"
+}

@@ -1,0 +1,19 @@
+{
+  "mode": "apply",
+  "oldBaseUrl": "https://backend-291r.onrender.com",
+  "targetOrgId": "default",
+  "sourceBookingCount": 238,
+  "sourceSitterCount": 6,
+  "sitterSync": {
+    "createdOrUpdated": 5,
+    "missingInSource": []
+  },
+  "created": 0,
+  "skippedFromCheckpoint": 0,
+  "duplicateSame": 238,
+  "duplicateDifferent": 0,
+  "failures": 0,
+  "mismatches": 0,
+  "importedCountInTargetByLegacyIds": 238,
+  "finishedAt": "2026-03-28T04:14:21.595Z"
+}

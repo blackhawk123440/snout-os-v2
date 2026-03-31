@@ -1,0 +1,448 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Design Overhaul: Rover warmth × Airbnb clarity × Stripe discipline */
+:root {
+  /* Color - Surface (warm stone palette) */
+  --color-surface-base: #fafaf9;
+  --color-surface-frosted-low: rgba(255, 255, 255, 0.9);
+  --color-surface-frosted-mid: rgba(255, 255, 255, 0.95);
+  --color-surface-frosted-high: rgba(255, 255, 255, 0.98);
+  --color-surface-overlay: #ffffff;
+  --color-surface-modal: #ffffff;
+  
+  /* Legacy surface aliases */
+  --color-surface-primary: #ffffff;
+  --color-surface-secondary: #f5f5f4;
+  --color-surface-tertiary: #fafaf9;
+  --color-surface-inverse: #1c1917;
+  --color-surface-elevated: #ffffff;
+
+  /* Color - Text (warm stone) */
+  --color-text-primary: #1c1917;
+  --color-text-secondary: #57534e;
+  --color-text-tertiary: #78716c;
+  --color-text-disabled: #a8a29e;
+  --color-text-inverse: #ffffff;
+  --color-text-brand: #1e3a5f;
+
+  /* Color - Border (warm-shifted) */
+  --color-border-default: rgba(28, 25, 23, 0.08);
+  --color-border-muted: rgba(28, 25, 23, 0.04);
+  --color-border-strong: rgba(28, 25, 23, 0.15);
+  --color-border-focus: #1e40af;
+  --color-border-accent: rgba(30, 64, 175, 0.25);
+
+  /* Color - Accent */
+  --color-accent-primary: #1e40af;
+  --color-accent-secondary: #eff6ff;
+  --color-accent-tertiary: #dbeafe;
+
+  /* Brand warm accent */
+  --color-brand-warm: #c2410c;
+  --color-brand-warm-light: #fff7ed;
+
+  /* Status colors - success */
+  --color-status-success-bg: #ecfdf5;
+  --color-status-success-border: #a7f3d0;
+  --color-status-success-text: #065f46;
+  --color-status-success-text-secondary: #047857;
+  --color-status-success-fill: #10b981;
+  --color-status-success-fill-muted: #a7f3d0;
+  /* Status colors - warning */
+  --color-status-warning-bg: #fffbeb;
+  --color-status-warning-border: #fcd34d;
+  --color-status-warning-text: #92400e;
+  --color-status-warning-text-secondary: #b45309;
+  /* Status colors - danger */
+  --color-status-danger-bg: #fef2f2;
+  --color-status-danger-border: #fca5a5;
+  --color-status-danger-text: #991b1b;
+  --color-status-danger-text-secondary: #b91c1c;
+  --color-status-danger-fill: #dc2626;
+  --color-status-danger-fill-hover: #b91c1c;
+  --color-status-danger-text-on-fill: #ffffff;
+  /* Status colors - info (blue) */
+  --color-status-info-bg: #eff6ff;
+  --color-status-info-border: #bfdbfe;
+  --color-status-info-text: #1e40af;
+  --color-status-info-fill: #3b82f6;
+  /* Status colors - purple (in-progress) */
+  --color-status-purple-bg: #f5f3ff;
+  --color-status-purple-border: #c4b5fd;
+  --color-status-purple-text: #6d28d9;
+  --color-status-purple-fill: #8b5cf6;
+  /* Status - warning fill */
+  --color-status-warning-fill: #f59e0b;
+
+  /* Spacing - Phase 8: Coherent rhythm */
+  --spacing-0: 0;
+  --spacing-0-5: 0.125rem;
+  --spacing-1: 0.25rem;
+  --spacing-1-5: 0.375rem;
+  --spacing-2: 0.5rem;
+  --spacing-3: 0.75rem;
+  --spacing-4: 1rem;
+  --spacing-5: 1.25rem;
+  --spacing-6: 1.5rem;
+  --spacing-7: 1.75rem;
+  --spacing-8: 2rem;
+  --spacing-9: 2.25rem;
+  --spacing-10: 2.5rem;
+  --spacing-11: 2.75rem;
+  --spacing-12: 3rem;
+  --spacing-16: 4rem;
+  
+  /* Radius - softer, Rover-influenced */
+  --radius: 0.5rem;
+  --radius-none: 0;
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
+  --radius-2xl: 1.5rem;
+  --radius-full: 9999px;
+  
+  /* Blur - Phase 8: Surface-specific */
+  --blur-none: 0;
+  --blur-sm: 8px;
+  --blur-md: 16px;
+  --blur-lg: 24px;
+  --blur-xl: 40px;
+  
+  /* Shadow - warm, subtle elevation */
+  --shadow-none: none;
+  --shadow-xs: 0 1px 2px rgba(28, 25, 23, 0.04);
+  --shadow-sm: 0 1px 3px rgba(28, 25, 23, 0.06), 0 1px 2px rgba(28, 25, 23, 0.04);
+  --shadow-md: 0 4px 6px -1px rgba(28, 25, 23, 0.06), 0 2px 4px -2px rgba(28, 25, 23, 0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(28, 25, 23, 0.06), 0 4px 6px -4px rgba(28, 25, 23, 0.04);
+  --shadow-xl: 0 24px 32px -8px rgba(28, 25, 23, 0.10), 0 8px 16px -8px rgba(28, 25, 23, 0.06);
+  --shadow-card: 0 1px 3px rgba(28, 25, 23, 0.04), 0 0 0 1px rgba(28, 25, 23, 0.06);
+  
+  /* Z-Index - UI Constitution z.layer.* */
+  --z-layer-base: 0;
+  --z-layer-elevated: 10;
+  --z-layer-floating: 100;
+  --z-layer-overlay: 1000;
+  --z-layer-modal: 1050;
+  --z-layer-tooltip: 1070;
+  
+  /* Motion - Phase 8: Tuned physics */
+  --motion-duration-instant: 100ms;
+  --motion-duration-fast: 150ms;
+  --motion-duration-normal: 250ms;
+  --motion-duration-slow: 350ms;
+  
+  /* Motion - Phase 8: iOS-class easing */
+  --motion-easing-standard: cubic-bezier(0.2, 0, 0, 1);
+  --motion-easing-emphasized: cubic-bezier(0.2, 0, 0, 1);
+  --motion-easing-decelerated: cubic-bezier(0, 0, 0.2, 1);
+  --motion-easing-accelerated: cubic-bezier(0.4, 0, 1, 1);
+  --motion-easing-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  
+  /* Legacy variables for backward compatibility */
+  --background: #ffffff;
+  --foreground: #171717;
+  --primary: #fce1ef;
+  --primary-light: #feecf4;
+  --primary-dark: #f9d0e5;
+  --text-primary: #432f21;
+  --accent: #f8fafc;
+  --gray-bg: #f5f5f5;
+  --gray-border: #e5e5e5;
+  --gray-text: #1a1a1a;
+
+  /* Navy/teal palette (enterprise design system) */
+  --color-navy-50: #f0f4f8;
+  --color-navy-100: #d9e2ec;
+  --color-navy-200: #bcccdc;
+  --color-navy-300: #9fb3c8;
+  --color-navy-400: #829ab1;
+  --color-navy-500: #627d98;
+  --color-navy-600: #486581;
+  --color-navy-700: #334e68;
+  --color-navy-800: #243b53;
+  --color-navy-900: #102a43;
+  --color-teal-50: #effcf6;
+  --color-teal-100: #c6f7e2;
+  --color-teal-200: #8eedc7;
+  --color-teal-300: #5ceabd;
+  --color-teal-400: #2dd4bf;
+  --color-teal-500: #14b8a6;
+  --color-teal-600: #0d9488;
+  --color-teal-700: #0f766e;
+  --color-teal-800: #115e59;
+  --color-teal-900: #134e4a;
+
+  /* UI density (Compact / Comfortable / Spacious) */
+  --density-row: 0.75rem;
+  --density-gap: 1rem;
+  --density-padding: 1rem;
+}
+
+/* Dark mode (warm stone-shifted) */
+.dark {
+  --color-surface-base: #0c0a09;
+  --color-surface-frosted-low: rgba(28, 25, 23, 0.9);
+  --color-surface-frosted-mid: rgba(28, 25, 23, 0.95);
+  --color-surface-frosted-high: rgba(28, 25, 23, 0.98);
+  --color-surface-overlay: #1c1917;
+  --color-surface-modal: #1c1917;
+  --color-surface-primary: #1c1917;
+  --color-surface-secondary: #0c0a09;
+  --color-surface-tertiary: #0c0a09;
+  --color-surface-inverse: #fafaf9;
+  --color-surface-elevated: #292524;
+  --color-text-primary: #fafaf9;
+  --color-text-secondary: #d6d3d1;
+  --color-text-tertiary: #a8a29e;
+  --color-text-disabled: #78716c;
+  --color-text-inverse: #0c0a09;
+  --color-text-brand: #93c5fd;
+  --color-border-default: rgba(168, 162, 158, 0.2);
+  --color-border-muted: rgba(168, 162, 158, 0.1);
+  --color-border-strong: rgba(168, 162, 158, 0.3);
+  --color-border-focus: #60a5fa;
+  --color-accent-primary: #3b82f6;
+  --color-accent-secondary: #1e3a8a;
+  --color-accent-tertiary: #1e40af;
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  --color-status-success-bg: rgba(16, 185, 129, 0.1);
+  --color-status-success-border: rgba(16, 185, 129, 0.3);
+  --color-status-success-text: #6ee7b7;
+  --color-status-success-text-secondary: #34d399;
+  --color-status-success-fill: #10b981;
+  --color-status-success-fill-muted: rgba(16, 185, 129, 0.2);
+  --color-status-warning-bg: rgba(245, 158, 11, 0.1);
+  --color-status-warning-border: rgba(245, 158, 11, 0.3);
+  --color-status-warning-text: #fcd34d;
+  --color-status-warning-text-secondary: #fbbf24;
+  --color-status-danger-bg: rgba(239, 68, 68, 0.1);
+  --color-status-danger-border: rgba(239, 68, 68, 0.3);
+  --color-status-danger-text: #fca5a5;
+  --color-status-danger-text-secondary: #f87171;
+  --color-status-danger-fill: #ef4444;
+  --color-status-danger-fill-hover: #dc2626;
+  --color-status-danger-text-on-fill: #ffffff;
+  --color-status-info-bg: rgba(59, 130, 246, 0.1);
+  --color-status-info-border: rgba(59, 130, 246, 0.3);
+  --color-status-info-text: #93c5fd;
+  --color-status-info-fill: #3b82f6;
+  --color-status-purple-bg: rgba(139, 92, 246, 0.1);
+  --color-status-purple-border: rgba(139, 92, 246, 0.3);
+  --color-status-purple-text: #c4b5fd;
+  --color-status-purple-fill: #8b5cf6;
+  --color-status-warning-fill: #f59e0b;
+  --color-teal-50: rgba(45, 212, 191, 0.15);
+  --color-teal-700: #2dd4bf;
+  --background: #0f172a;
+  --foreground: #f1f5f9;
+}
+
+/* Snout brand theme — warm browns and pinks from snoutservices.com */
+.theme-snout {
+  --color-surface-base: #fef7fb;
+  --color-surface-frosted-low: rgba(254, 247, 251, 0.9);
+  --color-surface-frosted-mid: rgba(254, 247, 251, 0.95);
+  --color-surface-frosted-high: rgba(254, 247, 251, 0.98);
+  --color-surface-overlay: #ffffff;
+  --color-surface-modal: #ffffff;
+  --color-surface-primary: #ffffff;
+  --color-surface-secondary: #fef2f8;
+  --color-surface-tertiary: #fef7fb;
+  --color-surface-inverse: #432f21;
+  --color-surface-elevated: #ffffff;
+
+  --color-text-primary: #432f21;
+  --color-text-secondary: #6b5548;
+  --color-text-tertiary: #8c7769;
+  --color-text-disabled: #b8a99e;
+  --color-text-inverse: #ffffff;
+  --color-text-brand: #432f21;
+
+  --color-border-default: rgba(67, 47, 33, 0.12);
+  --color-border-muted: rgba(67, 47, 33, 0.06);
+  --color-border-strong: rgba(67, 47, 33, 0.20);
+  --color-border-focus: #432f21;
+  --color-border-accent: rgba(67, 47, 33, 0.25);
+
+  --color-accent-primary: #432f21;
+  --color-accent-secondary: #fce1ef;
+  --color-accent-tertiary: #f9d0e5;
+  --color-status-success-bg: #ecfdf5;
+  --color-status-success-border: #a7f3d0;
+  --color-status-success-text: #065f46;
+  --color-status-success-text-secondary: #047857;
+  --color-status-success-fill: #10b981;
+  --color-status-success-fill-muted: #a7f3d0;
+  --color-status-warning-bg: #fffbeb;
+  --color-status-warning-border: #fcd34d;
+  --color-status-warning-text: #92400e;
+  --color-status-warning-text-secondary: #b45309;
+  --color-status-danger-bg: #fef2f2;
+  --color-status-danger-border: #fca5a5;
+  --color-status-danger-text: #991b1b;
+  --color-status-danger-text-secondary: #b91c1c;
+  --color-status-danger-fill: #dc2626;
+  --color-status-danger-fill-hover: #b91c1c;
+  --color-status-danger-text-on-fill: #ffffff;
+  --color-status-info-bg: #eff6ff;
+  --color-status-info-border: #bfdbfe;
+  --color-status-info-text: #1e40af;
+  --color-status-info-fill: #3b82f6;
+  --color-status-purple-bg: #f5f3ff;
+  --color-status-purple-border: #c4b5fd;
+  --color-status-purple-text: #6d28d9;
+  --color-status-purple-fill: #8b5cf6;
+  --color-status-warning-fill: #f59e0b;
+
+  --background: #fef7fb;
+  --foreground: #432f21;
+}
+
+/* Snout brand dark — deep brown backgrounds, pink accents */
+.theme-snout-dark {
+  --color-surface-base: #1a0802;
+  --color-surface-frosted-low: rgba(39, 16, 12, 0.9);
+  --color-surface-frosted-mid: rgba(39, 16, 12, 0.95);
+  --color-surface-frosted-high: rgba(39, 16, 12, 0.98);
+  --color-surface-overlay: #27100c;
+  --color-surface-modal: #27100c;
+  --color-surface-primary: #27100c;
+  --color-surface-secondary: #351f16;
+  --color-surface-tertiary: #1a0802;
+  --color-surface-inverse: #fef7fb;
+  --color-surface-elevated: #432f21;
+
+  --color-text-primary: #fef2f8;
+  --color-text-secondary: #f9d0e5;
+  --color-text-tertiary: #d4a999;
+  --color-text-disabled: #8c6b5a;
+  --color-text-inverse: #1a0802;
+  --color-text-brand: #fce1ef;
+
+  --color-border-default: rgba(249, 208, 229, 0.15);
+  --color-border-muted: rgba(249, 208, 229, 0.08);
+  --color-border-strong: rgba(249, 208, 229, 0.25);
+  --color-border-focus: #fce1ef;
+  --color-border-accent: rgba(252, 225, 239, 0.25);
+
+  --color-accent-primary: #fce1ef;
+  --color-accent-secondary: #351f16;
+  --color-accent-tertiary: #432f21;
+  --color-status-success-bg: rgba(16, 185, 129, 0.1);
+  --color-status-success-border: rgba(16, 185, 129, 0.3);
+  --color-status-success-text: #6ee7b7;
+  --color-status-success-text-secondary: #34d399;
+  --color-status-success-fill: #10b981;
+  --color-status-success-fill-muted: rgba(16, 185, 129, 0.2);
+  --color-status-warning-bg: rgba(245, 158, 11, 0.1);
+  --color-status-warning-border: rgba(245, 158, 11, 0.3);
+  --color-status-warning-text: #fcd34d;
+  --color-status-warning-text-secondary: #fbbf24;
+  --color-status-danger-bg: rgba(239, 68, 68, 0.1);
+  --color-status-danger-border: rgba(239, 68, 68, 0.3);
+  --color-status-danger-text: #fca5a5;
+  --color-status-danger-text-secondary: #f87171;
+  --color-status-danger-fill: #ef4444;
+  --color-status-danger-fill-hover: #dc2626;
+  --color-status-danger-text-on-fill: #ffffff;
+  --color-status-info-bg: rgba(59, 130, 246, 0.1);
+  --color-status-info-border: rgba(59, 130, 246, 0.3);
+  --color-status-info-text: #93c5fd;
+  --color-status-info-fill: #3b82f6;
+  --color-status-purple-bg: rgba(139, 92, 246, 0.1);
+  --color-status-purple-border: rgba(139, 92, 246, 0.3);
+  --color-status-purple-text: #c4b5fd;
+  --color-status-purple-fill: #8b5cf6;
+  --color-status-warning-fill: #f59e0b;
+
+  --background: #1a0802;
+  --foreground: #fef2f8;
+}
+
+/* Density: Compact */
+[data-density="compact"] {
+  --density-row: 0.5rem;
+  --density-gap: 0.75rem;
+  --density-padding: 0.75rem;
+}
+
+/* Density: Spacious */
+[data-density="spacious"] {
+  --density-row: 1rem;
+  --density-gap: 1.25rem;
+  --density-padding: 1.25rem;
+}
+
+/* Phase 8: Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Focus ring defaults (enterprise accessibility) */
+*:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+/* Base typography */
+body {
+  font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  color: var(--color-text-primary);
+  background-color: var(--color-surface-base);
+}
+
+h1, h2, h3, h4, h5, h6, .font-heading {
+  font-family: var(--font-jakarta), var(--font-inter), -apple-system, sans-serif;
+  color: var(--color-text-primary);
+}
+h1 { font-size: 1.875rem; font-weight: 700; letter-spacing: -0.025em; line-height: 1.2; }
+h2 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em; line-height: 1.25; }
+h3 { font-size: 1.25rem; font-weight: 600; letter-spacing: -0.015em; line-height: 1.3; }
+h4 { font-size: 1.125rem; font-weight: 600; line-height: 1.35; }
+
+/* Finance-grade: tabular numbers for KPIs and money */
+.font-tabular,
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+a {
+  color: var(--color-accent-primary);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+a:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+[disabled],
+.disabled {
+  color: var(--color-text-disabled);
+  cursor: not-allowed;
+  opacity: 0.7;
+}

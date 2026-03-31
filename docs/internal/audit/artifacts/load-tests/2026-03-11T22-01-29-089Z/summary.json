@@ -1,0 +1,1301 @@
+{
+  "runId": "2026-03-11T22-01-29-089Z",
+  "startedAt": "2026-03-11T22:01:29.089Z",
+  "completedAt": "2026-03-11T22:12:29.230Z",
+  "mode": "live",
+  "suite": "live-ramp",
+  "baseUrl": "https://snout-os-staging.onrender.com",
+  "thresholds": {
+    "bookings_create_1000": {
+      "p50Ms": 300,
+      "p95Ms": 1000,
+      "p99Ms": 2000,
+      "maxErrorRate": 0.02,
+      "maxDuplicateRate": 0,
+      "minThroughputRps": 120
+    },
+    "messages_send_2000": {
+      "p50Ms": 180,
+      "p95Ms": 700,
+      "p99Ms": 1400,
+      "maxErrorRate": 0.025,
+      "minThroughputRps": 300
+    },
+    "bookings_reads_paginated": {
+      "p50Ms": 120,
+      "p95Ms": 450,
+      "p99Ms": 900,
+      "maxErrorRate": 0.01,
+      "minThroughputRps": 400
+    },
+    "thread_reads": {
+      "p50Ms": 130,
+      "p95Ms": 500,
+      "p99Ms": 950,
+      "maxErrorRate": 0.01,
+      "minThroughputRps": 350
+    },
+    "queue_backlog_drain": {
+      "p50Ms": 20,
+      "p95Ms": 100,
+      "p99Ms": 250,
+      "maxErrorRate": 0.01,
+      "minQueueDrainPerSec": 800
+    },
+    "session_validation_burst": {
+      "p50Ms": 140,
+      "p95Ms": 600,
+      "p99Ms": 1200,
+      "maxErrorRate": 0.03,
+      "minThroughputRps": 300
+    },
+    "queue_retry_failure_storm": {
+      "p50Ms": 30,
+      "p95Ms": 180,
+      "p99Ms": 350,
+      "maxErrorRate": 0.25,
+      "minQueueDrainPerSec": 500,
+      "maxDeadLetterCount": 150,
+      "maxRetryCount": 4000
+    }
+  },
+  "results": [
+    {
+      "gate": "bookings_create_1000",
+      "mode": "live",
+      "operationCount": 0,
+      "concurrency": 0,
+      "durationMs": 0,
+      "throughputRps": 0,
+      "successCount": 0,
+      "errorCount": 0,
+      "errorRate": 0,
+      "observedDuplicateCount": 0,
+      "duplicateCount": 0,
+      "duplicateRate": 0,
+      "retryCount": 0,
+      "deadLetterCount": 0,
+      "timeoutCount": 0,
+      "timeoutRate": 0,
+      "statusCounts": {},
+      "failureCategory": "config failure",
+      "stage": "high",
+      "latencies": {
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0,
+        "min": 0
+      },
+      "pass": false,
+      "failures": [
+        "CONFIG-BLOCKED: Public booking is disabled in SaaS mode until org binding is configured"
+      ],
+      "notes": [
+        "bookings_create_1000 marked CONFIG-BLOCKED, not performance-failed"
+      ]
+    },
+    {
+      "gate": "messages_send_2000",
+      "mode": "live",
+      "operationCount": 350,
+      "concurrency": 350,
+      "durationMs": 20040.531917000015,
+      "throughputRps": 17.464606301347793,
+      "successCount": 0,
+      "errorCount": 350,
+      "errorRate": 1,
+      "observedDuplicateCount": 0,
+      "duplicateCount": 0,
+      "duplicateRate": 0,
+      "retryCount": 0,
+      "deadLetterCount": 0,
+      "timeoutCount": 48,
+      "timeoutRate": 0.13714285714285715,
+      "statusCounts": {
+        "0": 48,
+        "429": 272,
+        "500": 30
+      },
+      "failureCategory": "messaging/provider bottleneck",
+      "latencies": {
+        "p50": 12591.441625000036,
+        "p95": 20010.542833000014,
+        "p99": 20012.548333000042,
+        "max": 20012.849667000002,
+        "min": 2817.582166999986
+      },
+      "pass": false,
+      "failures": [
+        "p50 12591.4ms > 180ms",
+        "p95 20010.5ms > 700ms",
+        "p99 20012.5ms > 1400ms",
+        "errorRate 100.00% > 2.50%",
+        "throughput 17.46 rps < 300 rps"
+      ],
+      "notes": [
+        "ramp stage: high"
+      ],
+      "stage": "high"
+    },
+    {
+      "gate": "bookings_reads_paginated",
+      "mode": "live",
+      "operationCount": 400,
+      "concurrency": 120,
+      "durationMs": 47140.46995900001,
+      "throughputRps": 8.48527815585836,
+      "successCount": 340,
+      "errorCount": 60,
+      "errorRate": 0.15,
+      "observedDuplicateCount": 0,
+      "duplicateCount": 0,
+      "duplicateRate": 0,
+      "retryCount": 0,
+      "deadLetterCount": 0,
+      "timeoutCount": 60,
+      "timeoutRate": 0.15,
+      "statusCounts": {
+        "0": 60,
+        "200": 340
+      },
+      "failureCategory": "DB/read bottleneck",
+      "latencies": {
+        "p50": 10823.720249999955,
+        "p95": 20003.118166,
+        "p99": 20007.691833999997,
+        "max": 20011.614583000017,
+        "min": 212.08504199999152
+      },
+      "pass": false,
+      "failures": [
+        "p50 10823.7ms > 120ms",
+        "p95 20003.1ms > 450ms",
+        "p99 20007.7ms > 900ms",
+        "errorRate 15.00% > 1.00%",
+        "throughput 8.49 rps < 400 rps"
+      ],
+      "notes": [
+        "ramp stage: high"
+      ],
+      "stage": "high"
+    },
+    {
+      "gate": "thread_reads",
+      "mode": "live",
+      "operationCount": 350,
+      "concurrency": 120,
+      "durationMs": 24804.04554099997,
+      "throughputRps": 14.110601410623351,
+      "successCount": 350,
+      "errorCount": 0,
+      "errorRate": 0,
+      "observedDuplicateCount": 0,
+      "duplicateCount": 0,
+      "duplicateRate": 0,
+      "retryCount": 0,
+      "deadLetterCount": 0,
+      "timeoutCount": 0,
+      "timeoutRate": 0,
+      "statusCounts": {
+        "200": 350
+      },
+      "failureCategory": "DB/read bottleneck",
+      "latencies": {
+        "p50": 5589.881457999989,
+        "p95": 16799.471750000026,
+        "p99": 18421.850958999945,
+        "max": 19254.865541999985,
+        "min": 507.77537500002654
+      },
+      "pass": false,
+      "failures": [
+        "p50 5589.9ms > 130ms",
+        "p95 16799.5ms > 500ms",
+        "p99 18421.9ms > 950ms",
+        "throughput 14.11 rps < 350 rps"
+      ],
+      "notes": [
+        "ramp stage: high"
+      ],
+      "stage": "high"
+    },
+    {
+      "gate": "queue_backlog_drain",
+      "mode": "live",
+      "operationCount": 10,
+      "concurrency": 40,
+      "durationMs": 123105.87725000008,
+      "throughputRps": 0.08123089021730677,
+      "successCount": 10,
+      "errorCount": 0,
+      "errorRate": 0,
+      "observedDuplicateCount": 0,
+      "duplicateCount": 0,
+      "duplicateRate": 0,
+      "retryCount": 10,
+      "deadLetterCount": 0,
+      "timeoutCount": 0,
+      "timeoutRate": 0,
+      "statusCounts": {
+        "200": 10,
+        "500": 1
+      },
+      "failureCategory": "worker/queue saturation",
+      "latencies": {
+        "p50": 176.14912499999627,
+        "p95": 217.08095900004264,
+        "p99": 217.08095900004264,
+        "max": 217.08095900004264,
+        "min": 0
+      },
+      "pass": false,
+      "failures": [
+        "p50 176.1ms > 20ms",
+        "p95 217.1ms > 100ms",
+        "queue drain 0.08 jobs/s < 800 jobs/s"
+      ],
+      "notes": [
+        "queue gate mode: live-api-backed",
+        "ramp stage: high"
+      ],
+      "stage": "high"
+    },
+    {
+      "gate": "queue_retry_failure_storm",
+      "mode": "live",
+      "operationCount": 6,
+      "concurrency": 30,
+      "durationMs": 4899.042958000093,
+      "throughputRps": 1.2247290034887435,
+      "successCount": 4,
+      "errorCount": 2,
+      "errorRate": 0.3333333333333333,
+      "observedDuplicateCount": 0,
+      "duplicateCount": 0,
+      "duplicateRate": 0,
+      "retryCount": 8,
+      "deadLetterCount": 1,
+      "timeoutCount": 0,
+      "timeoutRate": 0,
+      "statusCounts": {
+        "200": 4,
+        "400": 2
+      },
+      "failureCategory": "worker/queue saturation",
+      "latencies": {
+        "p50": 142.51383399998304,
+        "p95": 1547.5996659998782,
+        "p99": 1547.5996659998782,
+        "max": 1547.5996659998782,
+        "min": 1
+      },
+      "pass": false,
+      "failures": [
+        "p50 142.5ms > 30ms",
+        "p95 1547.6ms > 180ms",
+        "p99 1547.6ms > 350ms",
+        "errorRate 33.33% > 25.00%",
+        "queue drain 1.22 jobs/s < 500 jobs/s"
+      ],
+      "notes": [
+        "queue gate mode: live-api-backed",
+        "Uses bounded retry profile with retryable transient vs non-retryable permanent classification",
+        "Storm simulation avoids retry amplification loops",
+        "ramp stage: high"
+      ],
+      "stage": "high"
+    },
+    {
+      "gate": "session_validation_burst",
+      "mode": "live",
+      "operationCount": 300,
+      "concurrency": 300,
+      "durationMs": 15350.912291000015,
+      "throughputRps": 19.542812460461064,
+      "successCount": 30,
+      "errorCount": 270,
+      "errorRate": 0.9,
+      "observedDuplicateCount": 0,
+      "duplicateCount": 0,
+      "duplicateRate": 0,
+      "retryCount": 0,
+      "deadLetterCount": 0,
+      "timeoutCount": 0,
+      "timeoutRate": 0,
+      "statusCounts": {
+        "200": 30,
+        "429": 270
+      },
+      "failureCategory": "DB/read bottleneck",
+      "latencies": {
+        "p50": 8342.605375000043,
+        "p95": 15059.233458000002,
+        "p99": 15184.045499999891,
+        "max": 15245.39300000004,
+        "min": 1295.8823329999577
+      },
+      "pass": false,
+      "failures": [
+        "p50 8342.6ms > 140ms",
+        "p95 15059.2ms > 600ms",
+        "p99 15184.0ms > 1200ms",
+        "errorRate 90.00% > 3.00%",
+        "throughput 19.54 rps < 300 rps"
+      ],
+      "notes": [
+        "Requests are spread across owner/sitter/client session cookies when provided",
+        "ramp stage: high"
+      ],
+      "stage": "high"
+    }
+  ],
+  "topBottlenecks": [
+    {
+      "gate": "messages_send_2000",
+      "reason": "failed gate: p50 12591.4ms > 180ms; p95 20010.5ms > 700ms; p99 20012.5ms > 1400ms; errorRate 100.00% > 2.50%; throughput 17.46 rps < 300 rps",
+      "severity": 25010.542833000014
+    },
+    {
+      "gate": "bookings_reads_paginated",
+      "reason": "failed gate: p50 10823.7ms > 120ms; p95 20003.1ms > 450ms; p99 20007.7ms > 900ms; errorRate 15.00% > 1.00%; throughput 8.49 rps < 400 rps",
+      "severity": 20753.118166
+    },
+    {
+      "gate": "session_validation_burst",
+      "reason": "failed gate: p50 8342.6ms > 140ms; p95 15059.2ms > 600ms; p99 15184.0ms > 1200ms; errorRate 90.00% > 3.00%; throughput 19.54 rps < 300 rps",
+      "severity": 19559.233458000002
+    },
+    {
+      "gate": "thread_reads",
+      "reason": "failed gate: p50 5589.9ms > 130ms; p95 16799.5ms > 500ms; p99 18421.9ms > 950ms; throughput 14.11 rps < 350 rps",
+      "severity": 16799.471750000026
+    },
+    {
+      "gate": "queue_retry_failure_storm",
+      "reason": "failed gate: p50 142.5ms > 30ms; p95 1547.6ms > 180ms; p99 1547.6ms > 350ms; errorRate 33.33% > 25.00%; queue drain 1.22 jobs/s < 500 jobs/s",
+      "severity": 3216.2663326665447
+    }
+  ],
+  "failingGates": [
+    "bookings_create_1000",
+    "messages_send_2000",
+    "bookings_reads_paginated",
+    "thread_reads",
+    "queue_backlog_drain",
+    "queue_retry_failure_storm",
+    "session_validation_burst"
+  ],
+  "recommendations": [
+    "Bookings create path: add/create composite indexes for dominant search filters and review idempotency table write contention.",
+    "Messaging send path: batch outbound provider writes and decouple sync delivery state updates from request path.",
+    "Read-heavy list endpoints: verify query plans for sort+filter indexes and enforce narrower includes to avoid row bloat.",
+    "Queue throughput: raise worker concurrency by queue class, tune retry backoff, and isolate storm-prone jobs into separate queues.",
+    "Session validation burst: add short-lived cache for session decode/DB lookups and pre-warm auth dependencies."
+  ],
+  "stageResults": [
+    {
+      "gate": "bookings_create_1000",
+      "mode": "live",
+      "operationCount": 0,
+      "concurrency": 0,
+      "durationMs": 0,
+      "throughputRps": 0,
+      "successCount": 0,
+      "errorCount": 0,
+      "errorRate": 0,
+      "observedDuplicateCount": 0,
+      "duplicateCount": 0,
+      "duplicateRate": 0,
+      "retryCount": 0,
+      "deadLetterCount": 0,
+      "timeoutCount": 0,
+      "timeoutRate": 0,
+      "statusCounts": {},
+      "failureCategory": "config failure",
+      "stage": "low",
+      "latencies": {
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0,
+        "min": 0
+      },
+      "pass": false,
+      "failures": [
+        "CONFIG-BLOCKED: Public booking is disabled in SaaS mode until org binding is configured"
+      ],
+      "notes": [
+        "bookings_create_1000 marked CONFIG-BLOCKED, not performance-failed"
+      ]
+    },
+    {
+      "gate": "messages_send_2000",
+      "mode": "live",
+      "operationCount": 122,
+      "concurrency": 122,
+      "durationMs": 9311.868458,
+      "throughputRps": 13.101559644046251,
+      "successCount": 0,
+      "errorCount": 122,
+      "errorRate": 1,
+      "observedDuplicateCount": 0,
+      "duplicateCount": 0,
+      "duplicateRate": 0,
+      "retryCount": 0,
+      "deadLetterCount": 0,
+      "timeoutCount": 0,
+      "timeoutRate": 0,
+      "statusCounts": {
+        "429": 92,
+        "500": 30
+      },
+      "failureCategory": "messaging/provider bottleneck",
+      "latencies": {
+        "p50": 6427.805665999999,
+        "p95": 9197.49325,
+        "p99": 9277.26175,
+        "max": 9296.408625,
+        "min": 3074.992624999999
+      },
+      "pass": false,
+      "failures": [
+        "p50 6427.8ms > 180ms",
+        "p95 9197.5ms > 700ms",
+        "p99 9277.3ms > 1400ms",
+        "errorRate 100.00% > 2.50%",
+        "throughput 13.10 rps < 300 rps"
+      ],
+      "notes": [
+        "ramp stage: low"
+      ],
+      "stage": "low"
+    },
+    {
+      "gate": "bookings_reads_paginated",
+      "mode": "live",
+      "operationCount": 140,
+      "concurrency": 42,
+      "durationMs": 16536.511333,
+      "throughputRps": 8.466114598223522,
+      "successCount": 140,
+      "errorCount": 0,
+      "errorRate": 0,
+      "observedDuplicateCount": 0,
+      "duplicateCount": 0,
+      "duplicateRate": 0,
+      "retryCount": 0,
+      "deadLetterCount": 0,
+      "timeoutCount": 0,
+      "timeoutRate": 0,
+      "statusCounts": {
+        "200": 140
+      },
+      "failureCategory": "DB/read bottleneck",
+      "latencies": {
+        "p50": 4516.463209000001,
+        "p95": 5456.652958000002,
+        "p99": 5854.8346249999995,
+        "max": 6048.5949999999975,
+        "min": 855.723708999998
+      },
+      "pass": false,
+      "failures": [
+        "p50 4516.5ms > 120ms",
+        "p95 5456.7ms > 450ms",
+        "p99 5854.8ms > 900ms",
+        "throughput 8.47 rps < 400 rps"
+      ],
+      "notes": [
+        "ramp stage: low"
+      ],
+      "stage": "low"
+    },
+    {
+      "gate": "thread_reads",
+      "mode": "live",
+      "operationCount": 122,
+      "concurrency": 42,
+      "durationMs": 7850.087583,
+      "throughputRps": 15.541227879317024,
+      "successCount": 122,
+      "errorCount": 0,
+      "errorRate": 0,
+      "observedDuplicateCount": 0,
+      "duplicateCount": 0,
+      "duplicateRate": 0,
+      "retryCount": 0,
+      "deadLetterCount": 0,
+      "timeoutCount": 0,
+      "timeoutRate": 0,
+      "statusCounts": {
+        "200": 122
+      },
+      "failureCategory": "DB/read bottleneck",
+      "latencies": {
+        "p50": 2507.720040999993,
+        "p95": 3602.647207999995,
+        "p99": 4049.0887500000026,
+        "max": 4782.588374999999,
+        "min": 734.7856669999965
+      },
+      "pass": false,
+      "failures": [
+        "p50 2507.7ms > 130ms",
+        "p95 3602.6ms > 500ms",
+        "p99 4049.1ms > 950ms",
+        "throughput 15.54 rps < 350 rps"
+      ],
+      "notes": [
+        "ramp stage: low"
+      ],
+      "stage": "low"
+    },
+    {
+      "gate": "queue_backlog_drain",
+      "mode": "live",
+      "operationCount": 3,
+      "concurrency": 14,
+      "durationMs": 121773.771458,
+      "throughputRps": 0.0246358469815046,
+      "successCount": 3,
+      "errorCount": 0,
+      "errorRate": 0,
+      "observedDuplicateCount": 0,
+      "duplicateCount": 0,
+      "duplicateRate": 0,
+      "retryCount": 3,
+      "deadLetterCount": 0,
+      "timeoutCount": 0,
+      "timeoutRate": 0,
+      "statusCounts": {
+        "200": 3,
+        "500": 1
+      },
+      "failureCategory": "worker/queue saturation",
+      "latencies": {
+        "p50": 181.49345800000447,
+        "p95": 208.1987919999956,
+        "p99": 208.1987919999956,
+        "max": 208.1987919999956,
+        "min": 0
+      },
+      "pass": false,
+      "failures": [
+        "p50 181.5ms > 20ms",
+        "p95 208.2ms > 100ms",
+        "queue drain 0.02 jobs/s < 800 jobs/s"
+      ],
+      "notes": [
+        "queue gate mode: live-api-backed",
+        "ramp stage: low"
+      ],
+      "stage": "low"
+    },
+    {
+      "gate": "queue_retry_failure_storm",
+      "mode": "live",
+      "operationCount": 2,
+      "concurrency": 10,
+      "durationMs": 4465.981499999994,
+      "throughputRps": 0.44782988912963534,
+      "successCount": 3,
+      "errorCount": -1,
+      "errorRate": -0.5,
+      "observedDuplicateCount": 0,
+      "duplicateCount": 0,
+      "duplicateRate": 0,
+      "retryCount": 7,
+      "deadLetterCount": 1,
+      "timeoutCount": 0,
+      "timeoutRate": 0,
+      "statusCounts": {
+        "200": 3,
+        "400": 1
+      },
+      "failureCategory": "worker/queue saturation",
+      "latencies": {
+        "p50": 178.5610839999863,
+        "p95": 1251.915083000029,
+        "p99": 1251.915083000029,
+        "max": 1251.915083000029,
+        "min": 1
+      },
+      "pass": false,
+      "failures": [
+        "p50 178.6ms > 30ms",
+        "p95 1251.9ms > 180ms",
+        "p99 1251.9ms > 350ms",
+        "queue drain 0.45 jobs/s < 500 jobs/s"
+      ],
+      "notes": [
+        "queue gate mode: live-api-backed",
+        "Uses bounded retry profile with retryable transient vs non-retryable permanent classification",
+        "Storm simulation avoids retry amplification loops",
+        "ramp stage: low"
+      ],
+      "stage": "low"
+    },
+    {
+      "gate": "session_validation_burst",
+      "mode": "live",
+      "operationCount": 105,
+      "concurrency": 105,
+      "durationMs": 5242.390042000014,
+      "throughputRps": 20.029032399111927,
+      "successCount": 30,
+      "errorCount": 75,
+      "errorRate": 0.7142857142857143,
+      "observedDuplicateCount": 0,
+      "duplicateCount": 0,
+      "duplicateRate": 0,
+      "retryCount": 0,
+      "deadLetterCount": 0,
+      "timeoutCount": 0,
+      "timeoutRate": 0,
+      "statusCounts": {
+        "200": 30,
+        "429": 75
+      },
+      "failureCategory": "DB/read bottleneck",
+      "latencies": {
+        "p50": 3514.3959160000086,
+        "p95": 5106.753708000004,
+        "p99": 5132.419500000018,
+        "max": 5201.528083000012,
+        "min": 1112.5897910000058
+      },
+      "pass": false,
+      "failures": [
+        "p50 3514.4ms > 140ms",
+        "p95 5106.8ms > 600ms",
+        "p99 5132.4ms > 1200ms",
+        "errorRate 71.43% > 3.00%",
+        "throughput 20.03 rps < 300 rps"
+      ],
+      "notes": [
+        "Requests are spread across owner/sitter/client session cookies when provided",
+        "ramp stage: low"
+      ],
+      "stage": "low"
+    },
+    {
+      "gate": "bookings_create_1000",
+      "mode": "live",
+      "operationCount": 0,
+      "concurrency": 0,
+      "durationMs": 0,
+      "throughputRps": 0,
+      "successCount": 0,
+      "errorCount": 0,
+      "errorRate": 0,
+      "observedDuplicateCount": 0,
+      "duplicateCount": 0,
+      "duplicateRate": 0,
+      "retryCount": 0,
+      "deadLetterCount": 0,
+      "timeoutCount": 0,
+      "timeoutRate": 0,
+      "statusCounts": {},
+      "failureCategory": "config failure",
+      "stage": "medium",
+      "latencies": {
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0,
+        "min": 0
+      },
+      "pass": false,
+      "failures": [
+        "CONFIG-BLOCKED: Public booking is disabled in SaaS mode until org binding is configured"
+      ],
+      "notes": [
+        "bookings_create_1000 marked CONFIG-BLOCKED, not performance-failed"
+      ]
+    },
+    {
+      "gate": "messages_send_2000",
+      "mode": "live",
+      "operationCount": 227,
+      "concurrency": 227,
+      "durationMs": 14849.923959000007,
+      "throughputRps": 15.286273561180321,
+      "successCount": 0,
+      "errorCount": 227,
+      "errorRate": 1,
+      "observedDuplicateCount": 0,
+      "duplicateCount": 0,
+      "duplicateRate": 0,
+      "retryCount": 0,
+      "deadLetterCount": 0,
+      "timeoutCount": 0,
+      "timeoutRate": 0,
+      "statusCounts": {
+        "429": 197,
+        "500": 30
+      },
+      "failureCategory": "messaging/provider bottleneck",
+      "latencies": {
+        "p50": 9175.230792000017,
+        "p95": 14719.97537499998,
+        "p99": 14807.867375000002,
+        "max": 14831.755000000005,
+        "min": 3268.309333000012
+      },
+      "pass": false,
+      "failures": [
+        "p50 9175.2ms > 180ms",
+        "p95 14720.0ms > 700ms",
+        "p99 14807.9ms > 1400ms",
+        "errorRate 100.00% > 2.50%",
+        "throughput 15.29 rps < 300 rps"
+      ],
+      "notes": [
+        "ramp stage: medium"
+      ],
+      "stage": "medium"
+    },
+    {
+      "gate": "bookings_reads_paginated",
+      "mode": "live",
+      "operationCount": 260,
+      "concurrency": 78,
+      "durationMs": 31200.888042000006,
+      "throughputRps": 8.333096149379143,
+      "successCount": 260,
+      "errorCount": 0,
+      "errorRate": 0,
+      "observedDuplicateCount": 0,
+      "duplicateCount": 0,
+      "duplicateRate": 0,
+      "retryCount": 0,
+      "deadLetterCount": 0,
+      "timeoutCount": 0,
+      "timeoutRate": 0,
+      "statusCounts": {
+        "200": 260
+      },
+      "failureCategory": "DB/read bottleneck",
+      "latencies": {
+        "p50": 8728.508750000008,
+        "p95": 13307.146917000005,
+        "p99": 14988.097500000003,
+        "max": 15277.544916999992,
+        "min": 248.41595800002688
+      },
+      "pass": false,
+      "failures": [
+        "p50 8728.5ms > 120ms",
+        "p95 13307.1ms > 450ms",
+        "p99 14988.1ms > 900ms",
+        "throughput 8.33 rps < 400 rps"
+      ],
+      "notes": [
+        "ramp stage: medium"
+      ],
+      "stage": "medium"
+    },
+    {
+      "gate": "thread_reads",
+      "mode": "live",
+      "operationCount": 227,
+      "concurrency": 78,
+      "durationMs": 14224.725417000009,
+      "throughputRps": 15.95812877545683,
+      "successCount": 227,
+      "errorCount": 0,
+      "errorRate": 0,
+      "observedDuplicateCount": 0,
+      "duplicateCount": 0,
+      "duplicateRate": 0,
+      "retryCount": 0,
+      "deadLetterCount": 0,
+      "timeoutCount": 0,
+      "timeoutRate": 0,
+      "statusCounts": {
+        "200": 227
+      },
+      "failureCategory": "DB/read bottleneck",
+      "latencies": {
+        "p50": 4099.347917000006,
+        "p95": 8322.490625000006,
+        "p99": 8910.709457999998,
+        "max": 9245.329957999988,
+        "min": 331.55220799997915
+      },
+      "pass": false,
+      "failures": [
+        "p50 4099.3ms > 130ms",
+        "p95 8322.5ms > 500ms",
+        "p99 8910.7ms > 950ms",
+        "throughput 15.96 rps < 350 rps"
+      ],
+      "notes": [
+        "ramp stage: medium"
+      ],
+      "stage": "medium"
+    },
+    {
+      "gate": "queue_backlog_drain",
+      "mode": "live",
+      "operationCount": 6,
+      "concurrency": 26,
+      "durationMs": 121238.00729099999,
+      "throughputRps": 0.049489431029648784,
+      "successCount": 6,
+      "errorCount": 0,
+      "errorRate": 0,
+      "observedDuplicateCount": 0,
+      "duplicateCount": 0,
+      "duplicateRate": 0,
+      "retryCount": 6,
+      "deadLetterCount": 0,
+      "timeoutCount": 0,
+      "timeoutRate": 0,
+      "statusCounts": {
+        "200": 6,
+        "500": 1
+      },
+      "failureCategory": "worker/queue saturation",
+      "latencies": {
+        "p50": 170.19033300000592,
+        "p95": 177.92849999997998,
+        "p99": 177.92849999997998,
+        "max": 177.92849999997998,
+        "min": 0
+      },
+      "pass": false,
+      "failures": [
+        "p50 170.2ms > 20ms",
+        "p95 177.9ms > 100ms",
+        "queue drain 0.05 jobs/s < 800 jobs/s"
+      ],
+      "notes": [
+        "queue gate mode: live-api-backed",
+        "ramp stage: medium"
+      ],
+      "stage": "medium"
+    },
+    {
+      "gate": "queue_retry_failure_storm",
+      "mode": "live",
+      "operationCount": 3,
+      "concurrency": 19,
+      "durationMs": 4138.708540999971,
+      "throughputRps": 0.724863799970596,
+      "successCount": 4,
+      "errorCount": -1,
+      "errorRate": -0.3333333333333333,
+      "observedDuplicateCount": 0,
+      "duplicateCount": 0,
+      "duplicateRate": 0,
+      "retryCount": 8,
+      "deadLetterCount": 1,
+      "timeoutCount": 0,
+      "timeoutRate": 0,
+      "statusCounts": {
+        "200": 4,
+        "400": 1
+      },
+      "failureCategory": "worker/queue saturation",
+      "latencies": {
+        "p50": 187.7768329999526,
+        "p95": 1084.4957500000019,
+        "p99": 1084.4957500000019,
+        "max": 1084.4957500000019,
+        "min": 1
+      },
+      "pass": false,
+      "failures": [
+        "p50 187.8ms > 30ms",
+        "p95 1084.5ms > 180ms",
+        "p99 1084.5ms > 350ms",
+        "queue drain 0.72 jobs/s < 500 jobs/s"
+      ],
+      "notes": [
+        "queue gate mode: live-api-backed",
+        "Uses bounded retry profile with retryable transient vs non-retryable permanent classification",
+        "Storm simulation avoids retry amplification loops",
+        "ramp stage: medium"
+      ],
+      "stage": "medium"
+    },
+    {
+      "gate": "session_validation_burst",
+      "mode": "live",
+      "operationCount": 195,
+      "concurrency": 195,
+      "durationMs": 10286.28316599998,
+      "throughputRps": 18.957284847509165,
+      "successCount": 34,
+      "errorCount": 161,
+      "errorRate": 0.8256410256410256,
+      "observedDuplicateCount": 0,
+      "duplicateCount": 0,
+      "duplicateRate": 0,
+      "retryCount": 0,
+      "deadLetterCount": 0,
+      "timeoutCount": 0,
+      "timeoutRate": 0,
+      "statusCounts": {
+        "200": 34,
+        "429": 161
+      },
+      "failureCategory": "DB/read bottleneck",
+      "latencies": {
+        "p50": 5689.714457999973,
+        "p95": 10134.695958999975,
+        "p99": 10208.925249999971,
+        "max": 10226.376583000005,
+        "min": 1307.1000420000055
+      },
+      "pass": false,
+      "failures": [
+        "p50 5689.7ms > 140ms",
+        "p95 10134.7ms > 600ms",
+        "p99 10208.9ms > 1200ms",
+        "errorRate 82.56% > 3.00%",
+        "throughput 18.96 rps < 300 rps"
+      ],
+      "notes": [
+        "Requests are spread across owner/sitter/client session cookies when provided",
+        "ramp stage: medium"
+      ],
+      "stage": "medium"
+    },
+    {
+      "gate": "bookings_create_1000",
+      "mode": "live",
+      "operationCount": 0,
+      "concurrency": 0,
+      "durationMs": 0,
+      "throughputRps": 0,
+      "successCount": 0,
+      "errorCount": 0,
+      "errorRate": 0,
+      "observedDuplicateCount": 0,
+      "duplicateCount": 0,
+      "duplicateRate": 0,
+      "retryCount": 0,
+      "deadLetterCount": 0,
+      "timeoutCount": 0,
+      "timeoutRate": 0,
+      "statusCounts": {},
+      "failureCategory": "config failure",
+      "stage": "high",
+      "latencies": {
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0,
+        "min": 0
+      },
+      "pass": false,
+      "failures": [
+        "CONFIG-BLOCKED: Public booking is disabled in SaaS mode until org binding is configured"
+      ],
+      "notes": [
+        "bookings_create_1000 marked CONFIG-BLOCKED, not performance-failed"
+      ]
+    },
+    {
+      "gate": "messages_send_2000",
+      "mode": "live",
+      "operationCount": 350,
+      "concurrency": 350,
+      "durationMs": 20040.531917000015,
+      "throughputRps": 17.464606301347793,
+      "successCount": 0,
+      "errorCount": 350,
+      "errorRate": 1,
+      "observedDuplicateCount": 0,
+      "duplicateCount": 0,
+      "duplicateRate": 0,
+      "retryCount": 0,
+      "deadLetterCount": 0,
+      "timeoutCount": 48,
+      "timeoutRate": 0.13714285714285715,
+      "statusCounts": {
+        "0": 48,
+        "429": 272,
+        "500": 30
+      },
+      "failureCategory": "messaging/provider bottleneck",
+      "latencies": {
+        "p50": 12591.441625000036,
+        "p95": 20010.542833000014,
+        "p99": 20012.548333000042,
+        "max": 20012.849667000002,
+        "min": 2817.582166999986
+      },
+      "pass": false,
+      "failures": [
+        "p50 12591.4ms > 180ms",
+        "p95 20010.5ms > 700ms",
+        "p99 20012.5ms > 1400ms",
+        "errorRate 100.00% > 2.50%",
+        "throughput 17.46 rps < 300 rps"
+      ],
+      "notes": [
+        "ramp stage: high"
+      ],
+      "stage": "high"
+    },
+    {
+      "gate": "bookings_reads_paginated",
+      "mode": "live",
+      "operationCount": 400,
+      "concurrency": 120,
+      "durationMs": 47140.46995900001,
+      "throughputRps": 8.48527815585836,
+      "successCount": 340,
+      "errorCount": 60,
+      "errorRate": 0.15,
+      "observedDuplicateCount": 0,
+      "duplicateCount": 0,
+      "duplicateRate": 0,
+      "retryCount": 0,
+      "deadLetterCount": 0,
+      "timeoutCount": 60,
+      "timeoutRate": 0.15,
+      "statusCounts": {
+        "0": 60,
+        "200": 340
+      },
+      "failureCategory": "DB/read bottleneck",
+      "latencies": {
+        "p50": 10823.720249999955,
+        "p95": 20003.118166,
+        "p99": 20007.691833999997,
+        "max": 20011.614583000017,
+        "min": 212.08504199999152
+      },
+      "pass": false,
+      "failures": [
+        "p50 10823.7ms > 120ms",
+        "p95 20003.1ms > 450ms",
+        "p99 20007.7ms > 900ms",
+        "errorRate 15.00% > 1.00%",
+        "throughput 8.49 rps < 400 rps"
+      ],
+      "notes": [
+        "ramp stage: high"
+      ],
+      "stage": "high"
+    },
+    {
+      "gate": "thread_reads",
+      "mode": "live",
+      "operationCount": 350,
+      "concurrency": 120,
+      "durationMs": 24804.04554099997,
+      "throughputRps": 14.110601410623351,
+      "successCount": 350,
+      "errorCount": 0,
+      "errorRate": 0,
+      "observedDuplicateCount": 0,
+      "duplicateCount": 0,
+      "duplicateRate": 0,
+      "retryCount": 0,
+      "deadLetterCount": 0,
+      "timeoutCount": 0,
+      "timeoutRate": 0,
+      "statusCounts": {
+        "200": 350
+      },
+      "failureCategory": "DB/read bottleneck",
+      "latencies": {
+        "p50": 5589.881457999989,
+        "p95": 16799.471750000026,
+        "p99": 18421.850958999945,
+        "max": 19254.865541999985,
+        "min": 507.77537500002654
+      },
+      "pass": false,
+      "failures": [
+        "p50 5589.9ms > 130ms",
+        "p95 16799.5ms > 500ms",
+        "p99 18421.9ms > 950ms",
+        "throughput 14.11 rps < 350 rps"
+      ],
+      "notes": [
+        "ramp stage: high"
+      ],
+      "stage": "high"
+    },
+    {
+      "gate": "queue_backlog_drain",
+      "mode": "live",
+      "operationCount": 10,
+      "concurrency": 40,
+      "durationMs": 123105.87725000008,
+      "throughputRps": 0.08123089021730677,
+      "successCount": 10,
+      "errorCount": 0,
+      "errorRate": 0,
+      "observedDuplicateCount": 0,
+      "duplicateCount": 0,
+      "duplicateRate": 0,
+      "retryCount": 10,
+      "deadLetterCount": 0,
+      "timeoutCount": 0,
+      "timeoutRate": 0,
+      "statusCounts": {
+        "200": 10,
+        "500": 1
+      },
+      "failureCategory": "worker/queue saturation",
+      "latencies": {
+        "p50": 176.14912499999627,
+        "p95": 217.08095900004264,
+        "p99": 217.08095900004264,
+        "max": 217.08095900004264,
+        "min": 0
+      },
+      "pass": false,
+      "failures": [
+        "p50 176.1ms > 20ms",
+        "p95 217.1ms > 100ms",
+        "queue drain 0.08 jobs/s < 800 jobs/s"
+      ],
+      "notes": [
+        "queue gate mode: live-api-backed",
+        "ramp stage: high"
+      ],
+      "stage": "high"
+    },
+    {
+      "gate": "queue_retry_failure_storm",
+      "mode": "live",
+      "operationCount": 6,
+      "concurrency": 30,
+      "durationMs": 4899.042958000093,
+      "throughputRps": 1.2247290034887435,
+      "successCount": 4,
+      "errorCount": 2,
+      "errorRate": 0.3333333333333333,
+      "observedDuplicateCount": 0,
+      "duplicateCount": 0,
+      "duplicateRate": 0,
+      "retryCount": 8,
+      "deadLetterCount": 1,
+      "timeoutCount": 0,
+      "timeoutRate": 0,
+      "statusCounts": {
+        "200": 4,
+        "400": 2
+      },
+      "failureCategory": "worker/queue saturation",
+      "latencies": {
+        "p50": 142.51383399998304,
+        "p95": 1547.5996659998782,
+        "p99": 1547.5996659998782,
+        "max": 1547.5996659998782,
+        "min": 1
+      },
+      "pass": false,
+      "failures": [
+        "p50 142.5ms > 30ms",
+        "p95 1547.6ms > 180ms",
+        "p99 1547.6ms > 350ms",
+        "errorRate 33.33% > 25.00%",
+        "queue drain 1.22 jobs/s < 500 jobs/s"
+      ],
+      "notes": [
+        "queue gate mode: live-api-backed",
+        "Uses bounded retry profile with retryable transient vs non-retryable permanent classification",
+        "Storm simulation avoids retry amplification loops",
+        "ramp stage: high"
+      ],
+      "stage": "high"
+    },
+    {
+      "gate": "session_validation_burst",
+      "mode": "live",
+      "operationCount": 300,
+      "concurrency": 300,
+      "durationMs": 15350.912291000015,
+      "throughputRps": 19.542812460461064,
+      "successCount": 30,
+      "errorCount": 270,
+      "errorRate": 0.9,
+      "observedDuplicateCount": 0,
+      "duplicateCount": 0,
+      "duplicateRate": 0,
+      "retryCount": 0,
+      "deadLetterCount": 0,
+      "timeoutCount": 0,
+      "timeoutRate": 0,
+      "statusCounts": {
+        "200": 30,
+        "429": 270
+      },
+      "failureCategory": "DB/read bottleneck",
+      "latencies": {
+        "p50": 8342.605375000043,
+        "p95": 15059.233458000002,
+        "p99": 15184.045499999891,
+        "max": 15245.39300000004,
+        "min": 1295.8823329999577
+      },
+      "pass": false,
+      "failures": [
+        "p50 8342.6ms > 140ms",
+        "p95 15059.2ms > 600ms",
+        "p99 15184.0ms > 1200ms",
+        "errorRate 90.00% > 3.00%",
+        "throughput 19.54 rps < 300 rps"
+      ],
+      "notes": [
+        "Requests are spread across owner/sitter/client session cookies when provided",
+        "ramp stage: high"
+      ],
+      "stage": "high"
+    }
+  ],
+  "degradationTable": [
+    {
+      "gate": "bookings_create_1000",
+      "firstDegradationPoint": "low",
+      "failureCategory": "config failure",
+      "details": "CONFIG-BLOCKED: Public booking is disabled in SaaS mode until org binding is configured"
+    },
+    {
+      "gate": "messages_send_2000",
+      "firstDegradationPoint": "low",
+      "failureCategory": "messaging/provider bottleneck",
+      "details": "p50 6427.8ms > 180ms; p95 9197.5ms > 700ms; p99 9277.3ms > 1400ms; errorRate 100.00% > 2.50%; throughput 13.10 rps < 300 rps"
+    },
+    {
+      "gate": "bookings_reads_paginated",
+      "firstDegradationPoint": "low",
+      "failureCategory": "DB/read bottleneck",
+      "details": "p50 4516.5ms > 120ms; p95 5456.7ms > 450ms; p99 5854.8ms > 900ms; throughput 8.47 rps < 400 rps"
+    },
+    {
+      "gate": "thread_reads",
+      "firstDegradationPoint": "low",
+      "failureCategory": "DB/read bottleneck",
+      "details": "p50 2507.7ms > 130ms; p95 3602.6ms > 500ms; p99 4049.1ms > 950ms; throughput 15.54 rps < 350 rps"
+    },
+    {
+      "gate": "queue_backlog_drain",
+      "firstDegradationPoint": "low",
+      "failureCategory": "worker/queue saturation",
+      "details": "p50 181.5ms > 20ms; p95 208.2ms > 100ms; queue drain 0.02 jobs/s < 800 jobs/s"
+    },
+    {
+      "gate": "queue_retry_failure_storm",
+      "firstDegradationPoint": "low",
+      "failureCategory": "worker/queue saturation",
+      "details": "p50 178.6ms > 30ms; p95 1251.9ms > 180ms; p99 1251.9ms > 350ms; queue drain 0.45 jobs/s < 500 jobs/s"
+    },
+    {
+      "gate": "session_validation_burst",
+      "firstDegradationPoint": "low",
+      "failureCategory": "DB/read bottleneck",
+      "details": "p50 3514.4ms > 140ms; p95 5106.8ms > 600ms; p99 5132.4ms > 1200ms; errorRate 71.43% > 3.00%; throughput 20.03 rps < 300 rps"
+    }
+  ]
+}

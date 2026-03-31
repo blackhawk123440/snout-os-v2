@@ -1,0 +1,40 @@
+I'm trying to connect Prisma to my Supabase PostgreSQL database but getting connection errors. Here's my situation:
+
+**Environment:**
+- Using Next.js 15 with Prisma 5.22.0
+- Supabase PostgreSQL database
+- Connection works via Supabase MCP server (can execute SQL queries successfully)
+
+**Current Error:**
+When running `npx prisma db push`, I get either:
+- "Can't reach database server" error, OR
+- "Authentication failed" error
+
+**My Connection String:**
+```
+postgresql://postgres:9GaX3HSdp6JK7Rh7@db.ktmarxugcepkgwgsgifx.supabase.co:5432/postgres
+```
+
+**What I've Tried:**
+1. Verified database is accessible (MCP connection works)
+2. Tried pooled connection string (port 6543)
+3. Tried direct connection string (port 5432)
+4. Removed directUrl from Prisma schema
+5. Simplified to use only DATABASE_URL
+
+**My Prisma Schema:**
+```prisma
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+```
+
+**What I Need:**
+1. Why Prisma can't connect even though MCP/SQL clients can?
+2. What's the correct connection string format for Supabase + Prisma?
+3. Should I use pooled connection (port 6543) or direct connection (port 5432) for migrations?
+4. Do I need any special configuration in Prisma for Supabase?
+
+Please provide specific, actionable steps to fix this.
+

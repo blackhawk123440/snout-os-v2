@@ -1,0 +1,29 @@
+{
+  "gate": "queue_retry_failure_storm",
+  "mode": "mock",
+  "operationCount": 6000,
+  "concurrency": 100,
+  "durationMs": 819.8768330000003,
+  "throughputRps": 7318.172386998033,
+  "successCount": 5904,
+  "errorCount": 96,
+  "errorRate": 0.016,
+  "observedDuplicateCount": 0,
+  "duplicateCount": 0,
+  "duplicateRate": 0,
+  "retryCount": 1325,
+  "deadLetterCount": 96,
+  "latencies": {
+    "p50": 12.413445668134955,
+    "p95": 28.49982662205366,
+    "p99": 38.89330808563318,
+    "max": 51.17789918228755,
+    "min": 4.003445615675446
+  },
+  "pass": true,
+  "failures": [],
+  "notes": [
+    "Uses bounded retry profile with retryable transient vs non-retryable permanent classification",
+    "Storm simulation avoids retry amplification loops"
+  ]
+}

@@ -1,0 +1,117 @@
+{
+  "runId": "2026-03-12T05-14-01-558Z",
+  "startedAt": "2026-03-12T05:14:01.558Z",
+  "completedAt": "2026-03-12T05:15:55.505Z",
+  "mode": "live",
+  "suite": "messages",
+  "baseUrl": "https://snout-os-staging.onrender.com",
+  "thresholds": {
+    "bookings_create_1000": {
+      "p50Ms": 300,
+      "p95Ms": 1000,
+      "p99Ms": 2000,
+      "maxErrorRate": 0.02,
+      "maxDuplicateRate": 0,
+      "minThroughputRps": 120
+    },
+    "messages_send_2000": {
+      "p50Ms": 180,
+      "p95Ms": 700,
+      "p99Ms": 1400,
+      "maxErrorRate": 0.025,
+      "minThroughputRps": 300
+    },
+    "bookings_reads_paginated": {
+      "p50Ms": 120,
+      "p95Ms": 450,
+      "p99Ms": 900,
+      "maxErrorRate": 0.01,
+      "minThroughputRps": 400
+    },
+    "thread_reads": {
+      "p50Ms": 130,
+      "p95Ms": 500,
+      "p99Ms": 950,
+      "maxErrorRate": 0.01,
+      "minThroughputRps": 350
+    },
+    "queue_backlog_drain": {
+      "p50Ms": 20,
+      "p95Ms": 100,
+      "p99Ms": 250,
+      "maxErrorRate": 0.01,
+      "minQueueDrainPerSec": 800
+    },
+    "session_validation_burst": {
+      "p50Ms": 140,
+      "p95Ms": 600,
+      "p99Ms": 1200,
+      "maxErrorRate": 0.03,
+      "minThroughputRps": 300
+    },
+    "queue_retry_failure_storm": {
+      "p50Ms": 30,
+      "p95Ms": 180,
+      "p99Ms": 350,
+      "maxErrorRate": 0.25,
+      "minQueueDrainPerSec": 500,
+      "maxDeadLetterCount": 150,
+      "maxRetryCount": 4000
+    }
+  },
+  "results": [
+    {
+      "gate": "messages_send_2000",
+      "mode": "live",
+      "operationCount": 2000,
+      "concurrency": 2000,
+      "durationMs": 113931.4885,
+      "throughputRps": 17.554409464245698,
+      "successCount": 200,
+      "errorCount": 1800,
+      "errorRate": 0.9,
+      "observedDuplicateCount": 0,
+      "duplicateCount": 0,
+      "duplicateRate": 0,
+      "retryCount": 0,
+      "deadLetterCount": 0,
+      "timeoutCount": 437,
+      "timeoutRate": 0.2185,
+      "statusCounts": {
+        "0": 447,
+        "202": 200,
+        "502": 1353
+      },
+      "failureCategory": "messaging/provider bottleneck",
+      "latencies": {
+        "p50": 3976.486709,
+        "p95": 20531.814209,
+        "p99": 20533.297334000003,
+        "max": 20535.356083000002,
+        "min": 2189.069291
+      },
+      "pass": false,
+      "failures": [
+        "p50 3976.5ms > 180ms",
+        "p95 20531.8ms > 700ms",
+        "p99 20533.3ms > 1400ms",
+        "errorRate 90.00% > 2.50%",
+        "throughput 17.55 rps < 300 rps"
+      ],
+      "notes": []
+    }
+  ],
+  "topBottlenecks": [
+    {
+      "gate": "messages_send_2000",
+      "reason": "failed gate: p50 3976.5ms > 180ms; p95 20531.8ms > 700ms; p99 20533.3ms > 1400ms; errorRate 90.00% > 2.50%; throughput 17.55 rps < 300 rps",
+      "severity": 25031.814209
+    }
+  ],
+  "failingGates": [
+    "messages_send_2000"
+  ],
+  "recommendations": [
+    "Messaging send path: batch outbound provider writes and decouple sync delivery state updates from request path."
+  ]
+}
