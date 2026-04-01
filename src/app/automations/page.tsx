@@ -1,10 +1,3 @@
-/**
- * Automations Control Center - List Page
- * 
- * Enterprise automation management system with builder, preview, test mode,
- * and audit capabilities.
- */
-
 'use client';
 
 import { useState } from 'react';
@@ -23,7 +16,7 @@ import {
   GridCol,
 } from '@/components/ui';
 import { OwnerAppShell, LayoutWrapper, PageHeader, Section } from '@/components/layout';
-import { AppErrorState } from '@/components/app';
+import { AppCard, AppCardBody, AppCardHeader, AppErrorState } from '@/components/app';
 import { tokens } from '@/lib/design-tokens';
 import { useMobile } from '@/lib/use-mobile';
 
@@ -142,7 +135,7 @@ export default function AutomationsPage() {
       <LayoutWrapper variant="wide">
         <PageHeader
           title="Automations"
-          subtitle="Manage automation types, templates, and run history"
+          subtitle="Keep follow-ups, reminders, and routine customer communication running without extra manual work."
           actions={
             <Link href="/ops/automation-failures">
               <Button variant="secondary" size="sm" leftIcon={<AlertTriangle size={14} />}>
@@ -152,7 +145,32 @@ export default function AutomationsPage() {
           }
         />
 
-        <Section title="Overview" description="Runs and failures are org-wide. Filter by status below.">
+        <Section>
+          <div className="grid gap-4 xl:grid-cols-[minmax(0,1.75fr)_minmax(320px,1fr)]">
+            <AppCard className="bg-[radial-gradient(circle_at_top_left,_rgba(234,88,12,0.10),_transparent_44%),linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.96))]">
+              <AppCardHeader title="Automation should feel like business leverage" />
+              <AppCardBody className="space-y-3">
+                <p className="max-w-3xl text-sm leading-6 text-text-secondary">
+                  Strong SaaS automations are not just switches. They are the repeatable workflows that keep owners responsive, clients informed, and the team on schedule without creating more operational overhead.
+                </p>
+                <p className="text-sm leading-6 text-text-secondary">
+                  Use this page to manage what runs automatically, what still needs human review, and where message reliability needs attention.
+                </p>
+              </AppCardBody>
+            </AppCard>
+
+            <AppCard>
+              <AppCardHeader title="Best next moves" />
+              <AppCardBody className="space-y-2 text-sm text-text-secondary">
+                <p>Keep the most customer-visible automations on first, especially reminders and follow-up messaging.</p>
+                <p>Treat failures like service-risk signals, not just technical logs.</p>
+                <p>Use testing and edits to improve message quality, not just delivery volume.</p>
+              </AppCardBody>
+            </AppCard>
+          </div>
+        </Section>
+
+        <Section title="Automation health" description="Runs and failures are org-wide. Use these metrics to spot customer-facing risk quickly.">
           <Grid gap={4}>
             <GridCol span={12} md={4}>
               <Card className="border border-border-default">
@@ -198,7 +216,7 @@ export default function AutomationsPage() {
           </Grid>
         </Section>
 
-        <Section title="Automation types">
+        <Section title="Automation workflows" description="Search for the workflows you want to review, then enable or refine them without leaving the product context.">
           <div className="mb-4 flex flex-wrap items-center gap-3">
             <Input
               placeholder="Search automations..."
@@ -223,7 +241,7 @@ export default function AutomationsPage() {
             <Card>
               <EmptyState
                 title="No automations found"
-                description={searchTerm || filterEnabled !== 'all' ? 'Try adjusting your filters' : 'No automation types configured'}
+                description={searchTerm || filterEnabled !== 'all' ? 'Try adjusting your filters to bring more workflows into view.' : 'No automation workflows are configured yet.'}
                 icon={<Zap className="w-8 h-8 text-text-tertiary" />}
               />
             </Card>

@@ -10,16 +10,16 @@ export interface AppPageHeaderProps {
 
 export function AppPageHeader({ title, subtitle, action }: AppPageHeaderProps) {
   return (
-    <div className="mb-4 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-      <div>
-        <h1 className="text-xl font-semibold tracking-tight text-text-primary lg:text-2xl">
+    <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <div className="min-w-0 flex-1">
+        <h1 className="text-2xl font-bold tracking-tight text-text-primary lg:text-3xl">
           {title}
         </h1>
         {subtitle && (
-          <p className="mt-0.5 text-sm text-text-secondary">{subtitle}</p>
+          <p className="mt-1 max-w-3xl text-sm leading-6 text-text-secondary">{subtitle}</p>
         )}
       </div>
-      {action && <div className="mt-2 shrink-0 sm:mt-0">{action}</div>}
+      {action && <div className="shrink-0">{action}</div>}
     </div>
   );
 }

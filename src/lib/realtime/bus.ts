@@ -3,6 +3,8 @@
  * Uses Redis pub/sub in production; in-memory fallback for local dev.
  */
 
+import { isBuildPhase } from '@/lib/runtime-phase';
+
 const REDIS_URL = process.env.NODE_ENV === "test" ? "" : process.env.REDIS_URL;
 
 type Handler = (payload: unknown) => void;
@@ -42,14 +44,22 @@ let redisSub: import('ioredis').default | null = null;
 async function getRedisClient(): Promise<import('ioredis').default> {
   if (redisClient) return redisClient;
   const Redis = (await import('ioredis')).default;
-  redisClient = new Redis(REDIS_URL!, { maxRetriesPerRequest: 1 });
+  redisClient = new Redis(REDIS_URL!, {
+    lazyConnect: true,
+    maxRetriesPerRequest: null,
+    enableOfflineQueue: !isBuildPhase,
+  });
   return redisClient;
 }
 
 async function getRedisSub(): Promise<import('ioredis').default> {
   if (redisSub) return redisSub;
   const Redis = (await import('ioredis')).default;
-  redisSub = new Redis(REDIS_URL!, { maxRetriesPerRequest: 1 });
+  redisSub = new Redis(REDIS_URL!, {
+    lazyConnect: true,
+    maxRetriesPerRequest: null,
+    enableOfflineQueue: !isBuildPhase,
+  });
   return redisSub;
 }
 

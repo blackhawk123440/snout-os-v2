@@ -85,6 +85,11 @@ export default function ClientMessageThreadPage() {
         <AppErrorState title="Couldn't load thread" subtitle={error.message || 'Thread not found'} onRetry={() => void refetch()} />
       ) : thread ? (
         <>
+          <div className="mb-4 rounded-2xl border border-border-default bg-surface-secondary px-4 py-3">
+            <p className="text-xs font-medium text-text-secondary">
+              Use this thread for in-app updates with your care team. Depending on your sitter and office setup, they may also contact you on your normal phone number.
+            </p>
+          </div>
           <div className="flex-1 space-y-3">
             {thread.messages?.length === 0 ? (
               <div className="rounded-2xl bg-accent-tertiary p-8 text-center">

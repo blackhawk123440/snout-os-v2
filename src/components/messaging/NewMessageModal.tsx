@@ -16,9 +16,10 @@ interface NewMessageModalProps {
   isOpen: boolean;
   onClose: () => void;
   onThreadCreated?: (threadId: string) => void;
+  nativePhoneMode?: boolean;
 }
 
-export function NewMessageModal({ isOpen, onClose, onThreadCreated }: NewMessageModalProps) {
+export function NewMessageModal({ isOpen, onClose, onThreadCreated, nativePhoneMode = false }: NewMessageModalProps) {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [message, setMessage] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -106,6 +107,18 @@ export function NewMessageModal({ isOpen, onClose, onThreadCreated }: NewMessage
               }}
             />
           </div>
+
+          {nativePhoneMode && (
+            <div style={{
+              padding: tokens.spacing[3],
+              backgroundColor: tokens.colors.neutral[50],
+              color: tokens.colors.text.secondary,
+              borderRadius: tokens.radius.sm,
+              fontSize: tokens.typography.fontSize.sm[0],
+            }}>
+              Native phone mode is active. This thread can support in-app coordination now, while your team still uses normal phone numbers outside the app until you add an optional business connector.
+            </div>
+          )}
 
           {error && (
             <div style={{

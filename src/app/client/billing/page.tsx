@@ -60,6 +60,21 @@ export default function ClientBillingPage() {
         <AppErrorState title="Couldn't load" subtitle={error.message || 'Unable to load'} onRetry={() => void refetch()} />
       ) : data ? (
         <div className="space-y-4 mt-4 pb-8">
+          <div className="rounded-2xl border border-border-default bg-[radial-gradient(circle_at_top_left,rgba(34,197,94,0.08),transparent_40%),linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.96))] p-5">
+            <div className="grid gap-4 md:grid-cols-[minmax(0,1.8fr)_minmax(220px,1fr)]">
+              <div>
+                <p className="text-sm font-semibold text-text-primary">Billing should feel clear, not stressful</p>
+                <p className="mt-2 text-sm leading-6 text-text-secondary">
+                  This page is built to help you understand what is due, what has already been paid, and where rewards or saved payment methods can make future bookings easier.
+                </p>
+              </div>
+              <div className="space-y-2 text-sm text-text-secondary">
+                <p>Unpaid invoices stay at the top so you can resolve them fast.</p>
+                <p>History, loyalty, bundles, and payment methods stay in one place so billing feels predictable.</p>
+              </div>
+            </div>
+          </div>
+
           {/* Balance hero */}
           <div className="rounded-2xl bg-gradient-to-br from-accent-secondary via-surface-primary to-accent-secondary/30 border border-accent-secondary p-6 text-center shadow-sm">
             <p className="text-[11px] font-semibold uppercase tracking-wider text-accent-primary/60 mb-1">Outstanding balance</p>

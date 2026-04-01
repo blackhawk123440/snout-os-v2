@@ -82,16 +82,16 @@ const CATEGORIES: CategoryConfig[] = [
   {
     key: 'messaging',
     label: 'Messaging',
-    description: 'How your business sends and receives text messages with clients and sitters.',
+    description: 'How your business handles calls and texts. Start with native phone numbers or add a connector later.',
     icon: <MessageSquare className="h-5 w-5" />,
     field: 'messagingProvider',
     statusKey: 'messaging',
     options: [
-      { value: 'none', label: 'None — use personal phone', available: true },
-      { value: 'twilio', label: 'Twilio — masked numbers, full automation', available: true },
-      { value: 'openphone', label: 'OpenPhone — shared business line', available: true },
+      { value: 'none', label: 'Native phone mode — owner, sitter, and client use normal numbers', available: true },
+      { value: 'openphone', label: 'OpenPhone — optional U.S. shared business line', available: true },
+      { value: 'twilio', label: 'Twilio — optional U.S. masked numbers and automation', available: true },
     ],
-    setupLink: '/settings?section=twilio',
+    setupLink: '/settings?section=integrations',
     setupLabel: 'Configure',
   },
   {
@@ -346,9 +346,43 @@ export function IntegrationStackSection() {
     data.status.accounting.configured,
     data.status.bookingIntake.configured,
   ].filter(Boolean).length;
+  const selectedMessagingLabel = CATEGORIES[0].options.find((option) => option.value === data.config.messagingProvider)?.label ?? 'Not selected';
+  const selectedPaymentLabel = CATEGORIES[1].options.find((option) => option.value === data.config.paymentProvider)?.label ?? 'Not selected';
+  const selectedBookingLabel = CATEGORIES[4].options.find((option) => option.value === data.config.bookingIntake)?.label ?? 'Not selected';
 
   return (
     <div className="flex flex-col gap-4">
+      <Card>
+        <div className="p-5">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div className="max-w-2xl">
+              <p className="text-sm font-semibold text-text-primary">Choose your business stack</p>
+              <p className="mt-1 text-sm text-text-secondary">
+                Start with the essentials that shape the customer experience: how people contact you, how you get paid, and how new bookings come in. Specialist connector setup can stay secondary until you actually need it.
+              </p>
+            </div>
+            <Badge variant={readyCount >= 3 ? 'success' : 'warning'}>
+              {readyCount >= 3 ? 'Core stack in place' : 'Core setup in progress'}
+            </Badge>
+          </div>
+
+          <div className="mt-4 grid gap-3 md:grid-cols-3">
+            <div className="rounded-xl border border-border-default bg-surface-secondary px-4 py-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">Messaging</p>
+              <p className="mt-1 text-sm text-text-primary">{selectedMessagingLabel}</p>
+            </div>
+            <div className="rounded-xl border border-border-default bg-surface-secondary px-4 py-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">Payments</p>
+              <p className="mt-1 text-sm text-text-primary">{selectedPaymentLabel}</p>
+            </div>
+            <div className="rounded-xl border border-border-default bg-surface-secondary px-4 py-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">Booking Intake</p>
+              <p className="mt-1 text-sm text-text-primary">{selectedBookingLabel}</p>
+            </div>
+          </div>
+        </div>
+      </Card>
+
       {/* Summary bar */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -378,6 +412,26 @@ export function IntegrationStackSection() {
         </div>
       </div>
 
+      <Card>
+        <div className="p-4">
+          <p className="text-sm font-semibold text-text-primary">Recommended launch path</p>
+          <div className="mt-3 grid gap-3 md:grid-cols-3">
+            <div className="rounded-xl border border-border-default bg-surface-secondary px-4 py-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">Start simple</p>
+              <p className="mt-1 text-sm text-text-secondary">Native phone mode, Stripe, and client portal booking are enough for a real launch.</p>
+            </div>
+            <div className="rounded-xl border border-border-default bg-surface-secondary px-4 py-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">Add connectors later</p>
+              <p className="mt-1 text-sm text-text-secondary">OpenPhone, Twilio, Google Calendar, and accounting sync are upgrades, not prerequisites.</p>
+            </div>
+            <div className="rounded-xl border border-border-default bg-surface-secondary px-4 py-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">Use support tools only when needed</p>
+              <p className="mt-1 text-sm text-text-secondary">Number management, routing, and provider diagnostics can stay out of the main owner workflow until you need them.</p>
+            </div>
+          </div>
+        </div>
+      </Card>
+
       {/* Category cards */}
       {CATEGORIES.map((category) => (
         <CategoryCard
@@ -395,16 +449,39 @@ export function IntegrationStackSection() {
           <div className="p-4 flex items-start gap-3">
             <Phone className="h-4 w-4 text-text-secondary mt-0.5 shrink-0" />
             <div>
-              <p className="text-sm text-text-primary font-medium">No messaging provider selected</p>
+              <p className="text-sm text-text-primary font-medium">Native phone mode is active</p>
               <p className="text-xs text-text-secondary mt-1">
-                Clients will receive booking links via the portal. SMS features like visit notifications
-                and automated reminders are disabled. You can still communicate with clients through
-                the in-app message center or your personal phone.
+                The workspace can run without Twilio or OpenPhone. Owners, sitters, and clients can use their regular phone numbers,
+                while in-app messaging and portal workflows remain available. Add a U.S. connector later if you want a dedicated business line,
+                masked routing, or deeper SMS automation.
               </p>
             </div>
           </div>
         </Card>
       )}
+
+      <Card>
+        <div className="p-4">
+          <p className="text-sm font-semibold text-text-primary">Specialist setup</p>
+          <p className="mt-1 text-sm text-text-secondary">
+            These tools are still available when you need deeper connector work, but they don’t need to lead the setup journey.
+          </p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Link href="/settings?section=openphone">
+              <Button variant="secondary" size="sm">Open OpenPhone</Button>
+            </Link>
+            <Link href="/settings?section=twilio">
+              <Button variant="secondary" size="sm">Open Twilio</Button>
+            </Link>
+            <Link href="/settings?section=numbers">
+              <Button variant="secondary" size="sm">Open Numbers</Button>
+            </Link>
+            <Link href="/settings?section=routing">
+              <Button variant="secondary" size="sm">Open Routing</Button>
+            </Link>
+          </div>
+        </div>
+      </Card>
     </div>
   );
 }

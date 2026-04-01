@@ -10,11 +10,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { mintApiJWT } from '@/lib/api/jwt';
+import { shouldSilenceBuildWarnings } from '@/lib/runtime-phase';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 if (!API_BASE_URL) {
-  console.error('[BFF Proxy] NEXT_PUBLIC_API_URL not set - proxy will fail');
+  if (!shouldSilenceBuildWarnings) {
+    console.error('[BFF Proxy] NEXT_PUBLIC_API_URL not set - proxy will fail');
+  }
 }
 
 /**

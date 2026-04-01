@@ -2,6 +2,7 @@ import { Queue, Worker, type Job } from "bullmq";
 import IORedis from "ioredis";
 import { getScopedDb } from "@/lib/tenancy";
 import { logEvent } from "@/lib/log-event";
+import { isBuildPhase } from "@/lib/runtime-phase";
 
 export interface ThreadActivityJobData {
   orgId: string;
@@ -19,12 +20,13 @@ let threadActivityWorker: Worker<ThreadActivityJobData> | null = null;
 
 function getRedisConnection(): IORedis | null {
   const redisUrl = process.env.REDIS_URL;
-  if (!redisUrl) return null;
+  if (!redisUrl || isBuildPhase) return null;
   if (!redisConnection) {
     redisConnection = new IORedis(redisUrl, {
-      maxRetriesPerRequest: 1,
+      maxRetriesPerRequest: null,
       enableAutoPipelining: true,
       lazyConnect: true,
+      enableOfflineQueue: false,
     });
   }
   return redisConnection;
@@ -122,4 +124,3 @@ export function initializeThreadActivityWorker(): Worker<ThreadActivityJobData> 
 
   return threadActivityWorker;
 }
-

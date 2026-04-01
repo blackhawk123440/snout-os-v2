@@ -68,6 +68,7 @@ const threadSchema = z.object({
     .object({
       id: z.string(),
       name: z.string(),
+      phone: z.string().nullable().optional(),
     })
     .nullable(),
   messageNumber: z.object({

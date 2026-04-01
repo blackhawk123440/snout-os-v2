@@ -4,14 +4,14 @@
  */
 
 import { Queue, Worker } from "bullmq";
-import IORedis from "ioredis";
 import { getScopedDb } from "@/lib/tenancy";
 import { reconcileOrgRange } from "./reconcile";
 import { logEvent } from "@/lib/log-event";
 import { attachQueueWorkerInstrumentation, recordQueueJobQueued } from "@/lib/queue-observability";
 import { resolveCorrelationId } from "@/lib/correlation-id";
+import { createRedisConnection } from "@/lib/redis-config";
 
-const connection = new IORedis(process.env.REDIS_URL || "redis://localhost:6379");
+const connection = createRedisConnection();
 const FINANCE_RECONCILE_WORKER_CONCURRENCY = Number(process.env.FINANCE_RECONCILE_WORKER_CONCURRENCY || "4");
 
 export const financeReconcileQueue = new Queue("finance.reconcile", {

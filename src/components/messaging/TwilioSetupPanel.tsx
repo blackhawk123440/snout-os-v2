@@ -8,9 +8,10 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Card, Button, Badge, EmptyState, Skeleton, Modal, Input } from '@/components/ui';
+import { Card, Button, Badge, Skeleton, Modal, Input } from '@/components/ui';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiGet, apiPost } from '@/lib/api/client';
+import { toastError, toastSuccess } from '@/lib/toast';
 import { z } from 'zod';
 
 const providerStatusSchema = z.object({
@@ -196,15 +197,19 @@ export function TwilioSetupPanel() {
         accountSid: testForm.accountSid || undefined,
         authToken: testForm.authToken || undefined,
       });
-      alert(result.message || (result.success ? 'Connection test successful' : 'Connection test failed'));
+      if (result.success) {
+        toastSuccess(result.message || 'Connection test successful');
+      } else {
+        toastError(result.message || 'Connection test failed');
+      }
     } catch (error: any) {
-      alert(`Test failed: ${error.message}`);
+      toastError(`Test failed: ${error.message}`);
     }
   };
 
   const handleConnect = async () => {
     if (!connectForm.accountSid || !connectForm.authToken) {
-      alert('Please enter both Account SID and Auth Token');
+      toastError('Enter both Account SID and Auth Token');
       return;
     }
     setVerificationFailedBanner(null);
@@ -213,15 +218,16 @@ export function TwilioSetupPanel() {
       if (result.verified === true) {
         setShowConnectModal(false);
         setConnectForm({ accountSid: '', authToken: '' });
-        alert('Provider connected and verified.');
+        toastSuccess('Twilio connected and verified');
       } else if (result.verified === false) {
         setVerificationFailedBanner('Connect reported success but verification failed. Use "Copy Setup Diagnostics" to debug.');
       } else {
         setShowConnectModal(false);
         setConnectForm({ accountSid: '', authToken: '' });
+        toastSuccess(result.message || 'Credentials saved');
       }
     } catch (error: any) {
-      alert(`Failed to save credentials: ${error.message}`);
+      toastError(`Failed to save credentials: ${error.message}`);
     }
   };
 
@@ -231,14 +237,14 @@ export function TwilioSetupPanel() {
       const result = await installWebhooks.mutateAsync();
       const verified = result.verified === true || result.webhookUrlConfigured === true;
       if (verified) {
-        alert('Webhooks installed and verified.');
+        toastSuccess('Webhooks installed and verified');
       } else if (result.success && result.verified === false) {
         setVerificationFailedBanner('Install reported success but verification failed. Use "Copy Setup Diagnostics" to debug.');
       } else if (!result.success) {
-        alert(result.message || 'Webhook install failed.');
+        toastError(result.message || 'Webhook install failed');
       }
     } catch (error: any) {
-      alert(`Failed to install webhooks: ${error.message}`);
+      toastError(`Failed to install webhooks: ${error.message}`);
     }
   };
 
@@ -247,14 +253,15 @@ export function TwilioSetupPanel() {
       const res = await fetch('/api/ops/twilio-setup-diagnostics');
       const data = await res.json();
       if (!res.ok) {
-        alert(data.error || 'Failed to fetch diagnostics');
+        toastError(data.error || 'Failed to fetch diagnostics');
         return;
       }
       await navigator.clipboard.writeText(JSON.stringify(data, null, 2));
       setDiagnosticsCopied(true);
       setTimeout(() => setDiagnosticsCopied(false), 2000);
+      toastSuccess('Setup diagnostics copied');
     } catch (e: any) {
-      alert(e?.message || 'Failed to copy diagnostics');
+      toastError(e?.message || 'Failed to copy diagnostics');
     }
   };
 
@@ -262,35 +269,72 @@ export function TwilioSetupPanel() {
     return <Skeleton height={400} />;
   }
 
+  const setupSteps = [
+    {
+      label: 'Connect account',
+      ready: readiness?.provider.ready ?? false,
+      detail: providerStatus?.connected
+        ? 'Twilio credentials are saved and the account is reachable.'
+        : 'Add your Account SID and Auth Token to unlock number sync and SMS testing.',
+    },
+    {
+      label: 'Sync numbers',
+      ready: readiness?.numbers.ready ?? false,
+      detail: readiness?.numbers.ready
+        ? readiness?.numbers.message
+        : 'Pull your Twilio numbers into Snout OS so the app can choose the right sending line.',
+    },
+    {
+      label: 'Install webhooks',
+      ready: readiness?.webhooks.ready ?? false,
+      detail: readiness?.webhooks.ready
+        ? readiness?.webhooks.message
+        : 'Install inbound webhooks so replies and delivery events come back into the workspace.',
+    },
+  ];
+  const completedSteps = setupSteps.filter((step) => step.ready).length;
+
   return (
-    <div>
-      <div className="mb-4">
-        <h2 className="text-xl font-bold mb-1">
-          Twilio Setup
-        </h2>
-        <p className="text-text-secondary text-sm">
-          Save credentials, test connection, install webhooks, and check readiness
-        </p>
-        <div className="flex gap-2 items-center mt-2">
+    <div className="flex flex-col gap-4">
+      <Card className="p-5">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div className="max-w-2xl">
+            <div className="mb-2 flex flex-wrap items-center gap-2">
+              <Badge variant="warning">Optional U.S. business connector</Badge>
+              <Badge variant={readiness?.overall ? 'success' : 'warning'}>
+                {readiness?.overall ? 'Launch-ready' : `${completedSteps}/3 setup steps complete`}
+              </Badge>
+            </div>
+            <h2 className="text-xl font-bold mb-1">
+              Twilio business messaging
+            </h2>
+            <p className="text-sm text-text-secondary">
+              Use Twilio when you want a dedicated business line, masked routing, or automated carrier-backed SMS flows. If your team is happy using normal phone numbers, native phone mode is still the recommended default.
+            </p>
+          </div>
           <Button variant="secondary" size="sm" onClick={handleCopyDiagnostics}>
             {diagnosticsCopied ? 'Copied' : 'Copy Setup Diagnostics'}
           </Button>
         </div>
-      </div>
-
-      <Card className="mb-4">
-        <h3 className="text-base font-semibold mb-2">
-          What masking does
-        </h3>
-        <div className="flex flex-col gap-2 text-sm text-text-secondary">
-          <p>Client messages the business number and the message is routed to the assigned sitter.</p>
-          <p>Sitter replies and the client still sees the business number.</p>
-          <p>Owner can audit, intervene, and verify message delivery end to end.</p>
-        </div>
       </Card>
 
+      <div className="grid gap-4 md:grid-cols-3">
+        <Card className="p-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary mb-2">Best for</p>
+          <p className="text-sm text-text-secondary">Teams that want a shared business number, masked sitter routing, and auditable SMS delivery.</p>
+        </Card>
+        <Card className="p-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary mb-2">Recommended setup</p>
+          <p className="text-sm text-text-secondary">Connect the account, sync numbers, install webhooks, then send one owner test before going live.</p>
+        </Card>
+        <Card className="p-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary mb-2">What masking does</p>
+          <p className="text-sm text-text-secondary">Clients see the business line, sitters can reply through routed numbers, and the office keeps visibility across the full thread.</p>
+        </Card>
+      </div>
+
       {verificationFailedBanner && (
-        <Card className="mb-4" style={{ borderLeft: '4px solid #dc2626', backgroundColor: '#fef2f2' }}>
+        <Card className="p-4" style={{ borderLeft: '4px solid #dc2626', backgroundColor: '#fef2f2' }}>
           <div className="flex justify-between items-start gap-3">
             <p className="m-0 text-sm font-medium">
               {verificationFailedBanner}
@@ -307,11 +351,35 @@ export function TwilioSetupPanel() {
         </Card>
       )}
 
-      {/* Provider Status */}
-      <Card className="mb-4">
+      <Card className="p-4">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h3 className="text-lg font-semibold">Guided setup</h3>
+            <p className="text-sm text-text-secondary">Follow these steps in order to make Twilio fully usable inside the workspace.</p>
+          </div>
+          <Badge variant={readiness?.overall ? 'success' : 'warning'}>
+            {readiness?.overall ? 'Ready to use' : 'Still in setup'}
+          </Badge>
+        </div>
+        <div className="grid gap-3 md:grid-cols-3">
+          {setupSteps.map((step, index) => (
+            <div key={step.label} className="rounded-xl border border-border-default bg-surface-secondary p-4">
+              <div className="flex items-center justify-between gap-3 mb-2">
+                <div className="text-sm font-semibold">{index + 1}. {step.label}</div>
+                <Badge variant={step.ready ? 'success' : 'warning'}>
+                  {step.ready ? 'Done' : 'Next'}
+                </Badge>
+              </div>
+              <p className="text-sm text-text-secondary">{step.detail}</p>
+            </div>
+          ))}
+        </div>
+      </Card>
+
+      <Card className="p-4">
         <div className="flex justify-between items-center mb-3">
           <h3 className="text-lg font-semibold">
-            Provider Connection
+            Step 1: Connect account
           </h3>
           <div className="flex gap-2">
             <Button
@@ -362,7 +430,7 @@ export function TwilioSetupPanel() {
               </p>
             )}
             <p className="text-sm text-text-secondary mt-2">
-              Connect your Twilio account to enable messaging
+              Connect your Twilio account to enable provider-backed SMS in this workspace.
             </p>
             {providerStatus?.checkedAt && (
               <div className="text-xs text-text-secondary mt-1">
@@ -373,11 +441,10 @@ export function TwilioSetupPanel() {
         )}
       </Card>
 
-      {/* Webhook Status */}
-      <Card className="mb-4">
+      <Card className="p-4">
         <div className="flex justify-between items-center mb-3">
           <h3 className="text-lg font-semibold">
-            Webhooks
+            Step 2: Install inbound webhooks
           </h3>
           <Button
             variant={webhookStatus?.installed ? 'secondary' : 'primary'}
@@ -422,7 +489,7 @@ export function TwilioSetupPanel() {
               </p>
             ) : null}
             <p className="text-sm text-text-secondary mt-2">
-              Install webhooks to receive inbound messages
+              Install webhooks so inbound messages and delivery activity flow back into Snout OS.
             </p>
             {webhookStatus?.checkedAt && (
               <div className="text-xs text-text-secondary mt-1">
@@ -433,17 +500,16 @@ export function TwilioSetupPanel() {
         )}
       </Card>
 
-      {/* Test SMS */}
-      <Card className="mb-4">
+      <Card className="p-4">
         <div className="flex justify-between items-center mb-3">
           <h3 className="text-lg font-semibold">
-            Test SMS
+            Step 3: Sync numbers and send a live test
           </h3>
           <div className="flex gap-2">
             <Button
               variant="secondary"
               size="sm"
-              onClick={() => syncNumbers.mutate(undefined, { onSuccess: (d) => alert(d?.message ?? 'Numbers synced.'), onError: (e: any) => alert(e?.message ?? 'Sync failed.') })}
+              onClick={() => syncNumbers.mutate(undefined, { onSuccess: (d) => toastSuccess(d?.message ?? 'Numbers synced'), onError: (e: any) => toastError(e?.message ?? 'Sync failed') })}
               disabled={!providerStatus?.connected || syncNumbers.isPending}
             >
               {syncNumbers.isPending ? 'Syncing...' : 'Sync numbers'}
@@ -459,15 +525,20 @@ export function TwilioSetupPanel() {
           </div>
         </div>
         <p className="text-sm text-text-secondary">
-          Sync Twilio numbers into the app first if Test SMS says no number. Then send a test SMS using the same send pipeline.
+          Sync your Twilio inventory first if the app says no sending number is available. Then send a real test through the same pipeline your team will use in production.
         </p>
       </Card>
 
-      {/* Readiness Checks */}
-      <Card>
-        <h3 className="text-lg font-semibold mb-3">
-          Readiness Checks
-        </h3>
+      <Card className="p-4">
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <h3 className="text-lg font-semibold">Launch readiness</h3>
+            <p className="text-sm text-text-secondary">These checks confirm whether Twilio is actually ready to carry live messages.</p>
+          </div>
+          <Badge variant={readiness?.overall ? 'success' : 'warning'}>
+            {readiness?.overall ? 'Ready' : 'Needs attention'}
+          </Badge>
+        </div>
         <div className="flex flex-col gap-3">
           <div className="flex justify-between items-center">
             <span>Provider Connection</span>
@@ -534,7 +605,60 @@ export function TwilioSetupPanel() {
         </div>
       </Card>
 
-      {/* Connect Modal */}
+      {providerStatus?.connected && (
+        <Card className="p-4">
+          <div className="flex justify-between items-center">
+            <div>
+              <p className="font-semibold">Owner delivery check</p>
+              <p className="text-sm text-text-secondary">
+                Send one live message to the owner phone before opening Twilio to staff or customers.
+              </p>
+            </div>
+            <Button
+              size="sm"
+              onClick={async () => {
+                try {
+                  const res = await fetch('/api/setup/test-owner-sms', { method: 'POST' });
+                  const json = await res.json();
+                  if (json.success) {
+                    toastSuccess(`Test sent to ${json.phone} via ${json.provider}`);
+                  } else {
+                    toastError(`Failed: ${json.error}`);
+                  }
+                } catch {
+                  toastError('Failed to send test');
+                }
+              }}
+            >
+              Send test
+            </Button>
+          </div>
+        </Card>
+      )}
+
+      {providerStatus?.connected && (
+        <Card className="p-4">
+          <p className="font-semibold mb-2">Specialist compliance note</p>
+          <p className="text-sm text-text-secondary mb-2">
+            U.S. carriers require A2P 10DLC registration for business SMS. Without it, delivery can be filtered or blocked even if setup tests pass.
+          </p>
+          <div className="flex gap-2 flex-wrap">
+            <Badge variant="warning">Check Twilio Console</Badge>
+            <a
+              href="https://console.twilio.com/us1/develop/sms/regulatory-compliance/a2p-10dlc"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm underline text-primary"
+            >
+              Open A2P registration →
+            </a>
+          </div>
+          <p className="text-xs text-text-tertiary mt-2">
+            If you're using OpenPhone instead, A2P registration is handled by OpenPhone.
+          </p>
+        </Card>
+      )}
+
       {showConnectModal && (
         <Modal isOpen={showConnectModal} title="Connect Twilio Provider" onClose={() => setShowConnectModal(false)}>
           <div className="flex flex-col gap-4">
@@ -665,9 +789,9 @@ export function TwilioSetupPanel() {
                     onSuccess: () => {
                       setShowTestSMSModal(false);
                       setTestSMSForm({ destinationE164: '', fromClass: 'front_desk' });
-                      alert('Test SMS sent.');
+                      toastSuccess('Test SMS sent');
                     },
-                    onError: (err: any) => alert(err?.message || 'Failed to send test SMS'),
+                    onError: (err: any) => toastError(err?.message || 'Failed to send test SMS'),
                   });
                 }}
                 disabled={!testSMSForm.destinationE164.trim() || testSMS.isPending}
@@ -677,57 +801,6 @@ export function TwilioSetupPanel() {
             </div>
           </div>
         </Modal>
-      )}
-
-      {/* Test to Owner Button */}
-      {providerStatus?.connected && (
-        <Card className="p-4 mt-4">
-          <div className="flex justify-between items-center">
-            <div>
-              <p className="font-semibold">Send Test to Owner</p>
-              <p className="text-sm text-text-secondary">
-                Verify SMS delivery to the owner's personal phone
-              </p>
-            </div>
-            <Button
-              size="sm"
-              onClick={async () => {
-                try {
-                  const res = await fetch('/api/setup/test-owner-sms', { method: 'POST' });
-                  const json = await res.json();
-                  if (json.success) alert(`Test sent to ${json.phone} via ${json.provider}`);
-                  else alert(`Failed: ${json.error}`);
-                } catch { alert('Failed to send test'); }
-              }}
-            >
-              Send test
-            </Button>
-          </div>
-        </Card>
-      )}
-
-      {/* A2P 10DLC Status */}
-      {providerStatus?.connected && (
-        <Card className="p-4 mt-4">
-          <p className="font-semibold mb-2">A2P 10DLC Compliance</p>
-          <p className="text-sm text-text-secondary mb-2">
-            US carriers require A2P 10DLC registration for business SMS. Without it, messages may be filtered or blocked.
-          </p>
-          <div className="flex gap-2 flex-wrap">
-            <Badge variant="warning">Check Twilio Console</Badge>
-            <a
-              href="https://console.twilio.com/us1/develop/sms/regulatory-compliance/a2p-10dlc"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm underline text-primary"
-            >
-              Open A2P registration →
-            </a>
-          </div>
-          <p className="text-xs text-text-tertiary mt-2">
-            If you're using OpenPhone, A2P registration is handled by OpenPhone automatically.
-          </p>
-        </Card>
       )}
     </div>
   );

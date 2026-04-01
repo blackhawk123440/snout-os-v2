@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { MessageCircle, Phone, ChevronRight } from 'lucide-react';
 import { LayoutWrapper } from '@/components/layout';
 import { useQuery } from '@tanstack/react-query';
+import { AppCard, AppCardBody, AppCardHeader } from '@/components/app';
 
 const FAQ = [
   {
@@ -57,6 +58,23 @@ export default function ClientSupportPage() {
           <p className="text-sm text-text-secondary mt-0.5">
             Get help with your account
           </p>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <AppCard className="bg-[radial-gradient(circle_at_top_left,_rgba(59,130,246,0.10),_transparent_42%),linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.96))]">
+            <AppCardHeader title="Help should feel calm and obvious" />
+            <AppCardBody className="space-y-2 text-sm text-text-secondary">
+              <p>Support works best when clients can either solve common questions quickly or reach the care team without wondering which channel to use.</p>
+              <p>This page keeps both paths together: direct contact plus clear answers to the questions that come up most often.</p>
+            </AppCardBody>
+          </AppCard>
+          <AppCard>
+            <AppCardHeader title="Best next moves" />
+            <AppCardBody className="space-y-2 text-sm text-text-secondary">
+              <p>Use messages for visit-specific help or account questions.</p>
+              <p>Use the FAQs below when you want the fastest route to the right page.</p>
+            </AppCardBody>
+          </AppCard>
         </div>
 
         {/* Contact options */}

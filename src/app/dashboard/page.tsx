@@ -201,6 +201,15 @@ function DashboardContent() {
     refetchInterval: 30000,
   });
 
+  const { data: onboardingData } = useQuery({
+    queryKey: ['owner', 'onboarding'],
+    queryFn: async () => {
+      const res = await fetch('/api/ops/onboarding');
+      return res.ok ? res.json() : null;
+    },
+    staleTime: 120000,
+  });
+
   // KPI overview (7d/30d)
   const [kpiRange, setKpiRange] = useState<'7d' | '30d'>('7d');
   const [kpiCollapsed, setKpiCollapsed] = useState(true);
@@ -248,6 +257,8 @@ function DashboardContent() {
 
   const attentionCount =
     (attention?.alerts.length ?? 0) + (attention?.staffing.length ?? 0);
+  const hasLiveWorkToday =
+    (stats?.totalVisits ?? 0) > 0 || (stats?.unassignedCount ?? 0) > 0;
   const subtitle = boardData
     ? `${stats?.totalVisits ?? 0} visits today \u00b7 ${stats?.activeSittersCount ?? 0} sitters active${attentionCount > 0 ? ` \u00b7 ${attentionCount} need attention` : ''}`
     : '';
@@ -306,10 +317,10 @@ function DashboardContent() {
           <div className="mb-4 flex items-center justify-between rounded-2xl border border-status-warning-border bg-status-warning-bg px-4 py-3">
             <div>
               <p className="text-sm font-medium text-status-warning-text">Messaging not configured</p>
-              <p className="text-xs text-status-warning-text-secondary">SMS notifications won't send until you connect a provider.</p>
+              <p className="text-xs text-status-warning-text-secondary">Choose OpenPhone or Twilio if you want a connected U.S. business line.</p>
             </div>
-            <Link href="/settings?section=twilio" className="min-h-[44px] inline-flex items-center rounded-lg border border-status-warning-border px-3 text-sm font-medium text-status-warning-text hover:opacity-90 transition">
-              Set up now
+            <Link href="/settings?section=integrations" className="min-h-[44px] inline-flex items-center rounded-lg border border-status-warning-border px-3 text-sm font-medium text-status-warning-text hover:opacity-90 transition">
+              Review options
             </Link>
           </div>
         )}
@@ -344,6 +355,15 @@ function DashboardContent() {
           />
         ) : boardData ? (
           <div className="space-y-6">
+            <LaunchPriorityHero
+              boardDate={boardData.date}
+              stats={boardData.stats}
+              hasLiveWorkToday={hasLiveWorkToday}
+              onboardingData={onboardingData}
+              msgStatus={msgStatus}
+              paymentStats={paymentStats}
+            />
+
             {/* ── 1. KPI Row — above the fold, business state in 3 seconds ── */}
             <QuickStatsStrip stats={boardData.stats} />
 
@@ -356,22 +376,19 @@ function DashboardContent() {
             {/* ── 3. Today's Schedule — secondary, scrollable ── */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h2 className="text-sm font-semibold text-text-primary">Today&apos;s Schedule</h2>
+                <h2 className="text-sm font-semibold text-text-primary">
+                  {isToday(boardData.date) ? "Today's schedule" : `${formatDateLabel(boardData.date)} schedule`}
+                </h2>
                 <Link href="/bookings?view=calendar" className="text-xs font-medium text-accent-primary hover:underline">
                   Full calendar
                 </Link>
               </div>
 
               {sitterSchedules.length === 0 && unassigned.length === 0 ? (
-                <div className="rounded-2xl border border-border-default bg-surface-primary p-8 text-center">
-                  <p className="text-lg font-semibold text-text-primary">No visits scheduled</p>
-                  <p className="mt-1 text-sm text-text-secondary">
-                    No visits scheduled for {formatDateLabel(boardData.date)}. Book a visit or check another day.
-                  </p>
-                  <Link href="/bookings/new" className="mt-4 inline-block">
-                    <Button size="sm">New booking</Button>
-                  </Link>
-                </div>
+                <ZeroDayState
+                  boardDate={boardData.date}
+                  hasOnboardingWork={Boolean(onboardingData && !onboardingData.isComplete)}
+                />
               ) : (
                 <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr,380px]">
                   <div className="space-y-4 min-w-0">
@@ -472,7 +489,7 @@ function DashboardContent() {
 
             {/* Predictions + Onboarding */}
             <PredictionsCard />
-            <OnboardingWizard />
+            <OnboardingWizard data={onboardingData} />
 
             <div className="flex flex-wrap gap-3 border-t border-border-default pt-4">
               <Link href="/bookings?view=calendar" className="text-sm font-medium text-accent-primary hover:underline">
@@ -486,6 +503,129 @@ function DashboardContent() {
         ) : null}
       </LayoutWrapper>
     </OwnerAppShell>
+  );
+}
+
+type LaunchPriorityHeroProps = {
+  boardDate: string;
+  stats: BoardStats;
+  hasLiveWorkToday: boolean;
+  onboardingData: any;
+  msgStatus: any;
+  paymentStats: any;
+};
+
+function LaunchPriorityHero({
+  boardDate,
+  stats,
+  hasLiveWorkToday,
+  onboardingData,
+  msgStatus,
+  paymentStats,
+}: LaunchPriorityHeroProps) {
+  const pendingOnboarding = Array.isArray(onboardingData?.steps)
+    ? onboardingData.steps.filter((step: any) => !step.completed).slice(0, 3)
+    : [];
+  const onboardingIncomplete = Boolean(onboardingData && !onboardingData.isComplete);
+  const outstandingPayments = paymentStats?.outstanding?.count ?? 0;
+  const failedPayments = paymentStats?.failedPayments ?? 0;
+  const topFocus = hasLiveWorkToday
+    ? stats.unassignedCount > 0
+      ? 'Assign unstaffed visits before they become last-minute coverage issues.'
+      : stats.inProgressVisits > 0
+        ? 'Active visits are underway. Keep an eye on reports, messages, and timing.'
+        : 'Your board is stable. Stay ahead of messages, payments, and schedule changes.'
+    : onboardingIncomplete
+      ? 'Your workspace is still in launch mode. Finish the setup basics before inviting real customers.'
+      : `No visits are scheduled for ${formatDateLabel(boardDate)}. This is a good time to review growth, messaging, and customer readiness.`;
+
+  return (
+    <div className="grid gap-4 xl:grid-cols-[1.15fr_0.85fr]">
+      <div className="rounded-3xl border border-border-default bg-surface-primary p-5 shadow-sm">
+        <div className="flex flex-wrap items-center gap-2 mb-3">
+          <span className="inline-flex rounded-full bg-accent-tertiary px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-accent-primary">
+            {hasLiveWorkToday ? 'Operator view' : onboardingIncomplete ? 'Launch mode' : 'Calm day'}
+          </span>
+          {onboardingIncomplete && (
+            <span className="inline-flex rounded-full bg-status-warning-bg px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-status-warning-text">
+              Setup still in progress
+            </span>
+          )}
+        </div>
+        <h2 className="text-2xl font-bold text-text-primary">
+          {hasLiveWorkToday ? 'What matters most today' : onboardingIncomplete ? 'Build a launch-ready workspace' : 'Your operations are clear'}
+        </h2>
+        <p className="mt-2 max-w-2xl text-sm text-text-secondary">
+          {topFocus}
+        </p>
+
+        <div className="mt-5 flex flex-wrap gap-3">
+          {onboardingIncomplete && pendingOnboarding.length > 0 ? (
+            pendingOnboarding.map((step: any) => (
+              <Link
+                key={step.key}
+                href={STEP_LINKS[step.key] || '/settings'}
+                className="inline-flex min-h-[44px] items-center rounded-xl border border-border-default bg-surface-secondary px-4 text-sm font-medium text-text-primary hover:bg-surface-tertiary transition"
+              >
+                {step.label}
+              </Link>
+            ))
+          ) : (
+            <>
+              <Link href="/bookings/new">
+                <Button size="sm" leftIcon={<Plus className="w-3.5 h-3.5" />}>Create booking</Button>
+              </Link>
+              <Link href="/clients">
+                <Button variant="secondary" size="sm">Open clients</Button>
+              </Link>
+              <Link href="/settings?section=integrations">
+                <Button variant="secondary" size="sm">Review launch stack</Button>
+              </Link>
+            </>
+          )}
+        </div>
+      </div>
+
+      <div className="grid gap-3 sm:grid-cols-3 xl:grid-cols-1">
+        <div className="rounded-2xl border border-border-default bg-surface-primary p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-text-tertiary">Messaging</p>
+          <p className="mt-2 text-sm font-semibold text-text-primary">
+            {msgStatus?.active ? (msgStatus.nativeMode ? 'Native phone mode live' : 'Connected business messaging live') : 'Optional connection not set'}
+          </p>
+          <p className="mt-1 text-xs text-text-secondary">
+            {msgStatus?.active
+              ? msgStatus.message
+              : 'You can keep things simple with native phone mode or add OpenPhone/Twilio later.'}
+          </p>
+        </div>
+        <div className="rounded-2xl border border-border-default bg-surface-primary p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-text-tertiary">Payments</p>
+          <p className="mt-2 text-sm font-semibold text-text-primary">
+            {outstandingPayments > 0 || failedPayments > 0
+              ? `${outstandingPayments} outstanding · ${failedPayments} failed`
+              : 'No billing fires right now'}
+          </p>
+          <p className="mt-1 text-xs text-text-secondary">
+            {outstandingPayments > 0 || failedPayments > 0
+              ? 'Clear payment friction quickly so customers keep trusting the platform.'
+              : 'Your billing view looks calm from the owner dashboard.'}
+          </p>
+        </div>
+        <div className="rounded-2xl border border-border-default bg-surface-primary p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-text-tertiary">Coverage</p>
+          <p className="mt-2 text-sm font-semibold text-text-primary">
+            {stats.unassignedCount > 0
+              ? `${stats.unassignedCount} visit${stats.unassignedCount !== 1 ? 's' : ''} need staff`
+              : `${stats.activeSittersCount} sitters active`}
+          </p>
+          <p className="mt-1 text-xs text-text-secondary">
+            {stats.unassignedCount > 0
+              ? 'The fastest way to make the business feel responsive is getting every visit staffed.'
+              : 'Staffing is in a healthy state for this board.'}
+          </p>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -545,6 +685,45 @@ function QuickStatsStrip({ stats }: { stats: BoardStats }) {
           </div>
         );
       })}
+    </div>
+  );
+}
+
+function ZeroDayState({
+  boardDate,
+  hasOnboardingWork,
+}: {
+  boardDate: string;
+  hasOnboardingWork: boolean;
+}) {
+  return (
+    <div className="rounded-3xl border border-border-default bg-surface-primary p-8">
+      <div className="max-w-2xl">
+        <div className="inline-flex rounded-full bg-surface-secondary px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-text-secondary">
+          {hasOnboardingWork ? 'Launch workspace' : 'Open capacity'}
+        </div>
+        <h3 className="mt-4 text-2xl font-bold text-text-primary">
+          {hasOnboardingWork ? 'You are ready for launch prep, not busywork' : 'No visits are scheduled for this day'}
+        </h3>
+        <p className="mt-2 text-sm text-text-secondary">
+          {hasOnboardingWork
+            ? `Use ${formatDateLabel(boardDate)} to finish setup, rehearse the customer journey, and make your first real booking feel polished.`
+            : `Nothing is scheduled for ${formatDateLabel(boardDate)}. This is a good chance to follow up with clients, review staffing, or add new bookings.`}
+        </p>
+        <div className="mt-5 flex flex-wrap gap-3">
+          <Link href="/bookings/new">
+            <Button size="sm">Create booking</Button>
+          </Link>
+          <Link href="/clients">
+            <Button variant="secondary" size="sm">Review clients</Button>
+          </Link>
+          <Link href={hasOnboardingWork ? '/setup' : '/calendar'}>
+            <Button variant="secondary" size="sm">
+              {hasOnboardingWork ? 'Open launch setup' : 'Open calendar'}
+            </Button>
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }
@@ -1497,23 +1676,14 @@ const STEP_LINKS: Record<string, string> = {
   business_profile: '/settings?section=business',
   services_created: '/settings?section=services',
   team_setup: '/sitters',
-  messaging_setup: '/settings?section=twilio',
+  messaging_setup: '/settings?section=integrations',
   payments_setup: '/settings?section=integrations',
   branding_done: '/settings?section=branding',
   first_client: '/clients',
   first_booking: '/bookings/new',
 };
 
-function OnboardingWizard() {
-  const { data } = useQuery({
-    queryKey: ['owner', 'onboarding'],
-    queryFn: async () => {
-      const res = await fetch('/api/ops/onboarding');
-      return res.ok ? res.json() : null;
-    },
-    staleTime: 120000,
-  });
-
+function OnboardingWizard({ data }: { data: any }) {
   if (!data || data.isComplete) return null;
 
   const steps = data.steps || [];
@@ -1524,9 +1694,12 @@ function OnboardingWizard() {
   return (
     <div className="mb-4 rounded-2xl border border-border-default bg-surface-primary p-4">
       <div className="flex items-center justify-between mb-2">
-        <h3 className="text-sm font-semibold text-text-primary">Complete Your Setup</h3>
+        <h3 className="text-sm font-semibold text-text-primary">Launch checklist</h3>
         <span className="text-xs text-text-tertiary">{completed}/{total} steps</span>
       </div>
+      <p className="mb-3 text-sm text-text-secondary">
+        Keep the product sellable by finishing the essentials first: setup, team, billing, messaging, and a real booking rehearsal.
+      </p>
       <div className="h-2 rounded-full bg-surface-tertiary mb-3 overflow-hidden">
         <div className="h-full rounded-full bg-accent-primary transition-all" style={{ width: `${pct}%` }} />
       </div>

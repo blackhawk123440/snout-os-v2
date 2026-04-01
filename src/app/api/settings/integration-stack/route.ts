@@ -45,11 +45,13 @@ const DEFAULT_CONFIG = {
 
 async function checkMessagingStatus(
   db: any,
-  orgId: string,
   provider: string
 ): Promise<{ configured: boolean; detail: string }> {
   if (provider === 'none') {
-    return { configured: true, detail: 'SMS disabled — clients use portal and email only' };
+    return {
+      configured: true,
+      detail: 'Native phone mode active — owners, sitters, and clients can use their normal numbers',
+    };
   }
 
   if (provider === 'twilio') {
@@ -61,7 +63,7 @@ async function checkMessagingStatus(
     return {
       configured,
       detail: configured
-        ? `${hasNumbers} number(s) active`
+        ? `${hasNumbers} Twilio number(s) active for your U.S. business connection`
         : !hasCreds
           ? 'Twilio credentials not configured'
           : 'No phone numbers provisioned',
@@ -75,7 +77,7 @@ async function checkMessagingStatus(
     return {
       configured,
       detail: configured
-        ? 'OpenPhone connected'
+        ? 'OpenPhone connected as your optional U.S. business line'
         : !hasCreds
           ? 'OpenPhone API key not configured'
           : 'Webhook secret missing',
@@ -166,7 +168,7 @@ export async function GET() {
 
     // Run live status checks in parallel
     const [messaging, payment, calendar] = await Promise.all([
-      checkMessagingStatus(db, ctx.orgId, config.messagingProvider),
+      checkMessagingStatus(db, config.messagingProvider),
       checkPaymentStatus(config.paymentProvider),
       checkCalendarStatus(db, config.calendarProvider),
     ]);

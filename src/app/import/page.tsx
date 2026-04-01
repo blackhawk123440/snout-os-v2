@@ -134,8 +134,28 @@ export default function ImportPage() {
       <LayoutWrapper variant="narrow">
         <AppPageHeader
           title="Import Clients"
-          subtitle="Migrate your client and pet data from another platform"
+          subtitle="Move client and pet data into Snout with a safer, more guided migration flow."
         />
+
+        {step !== 'done' && (
+          <div className="mb-6 grid gap-4 md:grid-cols-2">
+            <AppCard className="bg-[radial-gradient(circle_at_top_left,_rgba(59,130,246,0.10),_transparent_42%),linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.96))]">
+              <AppCardHeader title="A premium migration should feel safe" />
+              <AppCardBody className="space-y-2 text-sm text-text-secondary">
+                <p>Import is a trust moment. Owners need to know what platform they are coming from, what data will map cleanly, and what will be reviewed before anything changes in the live workspace.</p>
+                <p>This flow keeps migration simple: choose the source, preview the mapping, then import only after the data looks right.</p>
+              </AppCardBody>
+            </AppCard>
+            <AppCard>
+              <AppCardHeader title="What to expect" />
+              <AppCardBody className="space-y-2 text-sm text-text-secondary">
+                <p>Supported exports map client identity, contact details, addresses, and pet records where available.</p>
+                <p>Rows missing both email and phone are flagged before import so bad data does not quietly pollute the system.</p>
+                <p>After import, the team can move directly into clients and bookings without starting from scratch.</p>
+              </AppCardBody>
+            </AppCard>
+          </div>
+        )}
 
         {/* Step: Platform selection */}
         {step === 'platform' && (
@@ -178,6 +198,9 @@ export default function ImportPage() {
                 </p>
               </AppCardHeader>
               <AppCardBody>
+                <div className="mb-4 rounded-xl border border-border-default bg-surface-secondary px-4 py-3 text-sm text-text-secondary">
+                  Your data is previewed before import. Nothing is written into the workspace until you confirm the mapped rows.
+                </div>
                 <div
                   onDrop={handleDrop}
                   onDragOver={(e) => e.preventDefault()}
@@ -239,7 +262,7 @@ export default function ImportPage() {
             {warningRows.length > 0 && (
               <div className="flex items-center gap-2 rounded-lg bg-status-warning-bg px-3 py-2 text-sm text-status-warning-text">
                 <AlertTriangle className="h-4 w-4 shrink-0" />
-                {warningRows.length} row{warningRows.length > 1 ? 's' : ''} missing email and phone — will be skipped
+                {warningRows.length} row{warningRows.length > 1 ? 's' : ''} missing email and phone will be skipped unless corrected first
               </div>
             )}
 
@@ -297,11 +320,11 @@ export default function ImportPage() {
 
         {/* Step: Importing */}
         {step === 'importing' && (
-          <div className="mt-8 flex flex-col items-center justify-center text-center">
-            <div className="h-8 w-8 animate-spin rounded-full border-4 border-accent-primary border-t-transparent" />
-            <p className="mt-4 text-sm font-medium text-text-primary">Importing...</p>
+            <div className="mt-8 flex flex-col items-center justify-center text-center">
+              <div className="h-8 w-8 animate-spin rounded-full border-4 border-accent-primary border-t-transparent" />
+            <p className="mt-4 text-sm font-medium text-text-primary">Importing your migration...</p>
             <p className="mt-1 text-xs text-text-tertiary">
-              Processing {uniqueClients} clients and {totalPets} pets
+              Processing {uniqueClients} clients and {totalPets} pets with duplicate and mapping checks
             </p>
           </div>
         )}

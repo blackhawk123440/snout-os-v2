@@ -1,4 +1,5 @@
 import IORedis from "ioredis";
+import { isBuildPhase } from "@/lib/runtime-phase";
 
 export type ProviderName = "twilio";
 
@@ -38,7 +39,7 @@ const localState = new Map<string, MutableState>();
 let redisClient: IORedis | null = null;
 
 function redisEnabled(): boolean {
-  if (process.env.NODE_ENV === "test") return false;
+  if (process.env.NODE_ENV === "test" || isBuildPhase) return false;
   return !!process.env.REDIS_URL;
 }
 
@@ -46,9 +47,10 @@ function getRedis(): IORedis | null {
   if (!redisEnabled()) return null;
   if (!redisClient) {
     redisClient = new IORedis(process.env.REDIS_URL!, {
-      maxRetriesPerRequest: 1,
+      maxRetriesPerRequest: null,
       enableAutoPipelining: true,
       lazyConnect: true,
+      enableOfflineQueue: false,
     });
   }
   return redisClient;

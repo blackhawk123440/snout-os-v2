@@ -17,7 +17,6 @@ import { TemplatesSection } from './sections/TemplatesSection';
 import { ReviewsSection } from './sections/ReviewsSection';
 import { DigestSection } from './sections/DigestSection';
 import { BundlesSection } from './sections/BundlesSection';
-import { IntegrationsFullSection } from './sections/IntegrationsFullSection';
 import { IntegrationStackSection } from './sections/IntegrationStackSection';
 import { NumbersPanel } from '@/components/messaging/NumbersPanel';
 import { AssignmentsPanel } from '@/components/messaging/AssignmentsPanel';
@@ -81,11 +80,15 @@ const SECTION_IDS: SettingsSection[] = [
 
 const SECTION_GROUPS: { label: string; items: SettingsSection[] }[] = [
   { label: 'General', items: ['business', 'branding'] },
-  { label: 'Services', items: ['services', 'pricing', 'tiers', 'bundles'] },
-  { label: 'Communication', items: ['notifications', 'templates', 'reviews', 'digest'] },
-  { label: 'Messaging', items: ['numbers', 'routing', 'twilio', 'openphone'] },
-  { label: 'Advanced', items: ['ai', 'integrations', 'advanced'] },
+  { label: 'Services', items: ['services', 'pricing', 'bundles'] },
+  { label: 'Customer Experience', items: ['notifications', 'templates', 'reviews', 'digest'] },
+  { label: 'Launch', items: ['integrations'] },
 ];
+
+const SUPPORT_SECTION_GROUP: { label: string; items: SettingsSection[] } = {
+  label: 'Support Tools',
+  items: ['numbers', 'routing', 'twilio', 'openphone', 'tiers', 'ai', 'advanced'],
+};
 
 const SECTION_DESCRIPTIONS: Record<SettingsSection, string> = {
   business: 'Company name, phone, email, and timezone',
@@ -99,13 +102,22 @@ const SECTION_DESCRIPTIONS: Record<SettingsSection, string> = {
   reviews: 'Review collection and display settings',
   digest: 'Daily and weekly digest email configuration',
   bundles: 'Service bundle packages',
-  integrations: 'Messaging, payments, calendar, accounting, and booking intake',
+  integrations: 'Messaging choices, payments, calendar, accounting, and booking intake',
   numbers: 'Phone number management',
   routing: 'Message thread routing and assignments',
-  twilio: 'Twilio account configuration',
-  openphone: 'OpenPhone account configuration',
+  twilio: 'Optional Twilio U.S. business connection',
+  openphone: 'Optional OpenPhone U.S. business connection',
   advanced: 'Rotation rules, service areas, and system config',
 };
+
+function isSupportSettingsSection(section: SettingsSection) {
+  return SUPPORT_SECTION_GROUP.items.includes(section);
+}
+
+function visibleSectionGroups(activeTab: SettingsSection) {
+  if (!isSupportSettingsSection(activeTab)) return SECTION_GROUPS;
+  return [...SECTION_GROUPS, { label: SUPPORT_SECTION_GROUP.label, items: [activeTab] }];
+}
 
 function SettingsContent() {
   const searchParams = useSearchParams();
@@ -113,6 +125,8 @@ function SettingsContent() {
   const [activeTab, setActiveTab] = useState<SettingsSection>(
     sectionParam && SECTION_IDS.includes(sectionParam) ? sectionParam : 'business'
   );
+  const groups = visibleSectionGroups(activeTab);
+  const inSupportSection = isSupportSettingsSection(activeTab);
 
   useEffect(() => {
     if (sectionParam && SECTION_IDS.includes(sectionParam)) {
@@ -124,13 +138,28 @@ function SettingsContent() {
     <OwnerAppShell>
       <AppPageHeader
         title="Settings"
-        subtitle="Business, services, pricing, notifications, and advanced configuration"
+        subtitle="Business setup, services, customer experience, and launch settings"
       />
 
       {/* Mobile: horizontally scrollable grouped chips */}
       <div className="lg:hidden">
+        {inSupportSection && (
+          <div className="mb-3 rounded-xl border border-border-default bg-surface-secondary px-4 py-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">Support Tool</p>
+            <p className="mt-1 text-sm text-text-secondary">
+              You’re in a deeper configuration area. Most owners can stay in the main settings sections for day-to-day setup.
+            </p>
+            <button
+              type="button"
+              onClick={() => setActiveTab('integrations')}
+              className="mt-3 text-sm font-medium text-accent-primary hover:underline"
+            >
+              Back to core settings
+            </button>
+          </div>
+        )}
         <div className="flex gap-2 overflow-x-auto pb-3 -mx-1 px-1" style={{ WebkitOverflowScrolling: 'touch', scrollSnapType: 'x mandatory' }}>
-          {SECTION_GROUPS.flatMap((g) => g.items).map((id) => (
+          {groups.flatMap((g) => g.items).map((id) => (
             <button
               key={id}
               type="button"
@@ -155,7 +184,7 @@ function SettingsContent() {
       {/* Desktop: sidebar navigation + content */}
       <div className="hidden lg:grid lg:grid-cols-[220px_1fr] lg:gap-6">
         <nav className="space-y-5">
-          {SECTION_GROUPS.map((group) => (
+          {groups.map((group) => (
             <div key={group.label}>
               <p className="px-3 pb-1.5 text-[10px] font-semibold uppercase tracking-widest text-text-disabled">
                 {group.label}
@@ -179,11 +208,46 @@ function SettingsContent() {
               </div>
             </div>
           ))}
+          {!inSupportSection && (
+            <div className="rounded-xl border border-border-default bg-surface-secondary p-3">
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-text-disabled">
+                Support Tools
+              </p>
+              <p className="mt-1 text-xs text-text-tertiary">
+                Specialist setup for connectors, routing, AI, and internal operating rules.
+              </p>
+              <div className="mt-3 flex flex-col gap-1">
+                {SUPPORT_SECTION_GROUP.items.map((id) => (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => setActiveTab(id)}
+                    className="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-sm text-text-secondary transition hover:bg-surface-primary hover:text-text-primary"
+                  >
+                    <span className="w-4 h-4 shrink-0">{sectionIcon(id)}</span>
+                    <span>{sectionLabel(id)}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </nav>
         <div className="min-w-0">
           <div className="mb-4">
-            <h2 className="text-lg font-semibold text-text-primary">{sectionLabel(activeTab)}</h2>
+            <div className="flex items-center gap-2">
+              <h2 className="text-lg font-semibold text-text-primary">{sectionLabel(activeTab)}</h2>
+              {inSupportSection && <Badge variant="neutral">Support Tool</Badge>}
+            </div>
             <p className="text-sm text-text-tertiary mt-0.5">{SECTION_DESCRIPTIONS[activeTab]}</p>
+            {inSupportSection && (
+              <button
+                type="button"
+                onClick={() => setActiveTab('integrations')}
+                className="mt-2 text-sm font-medium text-accent-primary hover:underline"
+              >
+                Back to core settings
+              </button>
+            )}
           </div>
           <SectionContent section={activeTab} />
         </div>
@@ -560,6 +624,12 @@ function PricingSection() {
 
   return (
     <Card>
+      <div className="mb-6 rounded-xl border border-border-default bg-surface-secondary px-4 py-4">
+        <p className="text-sm font-semibold text-text-primary">Pricing setup</p>
+        <p className="mt-1 text-sm text-text-secondary">
+          Keep your launch pricing simple. Use this area to review the rules already in place, then expand into discounts and advanced pricing logic as the business grows.
+        </p>
+      </div>
       <h3 className="mb-4 text-lg">
         Pricing rules
       </h3>
@@ -571,7 +641,7 @@ function PricingSection() {
       {rules.length === 0 ? (
         <EmptyState
           title="No pricing rules"
-          description="Pricing rules define fees, discounts, or multipliers. Add rules via API or future UI."
+          description="No advanced pricing rules are active. This is fine for launch if you’re using straightforward service pricing."
         />
       ) : (
         <ul className="list-none p-0 m-0">
@@ -599,7 +669,7 @@ function PricingSection() {
       {discounts.length === 0 ? (
         <EmptyState
           title="No discounts"
-          description="Discount codes and automatic discounts. Add via API or future UI."
+          description="No discounts are active right now. Add them later when you want promo codes or automatic offers."
         />
       ) : (
         <ul className="list-none p-0 m-0">
@@ -704,6 +774,12 @@ function NotificationsSection() {
 
   return (
     <Card>
+      <div className="mb-6 rounded-xl border border-border-default bg-surface-secondary px-4 py-4">
+        <p className="text-sm font-semibold text-text-primary">Customer communication defaults</p>
+        <p className="mt-1 text-sm text-text-secondary">
+          Choose the channels your business uses by default, then control which reminders and alerts stay on for owners, sitters, and clients.
+        </p>
+      </div>
       <h3 className="mb-4 text-lg">
         Notification preferences
       </h3>
@@ -717,6 +793,16 @@ function NotificationsSection() {
           Saved.
         </Alert>
       )}
+      <div className="mb-5 grid gap-3 md:grid-cols-2">
+        <div className="rounded-xl border border-border-default bg-surface-secondary px-4 py-3">
+          <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">Primary Channels</p>
+          <p className="mt-1 text-sm text-text-secondary">Turn your core outbound channels on or off for the workspace.</p>
+        </div>
+        <div className="rounded-xl border border-border-default bg-surface-secondary px-4 py-3">
+          <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">Operational Alerts</p>
+          <p className="mt-1 text-sm text-text-secondary">Decide which reminders and owner-side alerts are part of the daily workflow.</p>
+        </div>
+      </div>
       <FormRow>
         <label style={{ cursor: 'pointer' }}>
           <Flex align="center" gap={3}>
@@ -801,6 +887,12 @@ function NotificationsSection() {
 function TiersSection() {
   return (
     <Card>
+      <div className="mb-6 rounded-xl border border-border-default bg-surface-secondary px-4 py-4">
+        <p className="text-sm font-semibold text-text-primary">Support tool</p>
+        <p className="mt-1 text-sm text-text-secondary">
+          Tier policies are useful once the team and incentive model are more mature. Most owners can ignore this during launch.
+        </p>
+      </div>
       <h3 className="mb-4 text-lg">
         Policy tiers
       </h3>
@@ -822,6 +914,12 @@ function TiersSection() {
 function AISection() {
   return (
     <Card>
+      <div className="mb-6 rounded-xl border border-border-default bg-surface-secondary px-4 py-4">
+        <p className="text-sm font-semibold text-text-primary">Support tool</p>
+        <p className="mt-1 text-sm text-text-secondary">
+          AI governance is an advanced operating area. Use it when you’re ready to manage budgets, prompts, and automation behavior more directly.
+        </p>
+      </div>
       <h3 className="mb-4 text-lg">
         AI governance
       </h3>
@@ -884,6 +982,12 @@ function AdvancedSection() {
   return (
     <>
       <Card className="mb-6">
+        <div className="mb-6 rounded-xl border border-border-default bg-surface-secondary px-4 py-4">
+          <p className="text-sm font-semibold text-text-primary">Support tool</p>
+          <p className="mt-1 text-sm text-text-secondary">
+            These controls affect internal operating behavior like pool rotation and service coverage. They matter for scale, but they are not part of the normal day-one setup path.
+          </p>
+        </div>
         <h3 className="mb-4 text-lg">
           Rotation (pool number lifecycle)
         </h3>
@@ -940,7 +1044,7 @@ function AdvancedSection() {
         ) : areas.length === 0 ? (
           <EmptyState
             title="No service areas"
-            description="Define coverage zones (ZIPs, radius, or polygon). Add via API or future UI."
+            description="No formal service areas are configured yet. That can be acceptable early on if your team already knows the territory."
           />
         ) : (
           <ul className="list-none p-0 m-0">
@@ -961,7 +1065,7 @@ function AdvancedSection() {
           Org config
         </h3>
         <p className="text-text-secondary">
-          Org metadata and feature flags are managed in the database. No editable controls here yet.
+          Org metadata and feature flags are still managed behind the scenes. There are no day-to-day controls needed here right now.
         </p>
       </Card>
     </>

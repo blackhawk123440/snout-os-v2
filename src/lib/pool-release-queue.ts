@@ -6,15 +6,13 @@
  */
 
 import { Queue, Worker } from "bullmq";
-import IORedis from "ioredis";
 import { releasePoolNumbers } from "./messaging/pool-release-job";
 import { attachQueueWorkerInstrumentation } from "@/lib/queue-observability";
 import { resolveCorrelationId } from "@/lib/correlation-id";
+import { createRedisConnection } from "@/lib/redis-config";
 
 // Redis connection
-const connection = new IORedis(process.env.REDIS_URL || "redis://localhost:6379", {
-  maxRetriesPerRequest: null, // Required by BullMQ
-});
+const connection = createRedisConnection();
 
 // Create pool release queue
 export const poolReleaseQueue = new Queue("pool-release", {

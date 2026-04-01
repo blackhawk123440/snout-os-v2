@@ -75,6 +75,14 @@ function ClientHomeContent() {
     : null;
 
   const threadCount = messagesData?.threads?.length ?? null;
+  const onboardingRemaining = onboarding
+    ? [
+        !onboarding.hasPets ? 'Add your pets' : null,
+        !onboarding.hasEmergencyContact ? 'Add an emergency contact' : null,
+        !onboarding.hasAddress ? 'Confirm your home address' : null,
+        !onboarding.hasHomeAccess ? 'Add home access details' : null,
+      ].filter(Boolean) as string[]
+    : [];
 
   const daysSinceReport = data?.latestReport
     ? Math.floor((now - new Date(data.latestReport.createdAt).getTime()) / (1000 * 60 * 60 * 24))
@@ -108,6 +116,14 @@ function ClientHomeContent() {
         />
       ) : data ? (
         <div className="space-y-4">
+          <ClientPriorityHero
+            firstName={firstName}
+            nextVisit={nextVisit}
+            pendingBookingsCount={pendingBookings.length}
+            hasOutstandingBalance={Boolean(balanceData?.hasOutstanding)}
+            onboardingRemaining={onboardingRemaining}
+          />
+
           {/* ─── Page Header ───────────────────────────────────── */}
           <div className="flex items-start justify-between gap-3">
             <div>
@@ -260,13 +276,15 @@ function ClientHomeContent() {
               </div>
             </div>
           ) : (
-            <div className="rounded-2xl bg-accent-tertiary p-8 text-center">
+            <div className="rounded-3xl bg-accent-tertiary p-8 text-center">
               <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-accent-primary shadow-sm mb-4">
                 <Calendar className="h-7 w-7 text-text-inverse" />
               </div>
-              <p className="text-xl font-bold text-text-primary">No upcoming visits</p>
+              <p className="text-xl font-bold text-text-primary">No upcoming visits yet</p>
               <p className="mt-2 text-sm text-text-secondary max-w-[280px] mx-auto leading-relaxed">
-                Book a visit and we&apos;ll take great care of them.
+                {onboardingRemaining.length > 0
+                  ? 'Finish a few essentials, then book with confidence knowing your care team has what they need.'
+                  : 'Book a visit when you are ready and your care team will take it from there.'}
               </p>
               <div className="mt-6 flex justify-center gap-3">
                 <Link href="/client/bookings/new">
@@ -395,6 +413,64 @@ function ClientHomeContent() {
         </div>
       ) : null}
     </LayoutWrapper>
+  );
+}
+
+function ClientPriorityHero({
+  firstName,
+  nextVisit,
+  pendingBookingsCount,
+  hasOutstandingBalance,
+  onboardingRemaining,
+}: {
+  firstName: string;
+  nextVisit: any;
+  pendingBookingsCount: number;
+  hasOutstandingBalance: boolean;
+  onboardingRemaining: string[];
+}) {
+  const topMessage = nextVisit
+    ? 'Your next visit is lined up. Use this space to stay ahead of updates, reports, and anything your sitter might need.'
+    : onboardingRemaining.length > 0
+      ? 'A few quick setup details will make your first booking smoother and safer.'
+      : 'You are ready to book whenever you need care. We will keep everything in one calm place once visits are scheduled.';
+
+  return (
+    <div className="rounded-3xl border border-border-default bg-surface-primary p-5 shadow-sm">
+      <div className="flex flex-wrap items-center gap-2 mb-3">
+        <span className="inline-flex rounded-full bg-accent-tertiary px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-accent-primary">
+          Client care hub
+        </span>
+        {pendingBookingsCount > 0 && (
+          <span className="inline-flex rounded-full bg-status-warning-bg px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-status-warning-text">
+            {pendingBookingsCount} pending
+          </span>
+        )}
+        {hasOutstandingBalance && (
+          <span className="inline-flex rounded-full bg-status-danger-bg px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-status-danger-text">
+            Billing attention
+          </span>
+        )}
+      </div>
+      <h2 className="text-2xl font-bold text-text-primary">
+        {nextVisit ? `Everything for ${firstName}'s care is in one place` : `You're in the right place, ${firstName}`}
+      </h2>
+      <p className="mt-2 max-w-2xl text-sm text-text-secondary">
+        {topMessage}
+      </p>
+      {onboardingRemaining.length > 0 && (
+        <div className="mt-4 flex flex-wrap gap-2">
+          {onboardingRemaining.slice(0, 3).map((item) => (
+            <span
+              key={item}
+              className="inline-flex rounded-xl border border-border-default bg-surface-secondary px-3 py-2 text-xs font-medium text-text-primary"
+            >
+              {item}
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
 

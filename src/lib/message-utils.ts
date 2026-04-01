@@ -8,6 +8,7 @@ import { getOwnerOpenPhoneNumberId } from "@/lib/phone-utils";
 import { formatPhoneForAPI } from "@/lib/phone-format";
 import { prisma } from "@/lib/db";
 import { isMessagingReady } from "@/lib/messaging-guard";
+import { getOrgMessagingProviderType } from "@/lib/messaging/provider-factory";
 
 /**
  * Send SMS message using the appropriate method (OpenPhone or fallback)
@@ -19,7 +20,8 @@ import { isMessagingReady } from "@/lib/messaging-guard";
 export async function sendMessage(
   to: string | null | undefined,
   message: string,
-  bookingId?: string
+  bookingId?: string,
+  orgId = 'default'
 ): Promise<boolean> {
   try {
     if (!to || !message) {
@@ -28,9 +30,10 @@ export async function sendMessage(
     }
 
     // Check if messaging is provisioned before attempting send
-    const ready = await isMessagingReady('default');
+    const ready = await isMessagingReady(orgId);
     if (!ready) {
-      console.warn(`[sendMessage] SMS not provisioned — message to ${to?.slice(0, 6)}... queued but not sent`);
+      const providerType = await getOrgMessagingProviderType(orgId).catch(() => 'none');
+      console.warn(`[sendMessage] Provider-backed messaging not enabled (${providerType}) — message to ${to?.slice(0, 6)}... skipped`);
       return false;
     }
 
@@ -86,7 +89,6 @@ export async function sendMessage(
     return false;
   }
 }
-
 
 
 

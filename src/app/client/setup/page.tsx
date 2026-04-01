@@ -241,8 +241,11 @@ export default function ClientSetupPage() {
       <div className="mx-auto w-full max-w-lg">
         {/* Header */}
         <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold text-text-primary">Welcome, {clientName.split(' ')[0] || 'there'}!</h1>
-          <p className="mt-1 text-sm text-text-secondary">Let&apos;s get your account set up</p>
+          <div className="inline-flex rounded-full bg-accent-tertiary px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-accent-primary">
+            Client setup
+          </div>
+          <h1 className="mt-4 text-2xl font-bold text-text-primary">Welcome, {clientName.split(' ')[0] || 'there'}!</h1>
+          <p className="mt-1 text-sm text-text-secondary">Let&apos;s get your account ready so booking and home access feel easy from day one.</p>
         </div>
 
         {/* Progress */}
@@ -267,6 +270,15 @@ export default function ClientSetupPage() {
         {error && (
           <div className="mb-4 rounded-lg bg-status-danger-bg border border-status-danger-border px-4 py-3">
             <p className="text-sm text-status-danger-text">{error}</p>
+          </div>
+        )}
+
+        {step !== 'complete' && (
+          <div className="mb-4 rounded-2xl border border-border-default bg-surface-primary p-4">
+            <p className="text-sm font-semibold text-text-primary">Why this matters</p>
+            <p className="mt-1 text-xs leading-5 text-text-secondary">
+              A complete profile helps your sitter arrive prepared, access your home smoothly, and care for your pets without last-minute back-and-forth.
+            </p>
           </div>
         )}
 
@@ -426,7 +438,7 @@ export default function ClientSetupPage() {
             </div>
             <h2 className="text-xl font-bold text-text-primary">You&apos;re all set!</h2>
             <p className="mt-2 text-sm text-text-secondary max-w-[300px] mx-auto leading-relaxed">
-              Your account is ready. You can manage your pets, bookings, and more from your dashboard.
+              Your account is ready. You can manage pets, request visits, review reports, and keep everything with your care team in one place.
             </p>
             <a href="/client/home" className="mt-6 inline-flex items-center gap-2 min-h-[44px] px-6 rounded-lg bg-accent-primary text-text-inverse text-sm font-semibold transition hover:brightness-90">
               View your dashboard

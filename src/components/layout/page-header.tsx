@@ -20,15 +20,15 @@ export interface PageHeaderProps {
 
 export function PageHeader({ title, subtitle, actions, breadcrumbs, className, testId }: PageHeaderProps) {
   return (
-    <header className={cn('mb-4', className)} data-testid={testId ?? 'page-header'}>
+    <header className={cn('mb-6', className)} data-testid={testId ?? 'page-header'}>
       {breadcrumbs && <div className="mb-1.5">{breadcrumbs}</div>}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div className="min-w-0 flex-1">
-          <h1 className="text-xl font-semibold tracking-tight text-text-primary lg:text-2xl">
+          <h1 className="text-2xl font-bold tracking-tight text-text-primary lg:text-3xl">
             {title}
           </h1>
           {subtitle && (
-            <p className="mt-0.5 text-sm text-text-secondary">{subtitle}</p>
+            <p className="mt-1 max-w-3xl text-sm leading-6 text-text-secondary">{subtitle}</p>
           )}
         </div>
         {actions && (

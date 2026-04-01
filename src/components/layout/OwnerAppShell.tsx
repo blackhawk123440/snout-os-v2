@@ -39,33 +39,34 @@ export const OWNER_SIDEBAR_SECTIONS: SidebarSection[] = [
       { label: 'Clients', href: '/clients', icon: 'fas fa-address-book' },
       { label: 'Team', href: '/sitters', icon: 'fas fa-user-friends' },
       { label: 'Messages', href: '/messaging', icon: 'fas fa-comments' },
-      { label: 'Money', href: '/money', icon: 'fas fa-dollar-sign' },
+      { label: 'Billing', href: '/money', icon: 'fas fa-dollar-sign' },
       { label: 'Settings', href: '/settings', icon: 'fas fa-cog' },
     ],
   },
-  {
-    title: 'Diagnostics',
-    muted: true,
-    items: [
-      {
-        label: 'Diagnostics',
-        href: '/ops/diagnostics',
-        icon: 'fas fa-stethoscope',
-        defaultCollapsed: true,
-        children: [
-          { label: 'Automation Failures', href: '/ops/automation-failures', icon: 'fas fa-triangle-exclamation' },
-          { label: 'Queue Failures', href: '/ops/failures', icon: 'fas fa-list-check' },
-          { label: 'Message Failures', href: '/ops/message-failures', icon: 'fas fa-comment-slash' },
-          { label: 'Calendar Repair', href: '/ops/calendar-repair', icon: 'fas fa-calendar-check' },
-          { label: 'Payout Operations', href: '/ops/payouts', icon: 'fas fa-sack-dollar' },
-          { label: 'Reconciliation', href: '/ops/finance/reconciliation', icon: 'fas fa-scale-balanced' },
-          { label: 'AI Ops', href: '/ops/ai', icon: 'fas fa-robot' },
-          { label: 'Exceptions', href: '/exceptions', icon: 'fas fa-flag' },
-        ],
-      },
-    ],
-  },
 ];
+
+export const OWNER_SUPPORT_SECTION: SidebarSection = {
+  title: 'Support Tools',
+  muted: true,
+  items: [
+    {
+      label: 'Operations Center',
+      href: '/ops/diagnostics',
+      icon: 'fas fa-stethoscope',
+      defaultCollapsed: true,
+      children: [
+        { label: 'Automation Failures', href: '/ops/automation-failures', icon: 'fas fa-triangle-exclamation' },
+        { label: 'Queue Failures', href: '/ops/failures', icon: 'fas fa-list-check' },
+        { label: 'Message Failures', href: '/ops/message-failures', icon: 'fas fa-comment-slash' },
+        { label: 'Calendar Repair', href: '/ops/calendar-repair', icon: 'fas fa-calendar-check' },
+        { label: 'Payout Operations', href: '/ops/payouts', icon: 'fas fa-sack-dollar' },
+        { label: 'Reconciliation', href: '/ops/finance/reconciliation', icon: 'fas fa-scale-balanced' },
+        { label: 'AI Ops', href: '/ops/ai', icon: 'fas fa-robot' },
+        { label: 'Exceptions', href: '/exceptions', icon: 'fas fa-flag' },
+      ],
+    },
+  ],
+};
 
 /** Flat list of all sidebar links (for mobile drawer and active matching). */
 function flattenSidebarItems(sections: SidebarSection[]): OwnerNavItem[] {
@@ -88,6 +89,7 @@ const OWNER_SIDEBAR_NAV_FLAT = flattenSidebarItems(OWNER_SIDEBAR_SECTIONS);
 const OWNER_PRIMARY_NAV: OwnerNavItem[] = [
   { label: 'Dashboard', href: '/dashboard', icon: 'fas fa-chart-line' },
   { label: 'Bookings', href: '/bookings', icon: 'fas fa-calendar-check' },
+  { label: 'Clients', href: '/clients', icon: 'fas fa-address-book' },
   { label: 'Messages', href: '/messaging', icon: 'fas fa-comments' },
 ];
 
@@ -134,8 +136,8 @@ const HEADER_MAP: Array<{ match: (p: string) => boolean; title: string; subtitle
   },
   {
     match: (p) => p.startsWith('/money'),
-    title: 'Money',
-    subtitle: 'Payments, finance, reports, and analytics',
+    title: 'Billing',
+    subtitle: 'Payments, revenue, payouts, and financial visibility',
   },
   {
     match: (p) => p.startsWith('/numbers'),
@@ -247,6 +249,17 @@ export function OwnerAppShell({ children }: { children: React.ReactNode }) {
     commitSha: string;
     buildTime: string | null;
   } | null>(null);
+  const isSupportRoute =
+    pathname.startsWith('/ops') ||
+    pathname.startsWith('/exceptions') ||
+    pathname.startsWith('/numbers') ||
+    pathname.startsWith('/assignments') ||
+    pathname.startsWith('/twilio-setup') ||
+    pathname.startsWith('/integrations') ||
+    pathname.startsWith('/finance');
+  const sidebarSections = isSupportRoute
+    ? [...OWNER_SIDEBAR_SECTIONS, OWNER_SUPPORT_SECTION]
+    : OWNER_SIDEBAR_SECTIONS;
 
   useEffect(() => {
     if (!loading && !user) router.replace('/login');
@@ -339,9 +352,9 @@ export function OwnerAppShell({ children }: { children: React.ReactNode }) {
           </div>
         </div>
         <nav className="flex-1 overflow-y-auto px-2 py-3" aria-label="Owner navigation">
-          {OWNER_SIDEBAR_SECTIONS.map((section) => {
+          {sidebarSections.map((section) => {
             const isMuted = section.muted ?? false;
-            const isDiagnostics = section.title === 'Diagnostics';
+            const isDiagnostics = section.title === 'Support Tools';
             return (
               <div key={section.title || 'main'} className={cn('mb-3', isMuted && 'opacity-80')}>
                 {section.title && (
@@ -456,11 +469,21 @@ export function OwnerAppShell({ children }: { children: React.ReactNode }) {
             );
           })}
         </nav>
-        {showDeployInfo && (
-          <div className="border-t border-border-default px-4 py-3 text-[11px] text-text-tertiary">
-            {deployInfo.envName} · {deployInfo.commitSha}
-          </div>
-        )}
+        <div className="border-t border-border-default px-4 py-3 text-[11px] text-text-tertiary">
+          {!isSupportRoute && (
+            <Link
+              href="/ops/diagnostics"
+              className="mb-2 inline-flex min-h-[32px] items-center rounded-md px-2 py-1 text-xs font-medium text-text-tertiary hover:bg-surface-secondary hover:text-text-secondary"
+            >
+              Open support tools
+            </Link>
+          )}
+          {showDeployInfo && (
+            <div>
+              {deployInfo.envName} · {deployInfo.commitSha}
+            </div>
+          )}
+        </div>
       </aside>
 
       <div className="flex min-h-0 min-w-0 flex-1 flex-col">
@@ -472,8 +495,17 @@ export function OwnerAppShell({ children }: { children: React.ReactNode }) {
         >
           <div className="flex h-full items-center justify-between gap-3">
             <div className="min-w-0">
-              <p className="truncate text-base font-semibold text-text-primary">{header.title}</p>
-              <p className="truncate text-xs text-text-tertiary">{header.subtitle}</p>
+              <div className="flex items-center gap-2">
+                <p className="truncate text-base font-semibold text-text-primary">{header.title}</p>
+                {isSupportRoute && (
+                  <span className="inline-flex items-center rounded-full bg-surface-tertiary px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-text-tertiary">
+                    Support
+                  </span>
+                )}
+              </div>
+              <p className="truncate text-xs text-text-tertiary">
+                {isSupportRoute ? 'Internal tools for support, diagnostics, and recovery' : header.subtitle}
+              </p>
             </div>
             <div className="flex items-center gap-2 lg:hidden">
               <button
@@ -547,7 +579,7 @@ export function OwnerAppShell({ children }: { children: React.ReactNode }) {
               </button>
             </div>
             <div className="flex flex-col gap-0">
-              {OWNER_SIDEBAR_SECTIONS.map((section) => (
+              {sidebarSections.map((section) => (
                 <div key={section.title || 'main'} className={cn('mb-3', section.muted && 'opacity-80')}>
                   {section.title && (
                     <p className="mb-1 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-text-tertiary">
@@ -580,6 +612,16 @@ export function OwnerAppShell({ children }: { children: React.ReactNode }) {
                   })}
                 </div>
               ))}
+              {!isSupportRoute && (
+                <Link
+                  href="/ops/diagnostics"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="mt-2 flex min-h-[44px] items-center gap-2 rounded-md px-2.5 text-sm text-text-tertiary hover:bg-surface-secondary hover:text-text-primary"
+                >
+                  <Icon name="fas fa-stethoscope" className="w-4 h-4 shrink-0" />
+                  <span>Open support tools</span>
+                </Link>
+              )}
             </div>
           </div>
         </div>

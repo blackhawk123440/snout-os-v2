@@ -8,12 +8,12 @@
  */
 
 import { Queue, Worker } from "bullmq";
-import IORedis from "ioredis";
 import { logAutomationRun, logEventFromLogger } from "./event-logger";
 import { publish, channels } from "@/lib/realtime/bus";
+import { createRedisConnection } from "@/lib/redis-config";
 
 // Redis connection
-const connection = new IORedis(process.env.REDIS_URL || "redis://localhost:6379");
+const connection = createRedisConnection();
 const AUTOMATION_WORKER_CONCURRENCY = Number(process.env.AUTOMATION_WORKER_CONCURRENCY || "12");
 const AUTOMATION_HIGH_WORKER_CONCURRENCY = Number(
   process.env.AUTOMATION_HIGH_WORKER_CONCURRENCY || "8"
@@ -296,4 +296,3 @@ export function initializeAutomationWorker(): Worker {
   
   return automationWorker;
 }
-

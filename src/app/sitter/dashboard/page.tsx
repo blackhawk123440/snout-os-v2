@@ -110,6 +110,14 @@ function SitterDashboardContent() {
       />
 
       <div className="space-y-4">
+        <SitterFocusHero
+          totalToday={totalToday}
+          inProgressCount={inProgressCount}
+          pendingRequests={pendingRequests.length}
+          unreadMessages={dash.unreadMessageCount}
+          nextVisit={nextVisit}
+        />
+
         {/* KPIs */}
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <div className="rounded-2xl bg-accent-tertiary p-4 sm:col-span-1">
@@ -310,6 +318,56 @@ function SitterDashboardContent() {
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function SitterFocusHero({
+  totalToday,
+  inProgressCount,
+  pendingRequests,
+  unreadMessages,
+  nextVisit,
+}: {
+  totalToday: number;
+  inProgressCount: number;
+  pendingRequests: number;
+  unreadMessages: number;
+  nextVisit: any;
+}) {
+  const topMessage = totalToday === 0
+    ? 'No visits are scheduled today, so this is a good window to confirm availability, review upcoming work, or reset after a busy run.'
+    : pendingRequests > 0
+      ? 'Start by reviewing pending requests so your schedule stays clear and the office can respond faster.'
+      : inProgressCount > 0
+        ? 'You have active work underway. Stay focused on timing, updates, and clean report handoff.'
+        : nextVisit
+          ? 'Your day is set. Use this dashboard to stay ahead of your next stop and anything that needs follow-up.'
+          : 'Your scheduled work is in good shape. Keep an eye on messages and reports so the day closes cleanly.';
+
+  return (
+    <div className="rounded-3xl border border-border-default bg-surface-primary p-5 shadow-sm">
+      <div className="mb-3 flex flex-wrap items-center gap-2">
+        <span className="inline-flex rounded-full bg-accent-tertiary px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-accent-primary">
+          Sitter hub
+        </span>
+        {pendingRequests > 0 && (
+          <span className="inline-flex rounded-full bg-status-warning-bg px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-status-warning-text">
+            {pendingRequests} pending
+          </span>
+        )}
+        {unreadMessages > 0 && (
+          <span className="inline-flex rounded-full bg-surface-secondary px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-text-secondary">
+            {unreadMessages} unread
+          </span>
+        )}
+      </div>
+      <h2 className="text-2xl font-bold text-text-primary">
+        {totalToday > 0 ? 'Stay clear on what matters today' : 'You have breathing room today'}
+      </h2>
+      <p className="mt-2 max-w-2xl text-sm text-text-secondary">
+        {topMessage}
+      </p>
     </div>
   );
 }

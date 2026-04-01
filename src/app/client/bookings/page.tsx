@@ -67,6 +67,12 @@ export default function ClientBookingsPage() {
 
   return (
     <LayoutWrapper variant="narrow">
+      <ClientBookingsHero
+        total={total || allBookings.length}
+        upcomingCount={upcomingCount}
+        pastCount={pastCount}
+      />
+
       <div className="flex items-start justify-between gap-3 mb-1">
         <div>
           <h1 className="text-[22px] font-bold tracking-tight text-text-primary font-heading leading-tight sm:text-2xl">
@@ -91,17 +97,20 @@ export default function ClientBookingsPage() {
       ) : error ? (
         <AppErrorState title="Couldn't load bookings" subtitle={error.message || 'Unable to load bookings'} onRetry={handleRefresh} />
       ) : displayed.length === 0 ? (
-        <div className="rounded-2xl bg-accent-tertiary p-8 text-center mt-4">
+        <div className="rounded-3xl bg-accent-tertiary p-8 text-center mt-4">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-accent-primary shadow-sm mb-4">
             <Calendar className="h-7 w-7 text-text-inverse" />
           </div>
           <p className="text-xl font-bold text-text-primary">No visits yet</p>
           <p className="mt-2 text-sm text-text-secondary max-w-[280px] mx-auto leading-relaxed">
-            Book your first visit and we&apos;ll handle the rest.
+            Book your first visit and your care team will take it from request to report in one place.
           </p>
           <div className="mt-6 flex justify-center gap-3">
             <Link href="/client/bookings/new">
               <Button variant="primary" size="md">Book a visit</Button>
+            </Link>
+            <Link href="/client/meet-greet">
+              <Button variant="secondary" size="md">Meet &amp; greet</Button>
             </Link>
           </div>
         </div>
@@ -193,6 +202,44 @@ export default function ClientBookingsPage() {
         </div>
       )}
     </LayoutWrapper>
+  );
+}
+
+function ClientBookingsHero({
+  total,
+  upcomingCount,
+  pastCount,
+}: {
+  total: number;
+  upcomingCount: number;
+  pastCount: number;
+}) {
+  return (
+    <div className="rounded-3xl border border-border-default bg-surface-primary p-5 shadow-sm mb-4">
+      <div className="flex flex-wrap items-center gap-2 mb-3">
+        <span className="inline-flex rounded-full bg-accent-tertiary px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-accent-primary">
+          Visit history
+        </span>
+      </div>
+      <h2 className="text-xl font-bold text-text-primary">Track every request, visit, and follow-up</h2>
+      <p className="mt-2 text-sm text-text-secondary">
+        Your booking history stays here so you can quickly see what&apos;s coming up, what&apos;s finished, and where to message or rebook.
+      </p>
+      <div className="mt-4 grid grid-cols-3 gap-3">
+        <div className="rounded-2xl border border-border-default bg-surface-secondary p-3">
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-text-tertiary">Total</p>
+          <p className="mt-1 text-lg font-bold text-text-primary tabular-nums">{total}</p>
+        </div>
+        <div className="rounded-2xl border border-border-default bg-surface-secondary p-3">
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-text-tertiary">Upcoming</p>
+          <p className="mt-1 text-lg font-bold text-text-primary tabular-nums">{upcomingCount}</p>
+        </div>
+        <div className="rounded-2xl border border-border-default bg-surface-secondary p-3">
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-text-tertiary">Past</p>
+          <p className="mt-1 text-lg font-bold text-text-primary tabular-nums">{pastCount}</p>
+        </div>
+      </div>
+    </div>
   );
 }
 

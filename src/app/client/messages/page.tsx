@@ -39,7 +39,7 @@ export default function ClientMessagesPage() {
           <p className="text-[14px] text-text-secondary mt-0.5">
             {threads.length > 0
               ? `${threads.length} conversation${threads.length !== 1 ? 's' : ''} with your care team`
-              : 'Chat with your sitter'}
+              : 'Chat with your sitter or care team'}
           </p>
         </div>
         <ClientRefreshButton onRefresh={refetch} loading={loading} />
@@ -56,7 +56,7 @@ export default function ClientMessagesPage() {
           </div>
           <p className="text-xl font-bold text-text-primary">No messages yet</p>
           <p className="mt-2 text-sm text-text-secondary max-w-[280px] mx-auto leading-relaxed">
-            Conversations with your sitter will appear here after you book a visit.
+            Conversations with your sitter will appear here after you book a visit. Your care team may also contact you from their regular business number.
           </p>
           <div className="mt-6 flex justify-center gap-3">
             <Link href="/client/bookings/new">
@@ -132,7 +132,7 @@ export default function ClientMessagesPage() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-[14px] font-semibold text-text-primary">Need to reach your sitter?</p>
-                <p className="text-[13px] text-text-secondary mt-0.5">Open a conversation above, or book a new visit to start one.</p>
+                <p className="text-[13px] text-text-secondary mt-0.5">Open a conversation above, or book a new visit to start one. Some teams may also follow up by phone outside the app.</p>
               </div>
             </div>
           </div>

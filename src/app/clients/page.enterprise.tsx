@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Plus, UserPlus } from 'lucide-react';
 import { OwnerAppShell, LayoutWrapper, PageHeader } from '@/components/layout';
+import { AppCard, AppCardBody, AppCardHeader } from '@/components/app';
 import { Button, Modal, TableSkeleton } from '@/components/ui';
 import { toastSuccess, toastError } from '@/lib/toast';
 import { DirectoryTab } from './tabs/DirectoryTab';
@@ -65,7 +66,9 @@ function ClientsContent() {
       <LayoutWrapper variant="wide">
         <PageHeader
           title="Clients"
-          subtitle={activeTab === 'directory' ? 'Client directory' : 'Clients waiting for availability'}
+          subtitle={activeTab === 'directory'
+            ? 'Manage every client relationship, from first request through repeat care and retention.'
+            : 'Keep waitlisted families warm and visible so availability turns into booked revenue faster.'}
           actions={
             <div className="flex items-center gap-2">
               <div className="flex gap-1 rounded-lg border border-border-default bg-surface-primary p-0.5">
@@ -101,6 +104,36 @@ function ClientsContent() {
             </div>
           }
         />
+
+        <div className="mb-6 grid gap-4 xl:grid-cols-[minmax(0,1.75fr)_minmax(320px,1fr)]">
+          <AppCard className="bg-[radial-gradient(circle_at_top_left,_rgba(14,116,144,0.12),_transparent_42%),linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.96))]">
+            <AppCardHeader title={activeTab === 'directory' ? 'Your client relationship hub' : 'Your waitlist follow-up hub'} />
+            <AppCardBody className="space-y-3">
+              <p className="max-w-3xl text-sm leading-6 text-text-secondary">
+                {activeTab === 'directory'
+                  ? 'A polished client system should make every family easy to find, easy to support, and easy to move back into active booking without extra admin friction.'
+                  : 'The waitlist should feel like a live revenue opportunity, not a forgotten spreadsheet. Keep leads visible, then turn openings into fast follow-up and confident booking.'}
+              </p>
+              <div className="flex flex-wrap gap-2 pt-1">
+                <Button variant="secondary" size="sm" onClick={() => setShowAddModal(true)} leftIcon={<UserPlus className="h-3.5 w-3.5" />}>
+                  Add client
+                </Button>
+                <Link href="/bookings/new">
+                  <Button size="sm" leftIcon={<Plus className="h-3.5 w-3.5" />}>Create booking</Button>
+                </Link>
+              </div>
+            </AppCardBody>
+          </AppCard>
+
+          <AppCard>
+            <AppCardHeader title="What elite looks like" />
+            <AppCardBody className="space-y-2 text-sm text-text-secondary">
+              <p>Families should feel remembered, not re-entered, every time they come back.</p>
+              <p>Owners should be able to find contact details, recent activity, and booking history without digging.</p>
+              <p>Waitlist follow-up should stay close to the booking workflow so open capacity turns into revenue quickly.</p>
+            </AppCardBody>
+          </AppCard>
+        </div>
 
         {activeTab === 'directory' && <DirectoryTab />}
         {activeTab === 'waitlist' && <WaitlistTab />}

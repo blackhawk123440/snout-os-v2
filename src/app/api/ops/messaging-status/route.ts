@@ -31,17 +31,21 @@ export async function GET() {
       numberCount = numbers;
     } catch {}
 
-    const active = providerType !== 'none' && (providerType === 'openphone' || hasActiveNumbers);
+    const nativeMode = providerType === 'none';
+    const active = nativeMode || providerType === 'openphone' || hasActiveNumbers;
 
     return NextResponse.json({
       active,
+      nativeMode,
       provider: providerType,
       hasActiveNumbers,
       numberCount,
-      setupUrl: '/messaging/twilio-setup',
+      setupUrl: '/settings?section=integrations',
       message: active
-        ? `Messaging active via ${providerType === 'openphone' ? 'OpenPhone' : 'Twilio'}`
-        : 'Messaging not configured — set up now',
+        ? nativeMode
+          ? 'Native phone mode is active'
+          : `Messaging active via ${providerType === 'openphone' ? 'OpenPhone' : 'Twilio'}`
+        : 'Choose a messaging connection if you want one',
     });
   } catch (error) {
     await logEvent({

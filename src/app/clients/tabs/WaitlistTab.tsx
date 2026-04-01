@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { AppErrorState } from '@/components/app';
+import { AppCard, AppCardBody, AppCardHeader, AppErrorState } from '@/components/app';
 import { Panel, Button, Badge, Skeleton, EmptyState, Flex } from '@/components/ui';
 import { formatServiceName } from '@/lib/format-utils';
 
@@ -62,9 +62,56 @@ export function WaitlistTab() {
   const entries = (data?.entries || []).filter(
     (e) => statusFilter === 'all' || e.status === statusFilter
   );
+  const waitlistSummary = useMemo(() => {
+    const allEntries = data?.entries || [];
+    return {
+      total: allEntries.length,
+      waiting: allEntries.filter((entry) => entry.status === 'waiting').length,
+      notified: allEntries.filter((entry) => entry.status === 'notified').length,
+      booked: allEntries.filter((entry) => entry.status === 'booked').length,
+    };
+  }, [data?.entries]);
 
   return (
     <div className="space-y-3">
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1.75fr)_minmax(320px,1fr)]">
+        <AppCard className="bg-[radial-gradient(circle_at_top_left,_rgba(245,158,11,0.12),_transparent_42%),linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.96))]">
+          <AppCardHeader title="Your waitlist should feel like pipeline, not overflow" />
+          <AppCardBody className="space-y-4">
+            <p className="max-w-3xl text-sm leading-6 text-text-secondary">
+              A polished waitlist keeps demand visible and easy to act on. When availability opens up, the team should know exactly who to contact and which requests are most likely to convert into bookings.
+            </p>
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+              <div className="rounded-2xl border border-border-default bg-surface-primary/80 px-4 py-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-text-tertiary">All entries</p>
+                <p className="mt-2 text-2xl font-semibold tracking-tight text-text-primary">{waitlistSummary.total}</p>
+              </div>
+              <div className="rounded-2xl border border-border-default bg-surface-primary/80 px-4 py-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-text-tertiary">Waiting</p>
+                <p className="mt-2 text-2xl font-semibold tracking-tight text-text-primary">{waitlistSummary.waiting}</p>
+              </div>
+              <div className="rounded-2xl border border-border-default bg-surface-primary/80 px-4 py-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-text-tertiary">Notified</p>
+                <p className="mt-2 text-2xl font-semibold tracking-tight text-text-primary">{waitlistSummary.notified}</p>
+              </div>
+              <div className="rounded-2xl border border-border-default bg-surface-primary/80 px-4 py-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-text-tertiary">Booked</p>
+                <p className="mt-2 text-2xl font-semibold tracking-tight text-text-primary">{waitlistSummary.booked}</p>
+              </div>
+            </div>
+          </AppCardBody>
+        </AppCard>
+
+        <AppCard>
+          <AppCardHeader title="Best next moves" />
+          <AppCardBody className="space-y-2 text-sm text-text-secondary">
+            <p>Prioritize clients who are still waiting and keep follow-up tight when openings appear.</p>
+            <p>Move notified requests forward quickly so the waitlist becomes booked revenue instead of stale demand.</p>
+            <p>Use the status filters below to focus only on the households that need action right now.</p>
+          </AppCardBody>
+        </AppCard>
+      </div>
+
       <div className="flex gap-2 flex-wrap">
         {['all', 'waiting', 'notified', 'booked', 'expired'].map((s) => (
           <Button
@@ -84,8 +131,10 @@ export function WaitlistTab() {
         <AppErrorState title="Couldn't load waitlist" subtitle="Check your connection and try again." onRetry={() => void refetch()} />
       ) : entries.length === 0 ? (
         <EmptyState
-          title="No waitlist entries"
-          description={statusFilter === 'all' ? 'The waitlist is empty. Clients can join when no sitters are available.' : `No ${statusFilter} entries found.`}
+          title={statusFilter === 'all' ? 'No waitlist entries yet' : `No ${statusFilter} waitlist entries`}
+          description={statusFilter === 'all'
+            ? 'When demand outpaces availability, households will appear here so the team can follow up quickly when openings return.'
+            : `No ${statusFilter} entries are currently in view.`}
         />
       ) : (
         <Panel>

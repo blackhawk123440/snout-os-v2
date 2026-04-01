@@ -38,9 +38,10 @@ interface InboxViewProps {
   sitterId?: string;
   initialThreadId?: string;
   inbox?: 'all' | 'owner'; // Filter by inbox type
+  nativePhoneMode?: boolean;
 }
 
-function InboxViewContent({ role = 'owner', sitterId, initialThreadId, inbox = 'all' }: InboxViewProps) {
+function InboxViewContent({ role = 'owner', sitterId, initialThreadId, inbox = 'all', nativePhoneMode = false }: InboxViewProps) {
   const searchParams = useSearchParams();
   const threadParam = searchParams.get('thread');
   const sitterParam = searchParams.get('sitterId');
@@ -552,6 +553,11 @@ function InboxViewContent({ role = 'owner', sitterId, initialThreadId, inbox = '
             {/* Thread Header */}
             <div className="flex items-center justify-between gap-3 border-b border-border-default bg-surface-primary px-5 py-3">
               <div className="min-w-0 flex-1">
+                {nativePhoneMode && (
+                  <div className="mb-2 inline-flex items-center rounded-full bg-surface-secondary px-2 py-1 text-[11px] font-medium text-text-secondary">
+                    Native phone mode
+                  </div>
+                )}
                 <div className="flex items-center gap-2">
                   <h3 className="truncate text-base font-semibold text-text-primary">
                     {selectedThread?.client.name || 'Unknown'}
@@ -571,8 +577,18 @@ function InboxViewContent({ role = 'owner', sitterId, initialThreadId, inbox = '
                   {selectedThread?.sitter && (
                     <span>Sitter: <span className="font-medium text-text-primary">{selectedThread.sitter.name}</span></span>
                   )}
+                  {nativePhoneMode && selectedThread?.client.contacts?.[0]?.e164 && (
+                    <a
+                      href={`tel:${selectedThread.client.contacts[0].e164}`}
+                      className="font-medium text-accent-primary hover:underline"
+                    >
+                      Call/text client: {selectedThread.client.contacts[0].e164}
+                    </a>
+                  )}
                   {selectedThread?.messageNumber?.e164 && (
-                    <span className="text-text-tertiary tabular-nums">{selectedThread.messageNumber.e164}</span>
+                    <span className="text-text-tertiary tabular-nums">
+                      {nativePhoneMode ? `Business line: ${selectedThread.messageNumber.e164}` : selectedThread.messageNumber.e164}
+                    </span>
                   )}
                 </div>
               </div>
@@ -756,10 +772,15 @@ function InboxViewContent({ role = 'owner', sitterId, initialThreadId, inbox = '
 
             {/* Compose Box - App design system */}
             <div className="flex-shrink-0 border-t border-border-default bg-surface-primary" style={{ padding: 'var(--density-padding)' }}>
+              {nativePhoneMode && (
+                <div className="mb-2 rounded-lg bg-surface-secondary px-3 py-2 text-xs text-text-secondary">
+                  Native phone mode keeps the inbox and in-app coordination available. For direct phone outreach, use the client number in the thread header or your device dialer.
+                </div>
+              )}
               <Textarea
                 value={composeMessage}
                 onChange={(e) => setComposeMessage(e.target.value)}
-                placeholder="Type a message..."
+                placeholder={nativePhoneMode ? 'Type an in-app message or internal note...' : 'Type a message...'}
                 rows={3}
                 size="sm"
                 fullWidth
@@ -849,6 +870,22 @@ function InboxViewContent({ role = 'owner', sitterId, initialThreadId, inbox = '
                 {selectedThread?.sitter && (
                   <div>
                     <span className="font-medium">Assigned Sitter:</span> {selectedThread.sitter.name}
+                    {selectedThread.sitter.phone && (
+                      <>
+                        {' '}•{' '}
+                        <a href={`tel:${selectedThread.sitter.phone}`} className="text-accent-primary hover:underline">
+                          {selectedThread.sitter.phone}
+                        </a>
+                      </>
+                    )}
+                  </div>
+                )}
+                {selectedThread?.client.contacts?.[0]?.e164 && (
+                  <div>
+                    <span className="font-medium">Client Phone:</span>{' '}
+                    <a href={`tel:${selectedThread.client.contacts[0].e164}`} className="text-accent-primary hover:underline">
+                      {selectedThread.client.contacts[0].e164}
+                    </a>
                   </div>
                 )}
                 <div>
@@ -1193,6 +1230,7 @@ function InboxViewContent({ role = 'owner', sitterId, initialThreadId, inbox = '
             setSelectedThreadId(threadId);
             setShowNewMessageModal(false);
           }}
+          nativePhoneMode={nativePhoneMode}
         />
       )}
     </div>

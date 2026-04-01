@@ -10,7 +10,7 @@ import { toastSuccess, toastError } from '@/lib/toast';
 import { DropdownMenu, DropdownMenuGroup, DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/DropdownMenu';
 import { formatDateTime, formatServiceName } from '@/lib/format-utils';
 import { OwnerAppShell, LayoutWrapper, PageHeader, Section } from '@/components/layout';
-import { AppErrorState, getStatusPill } from '@/components/app';
+import { AppCard, AppCardBody, AppCardHeader, AppErrorState, getStatusPill } from '@/components/app';
 import { DataTableShell, EmptyState, Table, TableSkeleton, Button } from '@/components/ui';
 import { StatusChip, StatusChipVariant } from '@/components/ui/status-chip';
 import type { StatusPillVariant } from '@/components/app';
@@ -222,6 +222,22 @@ function BookingsContent() {
   const error = queryError?.message || null;
 
   const filtered = useMemo(() => rows, [rows]);
+  const bookingSummary = useMemo(() => {
+    const confirmed = rows.filter((row: BookingRow) => row.status === 'confirmed').length;
+    const unassigned = rows.filter((row: BookingRow) => !row.sitter).length;
+    const paymentAttention = rows.filter((row: BookingRow) => (
+      ['confirmed', 'completed'].includes(row.status) && row.paymentStatus !== 'paid'
+    )).length;
+    const pending = rows.filter((row: BookingRow) => ['pending', 'pending_payment'].includes(row.status)).length;
+
+    return {
+      visible: rows.length,
+      confirmed,
+      unassigned,
+      paymentAttention,
+      pending,
+    };
+  }, [rows]);
 
   // Count only secondary filters (search is always visible)
   const activeFilterCount =
@@ -234,10 +250,10 @@ function BookingsContent() {
 
   const subtitle =
     activeView === 'calendar'
-      ? 'Dispatch board'
+      ? 'See upcoming care on the calendar and spot coverage gaps before they become customer issues.'
       : total > 0
-      ? `${((page - 1) * pageSize) + 1}\u2013${Math.min(page * pageSize, total)} of ${total} booking${total !== 1 ? 's' : ''}`
-      : 'All visits and assignments';
+      ? `${((page - 1) * pageSize) + 1}\u2013${Math.min(page * pageSize, total)} of ${total} bookings in your live operating queue`
+      : 'Manage upcoming visits, assignments, and payment follow-through from one place.';
 
   return (
     <OwnerAppShell>
@@ -273,59 +289,130 @@ function BookingsContent() {
           }
         />
 
+        <Section>
+          <div className="grid gap-4 xl:grid-cols-[minmax(0,1.75fr)_minmax(320px,1fr)]">
+            <AppCard className="bg-[radial-gradient(circle_at_top_left,_rgba(15,118,110,0.12),_transparent_45%),linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.96))]">
+              <AppCardHeader title={activeView === 'calendar' ? 'Your care calendar' : 'Your bookings workspace'} />
+              <AppCardBody className="space-y-4">
+                <p className="max-w-3xl text-sm leading-6 text-text-secondary">
+                  {activeView === 'calendar'
+                    ? 'Use the calendar to see where the week is full, where coverage is thin, and which visits may need quick owner attention.'
+                    : 'Track every visit from request to completion with a calmer, customer-ready operating view. Search fast, catch assignment gaps, and keep the team focused on what needs action today.'}
+                </p>
+                <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                  <div className="rounded-2xl border border-border-default bg-surface-primary/80 px-4 py-3">
+                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-text-tertiary">Visible now</p>
+                    <p className="mt-2 text-2xl font-semibold tracking-tight text-text-primary">{bookingSummary.visible}</p>
+                    <p className="mt-1 text-xs text-text-secondary">Bookings on this page right now</p>
+                  </div>
+                  <div className="rounded-2xl border border-border-default bg-surface-primary/80 px-4 py-3">
+                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-text-tertiary">Ready to deliver</p>
+                    <p className="mt-2 text-2xl font-semibold tracking-tight text-text-primary">{bookingSummary.confirmed}</p>
+                    <p className="mt-1 text-xs text-text-secondary">Confirmed visits with the schedule in motion</p>
+                  </div>
+                  <div className="rounded-2xl border border-border-default bg-surface-primary/80 px-4 py-3">
+                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-text-tertiary">Needs coverage</p>
+                    <p className="mt-2 text-2xl font-semibold tracking-tight text-text-primary">{bookingSummary.unassigned}</p>
+                    <p className="mt-1 text-xs text-text-secondary">Visits without a sitter assigned yet</p>
+                  </div>
+                  <div className="rounded-2xl border border-border-default bg-surface-primary/80 px-4 py-3">
+                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-text-tertiary">Needs follow-through</p>
+                    <p className="mt-2 text-2xl font-semibold tracking-tight text-text-primary">{bookingSummary.pending + bookingSummary.paymentAttention}</p>
+                    <p className="mt-1 text-xs text-text-secondary">Pending approvals or unpaid completed work</p>
+                  </div>
+                </div>
+              </AppCardBody>
+            </AppCard>
+
+            <AppCard>
+              <AppCardHeader title="Best next moves" />
+              <AppCardBody className="space-y-3">
+                <div className="rounded-2xl border border-border-default bg-surface-secondary px-4 py-3">
+                  <p className="text-sm font-semibold text-text-primary">Keep the launch path simple</p>
+                  <p className="mt-1 text-sm leading-6 text-text-secondary">
+                    New workspaces usually ship fastest when the team focuses on clean booking intake, clear assignment, and one reliable communication path.
+                  </p>
+                </div>
+                <div className="space-y-2 text-sm text-text-secondary">
+                  <p>{bookingSummary.unassigned > 0 ? `${bookingSummary.unassigned} booking${bookingSummary.unassigned !== 1 ? 's' : ''} still need sitter coverage.` : 'All visible bookings have sitter coverage assigned.'}</p>
+                  <p>{bookingSummary.pending > 0 ? `${bookingSummary.pending} booking${bookingSummary.pending !== 1 ? 's' : ''} are still pending confirmation.` : 'No visible bookings are waiting on confirmation.'}</p>
+                  <p>{bookingSummary.paymentAttention > 0 ? `${bookingSummary.paymentAttention} booking${bookingSummary.paymentAttention !== 1 ? 's' : ''} may need payment follow-up.` : 'No visible bookings are showing payment follow-up risk.'}</p>
+                </div>
+                <div className="flex flex-wrap gap-2 pt-1">
+                  <Link href="/bookings/new">
+                    <Button size="sm" leftIcon={<Plus className="h-3.5 w-3.5" />}>Add booking</Button>
+                  </Link>
+                  <Button size="sm" variant="secondary" onClick={() => changeView(activeView === 'list' ? 'calendar' : 'list')}>
+                    Open {activeView === 'list' ? 'calendar' : 'list'}
+                  </Button>
+                </div>
+              </AppCardBody>
+            </AppCard>
+          </div>
+        </Section>
+
         {activeView === 'list' && (
           <>
-            {/* Search bar + Filters toggle — ui-primitive-ok: custom filter layout */}
             <Section>
-              <div className="flex items-center gap-2">
-                <div className="relative flex-1">
-                  <input
-                    type="text"
-                    value={filters.search}
-                    onChange={(e) => { setFilters((p) => ({ ...p, search: e.target.value })); setPage(1); }}
-                    placeholder="Search client, service, sitter..."
-                    className="w-full min-h-[44px] rounded-lg border border-border-default bg-surface-primary px-3 py-2 pl-10 text-sm text-text-primary placeholder:text-text-disabled focus:border-border-focus focus:outline-none focus:ring-1 focus:ring-border-focus"
-                  />
-                  <svg className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-disabled" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" /></svg>
+              <div className="rounded-2xl border border-border-default bg-surface-primary p-4 shadow-sm">
+                <div className="mb-4 flex flex-col gap-1">
+                  <p className="text-sm font-semibold text-text-primary">Find and manage live bookings</p>
+                  <p className="text-sm leading-6 text-text-secondary">
+                    Search across clients, services, or sitters, then narrow the queue only when you need a closer operating view.
+                  </p>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => { setShowBulkAssign((p) => !p); if (showBulkAssign) { setSelectedIds(new Set()); setBulkSitterId(''); } }}
-                  className={`inline-flex min-h-[44px] items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium transition ${
-                    showBulkAssign
-                      ? 'border-accent-primary bg-accent-secondary text-accent-primary'
-                      : 'border-border-default bg-surface-primary text-text-secondary hover:bg-surface-secondary'
-                  }`}
-                >
-                  <CheckSquare className="h-4 w-4" />
-                  <span className="hidden sm:inline">Select</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowFilters((p) => !p)}
-                  className={`inline-flex min-h-[44px] items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium transition ${
-                    showFilters || activeFilterCount > 0
-                      ? 'border-accent-primary bg-accent-secondary text-accent-primary'
-                      : 'border-border-default bg-surface-primary text-text-secondary hover:bg-surface-secondary'
-                  }`}
-                >
-                  <SlidersHorizontal className="h-4 w-4" />
-                  <span className="hidden sm:inline">Filters</span>
-                  {activeFilterCount > 0 && (
-                    <span className="inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-accent-primary px-1.5 text-xs font-semibold text-text-inverse">
-                      {activeFilterCount}
-                    </span>
-                  )}
-                </button>
+                <div className="flex items-center gap-2">
+                  <div className="relative flex-1">
+                    <input
+                      type="text"
+                      value={filters.search}
+                      onChange={(e) => { setFilters((p) => ({ ...p, search: e.target.value })); setPage(1); }}
+                      placeholder="Search client, service, sitter..."
+                      className="w-full min-h-[44px] rounded-lg border border-border-default bg-surface-primary px-3 py-2 pl-10 text-sm text-text-primary placeholder:text-text-disabled focus:border-border-focus focus:outline-none focus:ring-1 focus:ring-border-focus"
+                    />
+                    <svg className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-disabled" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" /></svg>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => { setShowBulkAssign((p) => !p); if (showBulkAssign) { setSelectedIds(new Set()); setBulkSitterId(''); } }}
+                    className={`inline-flex min-h-[44px] items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium transition ${
+                      showBulkAssign
+                        ? 'border-accent-primary bg-accent-secondary text-accent-primary'
+                        : 'border-border-default bg-surface-primary text-text-secondary hover:bg-surface-secondary'
+                    }`}
+                  >
+                    <CheckSquare className="h-4 w-4" />
+                    <span className="hidden sm:inline">Select</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowFilters((p) => !p)}
+                    className={`inline-flex min-h-[44px] items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium transition ${
+                      showFilters || activeFilterCount > 0
+                        ? 'border-accent-primary bg-accent-secondary text-accent-primary'
+                        : 'border-border-default bg-surface-primary text-text-secondary hover:bg-surface-secondary'
+                    }`}
+                  >
+                    <SlidersHorizontal className="h-4 w-4" />
+                    <span className="hidden sm:inline">Filters</span>
+                    {activeFilterCount > 0 && (
+                      <span className="inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-accent-primary px-1.5 text-xs font-semibold text-text-inverse">
+                        {activeFilterCount}
+                      </span>
+                    )}
+                  </button>
+                </div>
               </div>
             </Section>
 
-            {/* Collapsible filter panel */}
             {showFilters && (
               <Section>
                 <div className="rounded-xl border border-border-default bg-surface-primary p-4">
                   <div className="flex items-center justify-between mb-3">
-                    <p className="text-xs font-semibold text-text-tertiary uppercase tracking-wider">Filters</p>
+                    <div>
+                      <p className="text-xs font-semibold text-text-tertiary uppercase tracking-wider">Refine this view</p>
+                      <p className="mt-1 text-sm text-text-secondary">Use filters when you need to isolate a date range, payment state, or coverage issue.</p>
+                    </div>
                     <div className="flex items-center gap-2">
                       {activeFilterCount > 0 && (
                         <button
@@ -388,9 +475,14 @@ function BookingsContent() {
                 <AppErrorState title="Couldn't load bookings" onRetry={() => void refetch()} />
               ) : filtered.length === 0 ? (
                 <EmptyState
-                  title="No bookings found"
-                  description="Adjust filters or create a new booking."
+                  title={activeFilterCount > 0 || Boolean(filters.search) ? 'No bookings match this view' : 'No bookings yet'}
+                  description={activeFilterCount > 0 || Boolean(filters.search)
+                    ? 'Try clearing filters or broadening your search to bring more bookings back into view.'
+                    : 'Your booking workspace is ready. Add the first visit to start building a reliable operating rhythm for clients and sitters.'}
                   primaryAction={{ label: 'Create booking', onClick: () => router.push('/bookings/new') }}
+                  secondaryAction={activeFilterCount > 0 || Boolean(filters.search)
+                    ? { label: 'Clear filters', onClick: () => { setFilters({ search: '', status: 'all', payment: 'all', from: '', to: '', sitterId: '', clientId: '' }); setPage(1); } }
+                    : undefined}
                 />
               ) : (
                 <>
@@ -409,7 +501,7 @@ function BookingsContent() {
                         onChange={(e) => setBulkSitterId(e.target.value)}
                         className="min-h-[44px] rounded-lg border border-border-default bg-surface-primary px-3 text-sm text-text-primary focus:border-border-focus focus:outline-none"
                       >
-                        <option value="">Reassign to...</option>
+                        <option value="">Assign selected bookings to...</option>
                         {sitterOptions.map((s) => (
                           <option key={s.id} value={s.id}>{s.firstName} {s.lastName}</option>
                         ))}
@@ -422,7 +514,7 @@ function BookingsContent() {
                           bulkReassignMutation.mutate({ sitterId: bulkSitterId, bookingIds: Array.from(selectedIds) });
                         }}
                       >
-                        {bulkReassignMutation.isPending ? 'Reassigning…' : 'Reassign'}
+                        {bulkReassignMutation.isPending ? 'Updating…' : 'Update sitter'}
                       </Button>
                       <Button
                         variant="danger"

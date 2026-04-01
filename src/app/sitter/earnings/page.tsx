@@ -120,6 +120,22 @@ export default function SitterEarningsPage() {
         />
       ) : data ? (
         <div className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="rounded-2xl border border-border-default bg-[radial-gradient(circle_at_top_left,_rgba(34,197,94,0.10),_transparent_42%),linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.96))] p-5 shadow-sm">
+              <p className="text-sm font-semibold text-text-primary">Earnings should feel transparent</p>
+              <p className="mt-2 text-sm leading-6 text-text-secondary">
+                This page is here to help you understand what you have earned, what is still pending payout, and how completed visits are turning into real take-home pay.
+              </p>
+            </div>
+            <div className="rounded-2xl border border-border-default bg-surface-primary p-5 shadow-sm">
+              <p className="text-sm font-semibold text-text-primary">Best next moves</p>
+              <div className="mt-2 space-y-2 text-sm text-text-secondary">
+                <p>Use completed jobs to confirm visit-level pay details.</p>
+                <p>Use payout transfers to track when money is actually moving out.</p>
+              </div>
+            </div>
+          </div>
+
           {/* Period selector */}
           <div className="flex gap-1.5 rounded-xl bg-surface-secondary p-1">
             {([['all', 'All time'], ['this_week', 'This week'], ['this_month', 'This month'], ['last_month', 'Last month']] as const).map(([key, label]) => (

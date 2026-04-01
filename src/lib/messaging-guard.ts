@@ -40,14 +40,15 @@ export async function guardedSend(
   const ready = await isMessagingReady(orgId);
 
   if (!ready) {
-    console.warn(`[messaging-guard] SMS not provisioned for org ${orgId} — ${automationType} queued but not sent`);
+    console.warn(`[messaging-guard] Provider-backed messaging not enabled for org ${orgId} — ${automationType} skipped`);
     await logEvent({
       orgId,
-      action: 'automation.sms_not_provisioned',
-      status: 'failed',
+      action: 'automation.messaging_not_enabled',
+      status: 'pending',
       metadata: {
         automationType,
-        reason: 'No messaging provider configured. Set up Twilio or OpenPhone in /messaging.',
+        skipped: true,
+        reason: 'Workspace is using native phone mode or has no provider-backed messaging configured.',
       },
     }).catch(() => {});
     return false;

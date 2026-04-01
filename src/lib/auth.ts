@@ -9,6 +9,7 @@ import Credentials from "next-auth/providers/credentials";
 import { prisma } from "./db";
 import { env } from "./env";
 import * as bcrypt from "bcryptjs";
+import { isBuildPhase, shouldSilenceBuildWarnings } from "./runtime-phase";
 
 /**
  * NextAuth configuration with credentials provider
@@ -18,6 +19,12 @@ const getSecret = (): string => {
   const secret = process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET;
 
   if (!secret) {
+    if (isBuildPhase) {
+      if (!shouldSilenceBuildWarnings) {
+        console.warn('[NextAuth] NEXTAUTH_SECRET missing during build. Using a temporary build-time placeholder.');
+      }
+      return 'build-only-secret-not-for-runtime-use-1234567890';
+    }
     if (process.env.NODE_ENV === 'production') {
       // HARD FAIL in production — do not fall back to any default
       throw new Error(

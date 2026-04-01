@@ -200,6 +200,11 @@ function SitterInboxContent() {
           <div className="flex flex-col rounded-2xl border border-border-default bg-surface-primary shadow-sm">
             {/* Messages + compose only */}
             <div className="flex-1 overflow-y-auto p-4 min-h-[50vh]">
+              <div className="mb-3 rounded-xl bg-surface-secondary px-4 py-3">
+                <p className="text-xs font-medium text-text-secondary">
+                  Use this inbox for visit-safe updates. Some workspaces also use normal phone numbers outside the app, but booking-window rules still apply here.
+                </p>
+              </div>
               {messagesLoading ? (
                 <SitterSkeletonList count={2} />
               ) : messages.length === 0 && pendingMessages.length === 0 ? (
@@ -397,7 +402,7 @@ function SitterInboxContent() {
                     <p className="text-xs text-text-tertiary">
                       {activeWindow
                         ? `Active until ${format(activeWindow.endsAt, 'MMM d, h:mm a')}`
-                        : 'Office-handled outside active window'}
+                        : 'Outside your active window. Use booking details or office guidance for next steps.'}
                     </p>
                   </div>
                 </div>
@@ -408,6 +413,11 @@ function SitterInboxContent() {
 
               {/* Messages */}
               <div className="flex-1 overflow-y-auto p-4">
+                <div className="mb-3 rounded-xl bg-surface-secondary px-4 py-3">
+                  <p className="text-xs font-medium text-text-secondary">
+                    Use this inbox for visit-safe updates. Some workspaces also use normal phone numbers outside the app, but booking-window rules still apply here.
+                  </p>
+                </div>
                 {messagesLoading ? (
                   <SitterSkeletonList count={2} />
                 ) : messages.length === 0 && pendingMessages.length === 0 ? (

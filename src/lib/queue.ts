@@ -1,10 +1,10 @@
 import { Queue, Worker } from "bullmq";
-import IORedis from "ioredis";
 import { attachQueueWorkerInstrumentation } from "@/lib/queue-observability";
 import { resolveCorrelationId } from "@/lib/correlation-id";
+import { createRedisConnection } from "@/lib/redis-config";
 
 // Redis connection
-const connection = new IORedis(process.env.REDIS_URL || "redis://localhost:6379");
+const connection = createRedisConnection();
 
 // Create queues
 export const summaryQueue = new Queue("daily-summary", { connection });

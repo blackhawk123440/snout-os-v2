@@ -131,8 +131,8 @@ export async function GET(req: NextRequest) {
         take: 1,
         select: { id: true, sitterId: true, startAt: true, endAt: true },
       },
-      client: { select: { id: true, firstName: true, lastName: true } },
-      sitter: { select: { id: true, firstName: true, lastName: true } },
+      client: { select: { id: true, firstName: true, lastName: true, phone: true } },
+      sitter: { select: { id: true, firstName: true, lastName: true, phone: true } },
       conversationFlags: {
         where: { resolvedAt: null },
         orderBy: { createdAt: "desc" },
@@ -178,10 +178,10 @@ export async function GET(req: NextRequest) {
     client: {
       id: t.client?.id ?? '',
       name: t.client ? `${t.client.firstName} ${t.client.lastName}`.trim() || 'Unknown' : 'Unknown',
-      contacts: [],
+      contacts: t.client?.phone ? [{ e164: t.client.phone }] : [],
     },
     sitter: t.sitter
-      ? { id: t.sitter.id, name: `${t.sitter.firstName} ${t.sitter.lastName}`.trim() }
+      ? { id: t.sitter.id, name: `${t.sitter.firstName} ${t.sitter.lastName}`.trim(), phone: t.sitter.phone ?? null }
       : null,
     messageNumber: t.messageNumber
       ? {

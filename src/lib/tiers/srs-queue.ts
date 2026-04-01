@@ -5,17 +5,15 @@
  */
 
 import { Queue, Worker } from "bullmq";
-import IORedis from "ioredis";
 import { calculateSRS, calculateRolling26WeekScore } from "./srs-engine";
 import { checkPromotionEligibility, checkDemotionRequired, checkAtRisk, checkPayRaiseEligibility, getTierPerks } from "./tier-rules";
 import { prisma } from "@/lib/db";
 import { attachQueueWorkerInstrumentation, recordQueueJobQueued } from "@/lib/queue-observability";
 import { resolveCorrelationId } from "@/lib/correlation-id";
+import { createRedisConnection } from "@/lib/redis-config";
 
 // Redis connection
-const connection = new IORedis(process.env.REDIS_URL || "redis://localhost:6379", {
-  maxRetriesPerRequest: null,
-});
+const connection = createRedisConnection();
 
 // Create SRS queue
 export const srsQueue = new Queue("srs", {

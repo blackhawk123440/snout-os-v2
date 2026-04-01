@@ -42,6 +42,8 @@ const webhookStatusSchema = z.object({
 
 const readinessCheckSchema = z.object({
   ready: z.boolean(),
+  overall: z.boolean().optional(),
+  checkedAt: z.string().optional(),
   checks: z.array(z.object({
     name: z.string(),
     passed: z.boolean(),

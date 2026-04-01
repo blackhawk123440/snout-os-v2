@@ -125,6 +125,28 @@ export default function ClientBookingDetailPage() {
         <AppErrorState title="Couldn't load booking" subtitle={error.message || 'Booking not found'} onRetry={() => void refetch()} />
       ) : booking ? (
         <div className="flex flex-col gap-4 pb-8">
+          <div className="rounded-3xl border border-border-default bg-surface-primary p-5 shadow-sm">
+            <div className="flex flex-wrap items-center gap-2 mb-3">
+              <span className="inline-flex rounded-full bg-accent-tertiary px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-accent-primary">
+                Booking status
+              </span>
+            </div>
+            <h2 className="text-xl font-bold text-text-primary">
+              {booking.status === 'completed'
+                ? 'This visit has been completed'
+                : booking.status === 'in_progress'
+                  ? 'Your visit is actively underway'
+                  : 'Your care request is being managed'}
+            </h2>
+            <p className="mt-2 text-sm text-text-secondary">
+              {booking.status === 'completed'
+                ? 'Use this page to review what happened, revisit the report, or book similar care again.'
+                : booking.status === 'in_progress'
+                  ? 'You can use this page to track timing, sitter details, and communication while care is in progress.'
+                  : 'Everything important for this booking lives here, including sitter details, timing, payment, and next actions.'}
+            </p>
+          </div>
+
           {/* Booking info */}
           <AppCard>
             <AppCardHeader>

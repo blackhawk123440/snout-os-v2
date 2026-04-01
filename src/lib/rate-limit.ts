@@ -4,6 +4,8 @@
  * In-memory: single-instance only, resets on restart. Use Redis for production.
  */
 
+import { isBuildPhase } from '@/lib/runtime-phase';
+
 export interface RateLimitResult {
   success: boolean;
   remaining: number;
@@ -72,12 +74,16 @@ async function checkMemory(identifier: string, config: RateLimitConfig): Promise
 
 async function checkRedis(identifier: string, config: RateLimitConfig): Promise<RateLimitResult> {
   try {
+    if (isBuildPhase) {
+      return checkMemory(identifier, config);
+    }
     if (!redisClientPromise) {
       redisClientPromise = import('ioredis').then(({ default: Redis }) =>
         new Redis(REDIS_URL!, {
-          maxRetriesPerRequest: 1,
+          maxRetriesPerRequest: null,
           enableAutoPipelining: true,
           lazyConnect: true,
+          enableOfflineQueue: false,
         })
       );
     }

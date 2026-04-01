@@ -793,6 +793,14 @@ export default function SitterTodayPage() {
             </div>
           }
         />
+        {!loading && (
+          <TodayWorkHero
+            upcomingCount={sections.upNext.length + sections.laterToday.length}
+            inProgressCount={sections.inProgress.length}
+            completedCount={sections.completed.length}
+            nextVisit={nextUp}
+          />
+        )}
         {!loading && nextUp && (
           <>
             <NextVisitHero
@@ -1002,5 +1010,55 @@ export default function SitterTodayPage() {
         </div>
       )}
     </>
+  );
+}
+
+function TodayWorkHero({
+  upcomingCount,
+  inProgressCount,
+  completedCount,
+  nextVisit,
+}: {
+  upcomingCount: number;
+  inProgressCount: number;
+  completedCount: number;
+  nextVisit: TodayBooking | null;
+}) {
+  const summary = inProgressCount > 0
+    ? 'You have active visits underway. Keep updates tight, timing clean, and reports ready when each visit ends.'
+    : nextVisit
+      ? 'Your next visit is queued up below with the details you need to start smoothly.'
+      : upcomingCount === 0 && completedCount === 0
+        ? 'No visits are on the board right now. This is a good time to confirm your schedule or check tomorrow.'
+        : 'Your current visits are complete. Review reports or messages before you sign off for the day.';
+
+  return (
+    <div className="mb-4 rounded-3xl border border-border-default bg-surface-primary p-5 shadow-sm">
+      <div className="mb-3 flex flex-wrap items-center gap-2">
+        <span className="inline-flex rounded-full bg-accent-tertiary px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-accent-primary">
+          Workday view
+        </span>
+      </div>
+      <h2 className="text-2xl font-bold text-text-primary">
+        {inProgressCount > 0 ? 'Focus on the visits in motion' : nextVisit ? 'Everything you need for the next stop' : 'Your day is under control'}
+      </h2>
+      <p className="mt-2 max-w-2xl text-sm text-text-secondary">
+        {summary}
+      </p>
+      <div className="mt-4 grid grid-cols-3 gap-3">
+        <div className="rounded-2xl border border-border-default bg-surface-secondary p-3">
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-text-tertiary">Upcoming</p>
+          <p className="mt-1 text-lg font-bold text-text-primary tabular-nums">{upcomingCount}</p>
+        </div>
+        <div className="rounded-2xl border border-border-default bg-surface-secondary p-3">
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-text-tertiary">In progress</p>
+          <p className="mt-1 text-lg font-bold text-text-primary tabular-nums">{inProgressCount}</p>
+        </div>
+        <div className="rounded-2xl border border-border-default bg-surface-secondary p-3">
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-text-tertiary">Completed</p>
+          <p className="mt-1 text-lg font-bold text-text-primary tabular-nums">{completedCount}</p>
+        </div>
+      </div>
+    </div>
   );
 }

@@ -3,6 +3,8 @@
  * Validates all required environment variables at startup
  */
 
+import { shouldSilenceBuildWarnings } from '@/lib/runtime-phase';
+
 const requiredEnvVars = {
   NODE_ENV: process.env.NODE_ENV || "development",
   DATABASE_URL: process.env.DATABASE_URL,
@@ -82,10 +84,12 @@ export function validateEnv() {
   }
 
   if (missing.length > 0) {
-    console.warn(
-      `⚠️  Missing required environment variables: ${missing.join(", ")}\n` +
-      "Please check your .env file or .env.local file"
-    );
+    if (!shouldSilenceBuildWarnings) {
+      console.warn(
+        `⚠️  Missing required environment variables: ${missing.join(", ")}\n` +
+        "Please check your .env file or .env.local file"
+      );
+    }
     // Don't throw - allow app to start but log warning
     // Individual API routes will handle missing env vars gracefully
   }
@@ -98,5 +102,4 @@ export function validateEnv() {
 
 // Export validated environment (will warn but not throw if invalid)
 export const env = validateEnv();
-
 

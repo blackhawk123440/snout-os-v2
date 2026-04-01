@@ -7,7 +7,7 @@
  *   1. business_profile  — BusinessSettings record exists for the org
  *   2. services_created  — at least one ServiceConfig record exists
  *   3. team_setup        — at least one non-deleted Sitter record exists
- *   4. messaging_setup   — ProviderCredential exists for the org
+ *   4. messaging_setup   — Native phone mode selected or a provider is connected
  *   5. payments_setup    — STRIPE_SECRET_KEY env var is configured
  *   6. branding_done     — brandingJson is non-null on Org
  *   7. first_client      — at least one Client record exists
@@ -53,6 +53,7 @@ export async function GET() {
       serviceCount,
       sitterCount,
       providerCredential,
+      integrationConfig,
       org,
       clientCount,
       bookingCount,
@@ -69,11 +70,15 @@ export async function GET() {
       // 3. team_setup — at least one non-deleted Sitter exists
       db.sitter.count({ where: { deletedAt: null } }),
 
-      // 4. messaging_setup — ProviderCredential exists for this org
-      // ProviderCredential has a unique orgId constraint, query directly
+      // 4. messaging_setup — provider credential if the org chooses a connector
       prisma.providerCredential.findUnique({
         where: { orgId: ctx.orgId },
         select: { id: true },
+      }),
+
+      db.orgIntegrationConfig.findFirst({
+        where: {},
+        select: { messagingProvider: true },
       }),
 
       // 6. branding_done — brandingJson is non-null on Org
@@ -111,7 +116,7 @@ export async function GET() {
       {
         key: 'messaging_setup',
         label: 'Configure messaging',
-        completed: !!providerCredential,
+        completed: integrationConfig?.messagingProvider === 'none' || !!providerCredential,
       },
       {
         key: 'payments_setup',

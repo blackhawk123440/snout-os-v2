@@ -3,7 +3,6 @@
  */
 
 import { Queue, Worker } from 'bullmq';
-import IORedis from 'ioredis';
 import { getScopedDb } from '@/lib/tenancy';
 import { upsertEventForBooking, deleteEventForBooking, syncRangeForSitter } from '@/lib/calendar/sync';
 import { logEvent } from '@/lib/log-event';
@@ -11,10 +10,11 @@ import { publish, channels } from '@/lib/realtime/bus';
 import { attachQueueWorkerInstrumentation, recordQueueJobQueued } from '@/lib/queue-observability';
 import { resolveCorrelationId } from '@/lib/correlation-id';
 import { processInboundReconcileJob, type InboundExternalEvent } from '@/lib/calendar/bidirectional-adapter';
+import { createRedisConnection } from '@/lib/redis-config';
 
 const DEAD_LETTER_AFTER_ATTEMPTS = 5;
 
-const connection = new IORedis(process.env.REDIS_URL || 'redis://localhost:6379');
+const connection = createRedisConnection();
 
 export const calendarQueue = new Queue('calendar-sync', {
   connection,

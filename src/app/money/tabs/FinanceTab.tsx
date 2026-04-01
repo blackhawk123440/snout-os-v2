@@ -128,6 +128,21 @@ export function FinanceTab() {
         <AppErrorState title="Couldn't load finance" subtitle={error} onRetry={() => void refetch()} />
       ) : data ? (
         <div className="space-y-6">
+          <div className="rounded-2xl border border-border-default bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.08),transparent_40%),linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.96))] p-4">
+            <div className="grid gap-4 lg:grid-cols-[minmax(0,1.8fr)_minmax(260px,1fr)]">
+              <div>
+                <p className="text-sm font-semibold text-text-primary">Revenue follow-through</p>
+                <p className="mt-2 max-w-3xl text-sm leading-6 text-text-secondary">
+                  Finance should make it easy to see what has landed, what is still outstanding, and which invoices need quick owner action before they become a trust or cash-flow problem.
+                </p>
+              </div>
+              <div className="space-y-2 text-sm text-text-secondary">
+                <p>Use unpaid invoices for near-term collections work.</p>
+                <p>Use recent payments to confirm revenue is landing the way the business expects.</p>
+              </div>
+            </div>
+          </div>
+
           {/* Stats strip */}
           <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
             <AppStatCard

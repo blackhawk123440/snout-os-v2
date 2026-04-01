@@ -455,6 +455,21 @@ export function PaymentsTab() {
 
   return (
     <div className="space-y-6">
+      <Card className="border border-border-default bg-[radial-gradient(circle_at_top_left,rgba(34,197,94,0.08),transparent_40%),linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.96))] p-4">
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1.8fr)_minmax(260px,1fr)]">
+          <div>
+            <p className="text-sm font-semibold text-text-primary">Collection health at a glance</p>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-text-secondary">
+              This page should help an owner answer three questions quickly: what has been collected, what still needs follow-through, and where failed or pending payments may create customer friction.
+            </p>
+          </div>
+          <div className="space-y-2 text-sm text-text-secondary">
+            <p>Use the time range to evaluate current collection momentum.</p>
+            <p>Search and status filters are best for chasing down individual payment issues without leaving the billing workflow.</p>
+          </div>
+        </div>
+      </Card>
+
       <div className="mb-6">
         <Select
           options={timeRanges.map((r) => ({ value: r.value, label: r.label }))}
@@ -554,6 +569,12 @@ export function PaymentsTab() {
 
       {/* Filters */}
       <Card className={`mb-4 ${isMobile ? 'p-3' : ''}`}>
+        {!isMobile && (
+          <div className="mb-3">
+            <p className="text-sm font-semibold text-text-primary">Refine this payment view</p>
+            <p className="mt-1 text-sm text-text-secondary">Search for a household, invoice, or failed transaction, then narrow by payment status only when you need a tighter collections view.</p>
+          </div>
+        )}
         {isMobile ? (
           <MobileFilterDrawer triggerLabel="Filters" activeCount={Number(Boolean(searchTerm)) + Number(statusFilter !== 'all')}>
             <AppFilterBar

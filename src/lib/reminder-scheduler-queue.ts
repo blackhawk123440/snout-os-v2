@@ -10,15 +10,15 @@
  */
 
 import { Queue, Worker } from "bullmq";
-import IORedis from "ioredis";
 import { prisma } from "@/lib/db";
 import { getScopedDb } from "@/lib/tenancy";
 import { enqueueAutomation } from "@/lib/automation-queue";
 import { logEventFromLogger } from "@/lib/event-logger";
 import { attachQueueWorkerInstrumentation, recordQueueJobQueued } from "@/lib/queue-observability";
 import { resolveCorrelationId } from "@/lib/correlation-id";
+import { createRedisConnection } from "@/lib/redis-config";
 
-const connection = new IORedis(process.env.REDIS_URL || "redis://localhost:6379");
+const connection = createRedisConnection();
 
 export const reminderSchedulerQueue = new Queue("reminder-scheduler", {
   connection,

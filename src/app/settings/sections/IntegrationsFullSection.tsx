@@ -108,11 +108,26 @@ export function IntegrationsFullSection() {
     <div className="flex flex-col gap-4">
       <Card>
         <div className="p-4 flex gap-2 flex-wrap">
+          <Badge variant="success">Native phone mode: Available by default</Badge>
           <Badge variant={snapshot.stripe.ready ? 'success' : 'warning'}>Stripe: {snapshot.stripe.ready ? 'Ready' : 'Needs setup'}</Badge>
-          <Badge variant={snapshot.twilio.ready ? 'success' : 'warning'}>Twilio: {snapshot.twilio.ready ? 'Ready' : 'Needs setup'}</Badge>
+          <Badge variant={snapshot.twilio.ready ? 'success' : 'warning'}>Twilio connection: {snapshot.twilio.ready ? 'Ready' : 'Optional'}</Badge>
           <Badge variant={snapshot.calendar.ready ? 'success' : 'warning'}>Calendar: {snapshot.calendar.ready ? 'Ready' : 'Needs setup'}</Badge>
           <Badge variant={snapshot.ai.ready ? 'success' : 'warning'}>AI/OpenAI: {snapshot.ai.ready ? 'Ready' : 'Needs setup'}</Badge>
           <Button variant="secondary" size="sm" onClick={loadSnapshot} className="ml-auto">Refresh</Button>
+        </div>
+      </Card>
+
+      <Card>
+        <div className="p-4">
+          <h3 className="font-semibold mb-2">Messaging options</h3>
+          <p className="text-text-secondary text-sm mb-3">
+            The system works with native phone numbers first. Owners, sitters, and clients can use their normal numbers, or you can add an optional U.S. connection like OpenPhone or Twilio when you want a shared business line, masked routing, or automation.
+          </p>
+          <div className="flex gap-2 flex-wrap">
+            <Link href="/settings?section=integrations"><Button variant="primary" size="sm">Choose messaging mode</Button></Link>
+            <Link href="/settings?section=openphone"><Button variant="secondary" size="sm">Open OpenPhone</Button></Link>
+            <Link href="/settings?section=twilio"><Button variant="secondary" size="sm">Open Twilio</Button></Link>
+          </div>
         </div>
       </Card>
 
@@ -133,7 +148,7 @@ export function IntegrationsFullSection() {
       <Card>
         <div className="p-4">
           <h3 className="font-semibold mb-2">Twilio</h3>
-          <p className="text-text-secondary text-sm mb-1"><strong>Status:</strong> {snapshot.twilio.ready ? 'Ready' : 'Needs setup'}</p>
+          <p className="text-text-secondary text-sm mb-1"><strong>Status:</strong> {snapshot.twilio.ready ? 'Ready' : 'Optional connection'}</p>
           <p className="text-text-secondary text-sm mb-3"><strong>Health:</strong> {snapshot.twilio.numbersConfigured ? 'Numbers configured' : 'Numbers missing'} &middot; {snapshot.twilio.webhooksInstalled ? 'Webhooks installed' : 'Webhooks missing'}</p>
           <div className="flex gap-2 flex-wrap">
             <Button variant="secondary" size="sm" onClick={() => runAction('twilio-test', () => fetch('/api/setup/provider/test', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' }))} disabled={!!busy['twilio-test']}>{busy['twilio-test'] ? 'Testing...' : 'Test Provider'}</Button>

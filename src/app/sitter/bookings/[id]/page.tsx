@@ -314,7 +314,14 @@ export default function SitterBookingDetailPage() {
             <div className="mt-2 space-y-2 text-sm text-text-secondary">
               <p className="text-xs uppercase tracking-wide text-text-tertiary">Client contact</p>
               <div className="flex flex-wrap gap-3">
-                <span className="text-text-secondary">Use the masked inbox thread for client communication.</span>
+                <span className="text-text-secondary">
+                  Use the visit inbox for updates during your active window. If your office runs native phone mode, the client may also be reached on their normal number.
+                </span>
+                {shouldRenderTel(booking.client?.phone) && (
+                  <a href={`tel:${booking.client?.phone}`} className="text-accent-primary underline underline-offset-2">
+                    {booking.client?.phone}
+                  </a>
+                )}
                 {shouldRenderMail(booking.client?.email) && (
                   <a href={`mailto:${booking.client?.email}`} className="break-all text-accent-primary underline underline-offset-2">
                     {booking.client?.email}

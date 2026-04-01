@@ -465,7 +465,7 @@ export default function NumbersPage() {
     <OwnerAppShell>
       <PageHeader
         title="Number Inventory"
-        description="Manage your messaging phone numbers"
+        description="Support tool for managing business messaging numbers, routing capacity, and sitter assignments"
         actions={
           <div className="flex gap-2">
             <Button onClick={() => setShowBuyModal(true)} variant="primary">
@@ -478,6 +478,23 @@ export default function NumbersPage() {
         }
       />
       <div className="p-6">
+        <Card className="mb-4 border border-border-default bg-[radial-gradient(circle_at_top_left,rgba(14,165,233,0.08),transparent_42%),linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.96))]">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+            <div className="max-w-3xl">
+              <div className="mb-2 flex items-center gap-2">
+                <Badge variant="info">Support Tool</Badge>
+              </div>
+              <p className="text-sm font-semibold text-text-primary">Numbers should stay out of the normal owner path until they need specialist attention.</p>
+              <p className="mt-2 text-sm leading-6 text-text-secondary">
+                This page is best used for provisioning numbers, handling capacity issues, quarantining lines, and managing sitter assignments. Most owners should only visit it when messaging operations need intervention.
+              </p>
+            </div>
+            <div className="max-w-sm text-sm text-text-secondary">
+              Use this area when a line is exhausted, a sitter number needs reassignment, or a messaging provider change requires manual review.
+            </div>
+          </div>
+        </Card>
+
         {/* Pool Exhausted Banner */}
         {(() => {
           const poolExhausted = numbers.some(n => n.class === 'pool' && (n as any).capacityStatus === 'At Capacity');
@@ -505,7 +522,7 @@ export default function NumbersPage() {
               {frontDeskCount}
             </div>
             <div className="text-text-secondary text-sm">
-              Front Desk
+              Front desk lines
             </div>
           </Card>
           <Card>
@@ -513,7 +530,7 @@ export default function NumbersPage() {
               {poolCount}
             </div>
             <div className="text-text-secondary text-sm">
-              Pool
+              Pool lines
             </div>
           </Card>
           <Card>
@@ -521,7 +538,7 @@ export default function NumbersPage() {
               {sitterCount}
             </div>
             <div className="text-text-secondary text-sm">
-              Sitter
+              Sitter lines
             </div>
           </Card>
         </div>

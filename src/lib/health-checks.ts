@@ -19,7 +19,7 @@ export async function checkRedisConnection(): Promise<{ connected: boolean; erro
   }
   try {
     const connection = new IORedis(redisUrl, {
-      maxRetriesPerRequest: 1,
+      maxRetriesPerRequest: null,
       connectTimeout: 2000,
       lazyConnect: true,
     });
@@ -39,8 +39,9 @@ export async function checkRedisConnection(): Promise<{ connected: boolean; erro
 export async function checkQueueConnection(): Promise<{ connected: boolean; error?: string }> {
   try {
     const connection = new IORedis(process.env.REDIS_URL || "redis://localhost:6379", {
-      maxRetriesPerRequest: 1,
+      maxRetriesPerRequest: null,
       connectTimeout: 2000,
+      lazyConnect: true,
     });
 
     // Test with a temporary queue
@@ -72,8 +73,9 @@ export async function getWorkerStatus(): Promise<{
 }> {
   try {
     const connection = new IORedis(process.env.REDIS_URL || "redis://localhost:6379", {
-      maxRetriesPerRequest: 1,
+      maxRetriesPerRequest: null,
       connectTimeout: 2000,
+      lazyConnect: true,
     });
 
     // Check automation queue (most important for worker status)
@@ -160,4 +162,3 @@ export async function getWorkerStatus(): Promise<{
     };
   }
 }
-

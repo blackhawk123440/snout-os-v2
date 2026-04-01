@@ -97,14 +97,14 @@ export function SitterMessagesTab({ sitterId }: SitterMessagesTabProps) {
     return (
       <div className="p-4">
         <Card className="p-4">
-          <div className="mb-4">
-            <h2 className="text-xl font-bold mb-2">
-              Messages
-            </h2>
-            <p className="text-text-secondary text-sm">
-              Conversations tied to this sitter's active work windows
-            </p>
-          </div>
+        <div className="mb-4">
+          <h2 className="text-xl font-bold mb-2">
+            Messages
+          </h2>
+          <p className="text-text-secondary text-sm">
+            Conversations tied to this sitter's active work windows. Native phone workflows can still happen outside the app if the office uses them.
+          </p>
+        </div>
 
           <EmptyState
             title="No Messages"
@@ -125,6 +125,9 @@ export function SitterMessagesTab({ sitterId }: SitterMessagesTabProps) {
           </h2>
           <p className="text-text-secondary text-sm">
             {SITTER_BOUNDARY_HELPER}
+          </p>
+          <p className="text-text-tertiary text-xs mt-1">
+            Some workspaces use normal phone numbers alongside the inbox. Follow office guidance and use active-window rules for anything sent here.
           </p>
         </div>
 

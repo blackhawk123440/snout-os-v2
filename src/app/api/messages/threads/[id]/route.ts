@@ -35,8 +35,8 @@ export async function GET(
         orderBy: { startAt: 'desc' },
         take: 1,
       },
-      client: { select: { id: true, firstName: true, lastName: true } },
-      sitter: { select: { id: true, firstName: true, lastName: true } },
+      client: { select: { id: true, firstName: true, lastName: true, phone: true } },
+      sitter: { select: { id: true, firstName: true, lastName: true, phone: true } },
       conversationFlags: {
         where: { resolvedAt: null },
         orderBy: { createdAt: 'desc' },
@@ -104,10 +104,10 @@ export async function GET(
     client: {
       id: t.client?.id ?? '',
       name: t.client ? `${t.client.firstName} ${t.client.lastName}`.trim() || 'Unknown' : 'Unknown',
-      contacts: [] as { e164: string }[],
+      contacts: t.client?.phone ? [{ e164: t.client.phone }] : [],
     },
     sitter: t.sitter
-      ? { id: t.sitter.id, name: `${t.sitter.firstName} ${t.sitter.lastName}`.trim() }
+      ? { id: t.sitter.id, name: `${t.sitter.firstName} ${t.sitter.lastName}`.trim(), phone: t.sitter.phone ?? null }
       : null,
     messageNumber: t.messageNumber
       ? {

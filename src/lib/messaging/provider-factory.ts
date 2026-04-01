@@ -28,13 +28,34 @@ class MockProvider implements MessagingProvider {
   }
 }
 
+async function getConfiguredMessagingMode(orgId: string): Promise<'twilio' | 'openphone' | 'none' | null> {
+  try {
+    const { prisma } = await import('@/lib/db');
+    const config = await (prisma as any).orgIntegrationConfig.findFirst({
+      where: { orgId },
+      select: { messagingProvider: true },
+    });
+    const provider = config?.messagingProvider;
+    if (provider === 'twilio' || provider === 'openphone' || provider === 'none') {
+      return provider;
+    }
+  } catch {}
+  return null;
+}
+
 /**
  * Get a messaging provider instance for an organization.
  * Checks: DB MessageAccount → DB Twilio credentials → env OpenPhone → MockProvider.
  */
 export async function getMessagingProvider(orgId: string): Promise<MessagingProvider> {
+  const configuredMode = await getConfiguredMessagingMode(orgId);
+
+  if (configuredMode === 'none') {
+    return new MockProvider();
+  }
+
   // 0. Explicit provider override via env
-  if (process.env.MESSAGING_PROVIDER === 'openphone') {
+  if (!configuredMode && process.env.MESSAGING_PROVIDER === 'openphone') {
     const apiKey = process.env.OPENPHONE_API_KEY;
     const numberId = process.env.OPENPHONE_NUMBER_ID;
     if (apiKey && numberId) {
@@ -43,42 +64,48 @@ export async function getMessagingProvider(orgId: string): Promise<MessagingProv
   }
 
   // 1. Check for DB-configured provider (MessageAccount)
-  try {
-    const { prisma } = await import('@/lib/db');
-    const messageAccount = await (prisma as any).messageAccount.findFirst({
-      where: { orgId },
-      orderBy: { updatedAt: 'desc' },
-    });
+  if (!configuredMode || configuredMode === 'openphone') {
+    try {
+      const { prisma } = await import('@/lib/db');
+      const messageAccount = await (prisma as any).messageAccount.findFirst({
+        where: { orgId },
+        orderBy: { updatedAt: 'desc' },
+      });
 
-    if (messageAccount?.provider === 'openphone' && messageAccount.providerConfigJson) {
-      try {
-        const config = JSON.parse(messageAccount.providerConfigJson);
-        if (config.apiKey && config.phoneNumberId) {
-          return new OpenPhoneProvider(config.apiKey, config.phoneNumberId, config.webhookSecret);
+      if (messageAccount?.provider === 'openphone' && messageAccount.providerConfigJson) {
+        try {
+          const config = JSON.parse(messageAccount.providerConfigJson);
+          if (config.apiKey && config.phoneNumberId) {
+            return new OpenPhoneProvider(config.apiKey, config.phoneNumberId, config.webhookSecret);
+          }
+        } catch (e) {
+          console.error('[provider-factory] Failed to parse OpenPhone config for org:', orgId, e);
         }
-      } catch (e) {
-        console.error('[provider-factory] Failed to parse OpenPhone config for org:', orgId, e);
       }
+    } catch {
+      // MessageAccount table may not exist yet — continue to fallbacks
     }
-  } catch {
-    // MessageAccount table may not exist yet — continue to fallbacks
   }
 
   // 2. Check for Twilio credentials
-  const credentials: ProviderCredentials | null = await getProviderCredentials(orgId);
-  if (credentials) {
-    return new TwilioProvider(undefined, orgId, credentials);
+  if (!configuredMode || configuredMode === 'twilio') {
+    const credentials: ProviderCredentials | null = await getProviderCredentials(orgId);
+    if (credentials) {
+      return new TwilioProvider(undefined, orgId, credentials);
+    }
   }
 
   // 3. Check environment-level OpenPhone fallback
-  const openphoneApiKey = process.env.OPENPHONE_API_KEY;
-  const openphoneNumberId = process.env.OPENPHONE_NUMBER_ID;
-  if (openphoneApiKey && openphoneNumberId) {
-    return new OpenPhoneProvider(
-      openphoneApiKey,
-      openphoneNumberId,
-      process.env.OPENPHONE_WEBHOOK_SECRET,
-    );
+  if (!configuredMode || configuredMode === 'openphone') {
+    const openphoneApiKey = process.env.OPENPHONE_API_KEY;
+    const openphoneNumberId = process.env.OPENPHONE_NUMBER_ID;
+    if (openphoneApiKey && openphoneNumberId) {
+      return new OpenPhoneProvider(
+        openphoneApiKey,
+        openphoneNumberId,
+        process.env.OPENPHONE_WEBHOOK_SECRET,
+      );
+    }
   }
 
   return new MockProvider();
@@ -88,6 +115,9 @@ export async function getMessagingProvider(orgId: string): Promise<MessagingProv
  * Get the provider type for an org (used by UI to show provider-specific pages).
  */
 export async function getOrgMessagingProviderType(orgId: string): Promise<'twilio' | 'openphone' | 'none'> {
+  const configuredMode = await getConfiguredMessagingMode(orgId);
+  if (configuredMode) return configuredMode;
+
   try {
     const { prisma } = await import('@/lib/db');
     const messageAccount = await (prisma as any).messageAccount.findFirst({
