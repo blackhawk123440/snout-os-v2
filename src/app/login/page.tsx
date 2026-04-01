@@ -1,7 +1,6 @@
 'use client';
 
 import { FormEvent, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { signIn } from 'next-auth/react';
 import { Input, Button } from '@/components/ui';
@@ -22,7 +21,6 @@ const getRedirectForRole = (user: SessionUser): string => {
 };
 
 export default function LoginPage() {
-  const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -47,7 +45,10 @@ export default function LoginPage() {
         return;
       }
 
-      const callbackUrl = searchParams.get('callbackUrl');
+      const callbackUrl =
+        typeof window !== 'undefined'
+          ? new URLSearchParams(window.location.search).get('callbackUrl')
+          : null;
       const safeCallbackUrl =
         callbackUrl && callbackUrl.startsWith('/') && !callbackUrl.startsWith('//')
           ? callbackUrl
