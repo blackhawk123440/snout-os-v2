@@ -10,6 +10,7 @@ import { prisma } from "./db";
 import { env } from "./env";
 import * as bcrypt from "bcryptjs";
 import { isBuildPhase, shouldSilenceBuildWarnings } from "./runtime-phase";
+import { normalizeSignInEmail, shouldInvalidateSessionToken } from "./auth-utils";
 
 const AUTH_PRIVILEGED_ROLES = new Set(["owner", "admin", "superadmin"]);
 
@@ -118,7 +119,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           console.error('[NextAuth] SECURITY: E2E auth bypass attempted in production. DENIED. Remove ENABLE_E2E_AUTH from production environment.');
         }
         
-        if (!credentials?.email || !credentials?.password) {
+        const email = normalizeSignInEmail(credentials?.email);
+        const password = String(credentials?.password ?? "");
+
+        if (!email || !password) {
           logAuthEvent('authorize_rejected', { reason: 'missing_credentials' });
           return null;
         }
@@ -129,8 +133,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           // Note: API schema doesn't have sitterId directly, it's a relation
           // We'll get it via the sitter relation if needed
           // Use type assertion since Prisma client types may not match exactly
-          user = await (prisma as any).user.findUnique({
-            where: { email: credentials.email as string },
+          user = await (prisma as any).user.findFirst({
+            where: { email: { equals: email, mode: 'insensitive' } },
             select: { 
               id: true, 
               email: true, 
@@ -165,7 +169,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (user.passwordHash) {
           try {
             const isValid = await bcrypt.compare(
-              credentials.password as string,
+              password,
               user.passwordHash
             );
             if (!isValid) {
@@ -194,7 +198,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         let clientId: string | null = (user as any).client?.id || null;
         if (!clientId && (user as any).role === 'client' && (user as any).orgId && user.email) {
           const client = await (prisma as any).client.findFirst({
-            where: { orgId: (user as any).orgId, email: user.email },
+            where: { orgId: (user as any).orgId, email },
             select: { id: true },
           });
           clientId = client?.id || null;
@@ -257,19 +261,21 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             where: { id: token.id as string },
             select: { passwordChangedAt: true, deletedAt: true },
           });
-          if (dbUser?.deletedAt) return {};
-          if (dbUser?.passwordChangedAt) {
-            const changedAtSec = Math.floor(dbUser.passwordChangedAt.getTime() / 1000);
-            if (changedAtSec > (token.iat as number)) return {};
+          if (shouldInvalidateSessionToken({
+            deletedAt: dbUser?.deletedAt,
+            passwordChangedAt: dbUser?.passwordChangedAt,
+            tokenIssuedAtSec: typeof token.iat === "number" ? token.iat : null,
+          })) {
+            return {};
           }
         } catch (error) {
-          console.error('[NextAuth] session verification failed; invalidating JWT', {
+          console.error('[NextAuth] session verification failed; preserving JWT', {
             userId: token.id,
             role: token.role,
             privileged: AUTH_PRIVILEGED_ROLES.has(String(token.role || '')),
             message: error instanceof Error ? error.message : String(error),
           });
-          return {};
+          return token;
         }
       }
 

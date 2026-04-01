@@ -75,7 +75,7 @@ export async function middleware(request: NextRequest) {
         pathname.startsWith('/clients') || pathname.startsWith('/sitters') || pathname.startsWith('/messaging') ||
         pathname.startsWith('/messages') || pathname.startsWith('/numbers') || pathname.startsWith('/assignments') ||
         pathname.startsWith('/twilio-setup') || pathname.startsWith('/reports') || pathname.startsWith('/growth') ||
-        pathname.startsWith('/payroll') || pathname.startsWith('/settings') || pathname.startsWith('/integrations') ||
+        pathname.startsWith('/payroll') || pathname.startsWith('/money') || pathname.startsWith('/settings') || pathname.startsWith('/integrations') ||
         pathname.startsWith('/ops') || pathname === '/' || pathname === '') {
       return NextResponse.redirect(new URL('/client/home', request.url));
     }
@@ -91,7 +91,7 @@ export async function middleware(request: NextRequest) {
     
     // If user is authenticated as a sitter, enforce sitter restrictions
     if (isSitter) {
-      if (!pathname.startsWith('/api/') && pathname.startsWith('/finance')) {
+      if (!pathname.startsWith('/api/') && (pathname.startsWith('/finance') || pathname.startsWith('/money'))) {
         return new NextResponse('Forbidden', { status: 403 });
       }
       // Per Master Spec 7.1.2: Sitters cannot access restricted routes

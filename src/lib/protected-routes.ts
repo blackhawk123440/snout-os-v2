@@ -32,6 +32,9 @@ export function isProtectedRoute(pathname: string): boolean {
   if (pathname.startsWith("/finance")) {
     return true;
   }
+  if (pathname.startsWith("/money")) {
+    return true;
+  }
 
   // Owner dashboard pages
   if (pathname.startsWith("/dashboard")) {
@@ -368,4 +371,3 @@ export function isProtectedRoute(pathname: string): boolean {
 
   return false;
 }
-

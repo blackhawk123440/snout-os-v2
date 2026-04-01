@@ -1,7 +1,7 @@
 'use client';
 
 import { FormEvent, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { signIn } from 'next-auth/react';
 import { Input, Button } from '@/components/ui';
@@ -22,7 +22,7 @@ const getRedirectForRole = (user: SessionUser): string => {
 };
 
 export default function LoginPage() {
-  const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -34,9 +34,10 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
+      const normalizedEmail = email.trim().toLowerCase();
       const result = await signIn('credentials', {
         redirect: false,
-        email,
+        email: normalizedEmail,
         password,
       });
 
@@ -46,10 +47,16 @@ export default function LoginPage() {
         return;
       }
 
+      const callbackUrl = searchParams.get('callbackUrl');
+      const safeCallbackUrl =
+        callbackUrl && callbackUrl.startsWith('/') && !callbackUrl.startsWith('//')
+          ? callbackUrl
+          : null;
       await new Promise((resolve) => setTimeout(resolve, 100));
       const sessionRes = await fetch('/api/auth/session', { cache: 'no-store' });
       const session = await sessionRes.json().catch(() => null);
-      const redirectTarget = getRedirectForRole((session?.user || {}) as SessionUser);
+      const redirectTarget =
+        safeCallbackUrl || getRedirectForRole((session?.user || {}) as SessionUser);
       // Hard navigation so useSession picks up the fresh session cookie.
       // router.replace does a soft navigation where the NextAuth client cache
       // may still hold stale "unauthenticated" state, causing the app shell to

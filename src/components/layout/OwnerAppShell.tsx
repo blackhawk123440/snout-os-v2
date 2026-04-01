@@ -210,7 +210,7 @@ function matches(pathname: string, href: string): boolean {
 export function OwnerAppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, loading } = useAuth();
+  const { user, isOwner, loading } = useAuth();
   const mainRef = useRef<HTMLElement>(null);
   const [headerShadow, setHeaderShadow] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -234,8 +234,8 @@ export function OwnerAppShell({ children }: { children: React.ReactNode }) {
     : OWNER_SIDEBAR_SECTIONS;
 
   useEffect(() => {
-    if (!loading && !user) router.replace('/login');
-  }, [loading, user, router]);
+    if (!loading && !isOwner) router.replace('/login');
+  }, [loading, isOwner, router]);
 
   useEffect(() => {
     const el = mainRef.current;
@@ -268,7 +268,7 @@ export function OwnerAppShell({ children }: { children: React.ReactNode }) {
     return found ?? { title: 'Owner Workspace', subtitle: 'Operations' };
   }, [pathname]);
 
-  if (loading || !user) {
+  if (loading) {
     return (
       <div className="fixed inset-0 flex bg-surface-secondary">
         <aside className="hidden w-60 shrink-0 border-r border-border-default bg-surface-primary lg:flex lg:flex-col">
@@ -304,6 +304,10 @@ export function OwnerAppShell({ children }: { children: React.ReactNode }) {
         </div>
       </div>
     );
+  }
+
+  if (!isOwner || !user) {
+    return null;
   }
 
   const showDeployInfo = deployInfo && deployInfo.envName !== 'prod' && deployInfo.envName !== 'production';

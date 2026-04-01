@@ -48,6 +48,10 @@ describe("isProtectedRoute", () => {
     it("should protect /payments", () => {
       expect(isProtectedRoute("/payments")).toBe(true);
     });
+
+    it("should protect /money", () => {
+      expect(isProtectedRoute("/money")).toBe(true);
+    });
   });
 
   describe("booking management pages", () => {
@@ -136,4 +140,3 @@ describe("isProtectedRoute", () => {
     });
   });
 });
-
