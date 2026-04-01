@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getRequestContext } from '@/lib/request-context';
 import { ForbiddenError, requireAnyRole } from '@/lib/rbac';
 import { getScopedDb } from '@/lib/tenancy';
-import { prisma } from '@/lib/db';
 import { logEvent } from '@/lib/log-event';
 import { enqueueCalendarSync } from '@/lib/calendar-queue';
 import { ensureEventQueueBridge } from '@/lib/event-queue-bridge-init';
@@ -695,9 +694,10 @@ export async function DELETE(
   try {
     const resolvedParams = await context.params;
     const id = resolvedParams.id;
+    const db = getScopedDb(ctx);
 
-    const booking = await prisma.booking.findFirst({
-      where: { id, orgId: ctx.orgId },
+    const booking = await db.booking.findFirst({
+      where: { id },
       select: { id: true, status: true, service: true, firstName: true, lastName: true },
     });
 
@@ -712,7 +712,7 @@ export async function DELETE(
     }
 
     // Hard delete booking and related records in transaction
-    await prisma.$transaction(async (tx) => {
+    await (db as any).$transaction(async (tx: any) => {
       await tx.bookingStatusHistory.deleteMany({ where: { bookingId: id } });
       await tx.bookingChecklistItem.deleteMany({ where: { bookingId: id } });
       await tx.bookingTagAssignment.deleteMany({ where: { bookingId: id } });
@@ -757,4 +757,3 @@ export async function DELETE(
     return NextResponse.json({ error: 'Failed to delete booking', message }, { status: 500 });
   }
 }
-

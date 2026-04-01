@@ -7,7 +7,7 @@ import { AppCard, AppCardBody, AppPageHeader } from '@/components/app';
 import { toastSuccess, toastError } from '@/lib/toast';
 import { Button } from '@/components/ui';
 import { useSubmitMeetGreet, useClientPets, useClientMe } from '@/lib/api/client-hooks';
-import { Calendar, Clock, ArrowLeft, Check, Heart } from 'lucide-react';
+import { Calendar, Clock, ArrowLeft, Check } from 'lucide-react';
 
 const inputClass = 'w-full min-h-[44px] rounded-xl border border-border-default bg-surface-primary px-3 py-2 text-sm text-text-primary placeholder:text-text-disabled focus:border-border-focus focus:outline-none focus:ring-1 focus:ring-border-focus';
 
@@ -108,22 +108,6 @@ export default function MeetGreetPage() {
         </AppCard>
       ) : (
         <div className="space-y-4">
-          {/* Info card */}
-          <AppCard>
-            <AppCardBody>
-              <div className="flex items-start gap-3">
-                <Heart className="w-5 h-5 text-accent-primary shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-sm font-semibold text-text-primary">What to expect</p>
-                  <p className="text-xs text-text-secondary mt-1 leading-relaxed">
-                    A meet & greet is a free, no-commitment visit where you meet your sitter, show them your home,
-                    introduce your pets, and discuss your care preferences. Usually takes 15-30 minutes.
-                  </p>
-                </div>
-              </div>
-            </AppCardBody>
-          </AppCard>
-
           {/* Scheduling */}
           <AppCard>
             <AppCardBody>

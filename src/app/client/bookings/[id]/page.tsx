@@ -135,15 +135,15 @@ export default function ClientBookingDetailPage() {
               {booking.status === 'completed'
                 ? 'This visit has been completed'
                 : booking.status === 'in_progress'
-                  ? 'Your visit is actively underway'
-                  : 'Your care request is being managed'}
+                  ? 'This visit is in progress'
+                  : 'Booking status'}
             </h2>
             <p className="mt-2 text-sm text-text-secondary">
               {booking.status === 'completed'
-                ? 'Use this page to review what happened, revisit the report, or book similar care again.'
+                ? 'Review the visit, open the report, or book again.'
                 : booking.status === 'in_progress'
-                  ? 'You can use this page to track timing, sitter details, and communication while care is in progress.'
-                  : 'Everything important for this booking lives here, including sitter details, timing, payment, and next actions.'}
+                  ? 'Check timing, sitter details, and messages here.'
+                  : 'Details, payment, and next steps are here.'}
             </p>
           </div>
 

@@ -202,7 +202,7 @@ function SitterInboxContent() {
             <div className="flex-1 overflow-y-auto p-4 min-h-[50vh]">
               <div className="mb-3 rounded-xl bg-surface-secondary px-4 py-3">
                 <p className="text-xs font-medium text-text-secondary">
-                  Use this inbox for visit-safe updates. Some workspaces also use normal phone numbers outside the app, but booking-window rules still apply here.
+                  Send updates here during the active assignment window.
                 </p>
               </div>
               {messagesLoading ? (
@@ -213,7 +213,7 @@ function SitterInboxContent() {
                     <MessageSquare className="h-5 w-5 text-text-disabled" />
                   </div>
                   <p className="text-sm font-medium text-text-secondary">No messages yet</p>
-                  <p className="mt-1 text-xs text-text-tertiary max-w-[220px] mx-auto">Use the quick templates below or type a professional visit update.</p>
+                  <p className="mt-1 text-xs text-text-tertiary max-w-[220px] mx-auto">Send the first update when the visit starts.</p>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -402,7 +402,7 @@ function SitterInboxContent() {
                     <p className="text-xs text-text-tertiary">
                       {activeWindow
                         ? `Active until ${format(activeWindow.endsAt, 'MMM d, h:mm a')}`
-                        : 'Outside your active window. Use booking details or office guidance for next steps.'}
+                        : 'Outside the active assignment window.'}
                     </p>
                   </div>
                 </div>
@@ -415,7 +415,7 @@ function SitterInboxContent() {
               <div className="flex-1 overflow-y-auto p-4">
                 <div className="mb-3 rounded-xl bg-surface-secondary px-4 py-3">
                   <p className="text-xs font-medium text-text-secondary">
-                    Use this inbox for visit-safe updates. Some workspaces also use normal phone numbers outside the app, but booking-window rules still apply here.
+                    Send updates here during the active assignment window.
                   </p>
                 </div>
                 {messagesLoading ? (
@@ -426,7 +426,7 @@ function SitterInboxContent() {
                       <MessageSquare className="h-5 w-5 text-text-disabled" />
                     </div>
                     <p className="text-sm font-medium text-text-secondary">No messages yet</p>
-                    <p className="mt-1 text-xs text-text-tertiary max-w-[220px] mx-auto">Send a quick update to let the client know you've arrived or how the visit is going.</p>
+                    <p className="mt-1 text-xs text-text-tertiary max-w-[220px] mx-auto">Send a quick update when the visit starts or wraps up.</p>
                   </div>
                 ) : (
                   <div className="space-y-4">
@@ -483,7 +483,7 @@ function SitterInboxContent() {
               <div className="border-t border-border-default bg-status-warning-bg p-4">
                 <div className="mb-2 flex items-center justify-between gap-2">
                   <span className="text-sm font-medium text-text-primary">Quick templates</span>
-                  <span className="text-xs text-text-tertiary">Use for short professional status updates.</span>
+                  <span className="text-xs text-text-tertiary">Short status updates.</span>
                 </div>
                 <div className="md:hidden flex flex-wrap gap-2">
                   {QUICK_TEMPLATES.map((template) => (

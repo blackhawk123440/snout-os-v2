@@ -53,7 +53,7 @@ export default function SitterReportsPage() {
       ) : reports.length === 0 ? (
         <SitterEmptyState
           title="No reports yet"
-          subtitle="Submit a report after a visit — it will appear in the client's Latest report."
+          subtitle="Submit a report after a completed visit."
           cta={{ label: 'New report', onClick: () => router.push('/sitter/reports/new') }}
         />
       ) : (
