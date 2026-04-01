@@ -81,13 +81,6 @@ export function GrowthTab() {
         </Link>
       </div>
 
-      <Card>
-        <div className="p-4 text-sm text-text-secondary">
-          <strong>Reliability tiers (SRS)</strong> represent sitter performance. <strong>Policy tiers</strong> in settings
-          control entitlements (routing priority, permissions, and commission). They are intentionally separate.
-        </div>
-      </Card>
-
       {loading ? (
         <Card><div className="p-4">Loading growth data...</div></Card>
       ) : error ? (

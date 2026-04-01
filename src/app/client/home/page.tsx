@@ -430,10 +430,10 @@ function ClientPriorityHero({
   onboardingRemaining: string[];
 }) {
   const topMessage = nextVisit
-    ? 'Your next visit is lined up. Use this space to stay ahead of updates, reports, and anything your sitter might need.'
+    ? 'Your next visit is lined up. Check updates, messages, and reports here.'
     : onboardingRemaining.length > 0
-      ? 'A few quick setup details will make your first booking smoother and safer.'
-      : 'You are ready to book whenever you need care. We will keep everything in one calm place once visits are scheduled.';
+      ? 'Finish a few setup details before your first booking.'
+      : 'Book care any time and keep everything in one place.';
 
   return (
     <div className="rounded-3xl border border-border-default bg-surface-primary p-5 shadow-sm">
@@ -453,7 +453,7 @@ function ClientPriorityHero({
         )}
       </div>
       <h2 className="text-2xl font-bold text-text-primary">
-        {nextVisit ? `Everything for ${firstName}'s care is in one place` : `You're in the right place, ${firstName}`}
+        {nextVisit ? `Everything for ${firstName}'s care is here` : `Welcome, ${firstName}`}
       </h2>
       <p className="mt-2 max-w-2xl text-sm text-text-secondary">
         {topMessage}

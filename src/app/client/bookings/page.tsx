@@ -221,9 +221,9 @@ function ClientBookingsHero({
           Visit history
         </span>
       </div>
-      <h2 className="text-xl font-bold text-text-primary">Track every request, visit, and follow-up</h2>
+      <h2 className="text-xl font-bold text-text-primary">Your visits at a glance</h2>
       <p className="mt-2 text-sm text-text-secondary">
-        Your booking history stays here so you can quickly see what&apos;s coming up, what&apos;s finished, and where to message or rebook.
+        See upcoming care, past visits, and the fastest way back into a conversation or rebook.
       </p>
       <div className="mt-4 grid grid-cols-3 gap-3">
         <div className="rounded-2xl border border-border-default bg-surface-secondary p-3">

@@ -147,7 +147,7 @@ function SettingsContent() {
           <div className="mb-3 rounded-xl border border-border-default bg-surface-secondary px-4 py-3">
             <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">Support Tool</p>
             <p className="mt-1 text-sm text-text-secondary">
-              You’re in a deeper configuration area. Most owners can stay in the main settings sections for day-to-day setup.
+              This section is for advanced setup and troubleshooting.
             </p>
             <button
               type="button"
@@ -214,7 +214,7 @@ function SettingsContent() {
                 Support Tools
               </p>
               <p className="mt-1 text-xs text-text-tertiary">
-                Specialist setup for connectors, routing, AI, and internal operating rules.
+                Advanced setup for connectors, routing, AI, and internal rules.
               </p>
               <div className="mt-3 flex flex-col gap-1">
                 {SUPPORT_SECTION_GROUP.items.map((id) => (

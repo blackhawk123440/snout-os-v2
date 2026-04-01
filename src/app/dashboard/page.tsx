@@ -703,12 +703,12 @@ function ZeroDayState({
           {hasOnboardingWork ? 'Launch workspace' : 'Open capacity'}
         </div>
         <h3 className="mt-4 text-2xl font-bold text-text-primary">
-          {hasOnboardingWork ? 'You are ready for launch prep, not busywork' : 'No visits are scheduled for this day'}
+          {hasOnboardingWork ? 'Finish setup before opening bookings' : 'No visits scheduled'}
         </h3>
         <p className="mt-2 text-sm text-text-secondary">
           {hasOnboardingWork
-            ? `Use ${formatDateLabel(boardDate)} to finish setup, rehearse the customer journey, and make your first real booking feel polished.`
-            : `Nothing is scheduled for ${formatDateLabel(boardDate)}. This is a good chance to follow up with clients, review staffing, or add new bookings.`}
+            ? `Complete the remaining setup items for ${formatDateLabel(boardDate)} so bookings, payments, and messaging are ready to go live.`
+            : `Nothing is scheduled for ${formatDateLabel(boardDate)}.`}
         </p>
         <div className="mt-5 flex flex-wrap gap-3">
           <Link href="/bookings/new">

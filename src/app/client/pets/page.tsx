@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { PawPrint, Plus, ChevronRight } from 'lucide-react';
 import { LayoutWrapper, ClientRefreshButton } from '@/components/layout';
-import { AppCard, AppCardBody, AppCardHeader, AppErrorState } from '@/components/app';
+import { AppErrorState } from '@/components/app';
 import { Button } from '@/components/ui';
 import { useClientPets } from '@/lib/api/client-hooks';
 
@@ -40,23 +40,6 @@ export default function ClientPetsPage() {
         <AppErrorState title="Couldn't load pets" subtitle={error.message || 'Unable to load pets'} onRetry={() => void refetch()} />
       ) : pets.length === 0 ? (
         <div className="space-y-4 mt-4">
-          <div className="grid gap-4 md:grid-cols-2">
-            <AppCard className="bg-[radial-gradient(circle_at_top_left,_rgba(251,191,36,0.10),_transparent_42%),linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.96))]">
-              <AppCardHeader title="Great care starts with a complete pet profile" />
-              <AppCardBody className="space-y-2 text-sm text-text-secondary">
-                <p>Add your pet’s basics first, then fill in routines, medications, and care notes so every sitter has the right context before the visit starts.</p>
-                <p>The more complete the profile, the smoother bookings and handoffs become.</p>
-              </AppCardBody>
-            </AppCard>
-            <AppCard>
-              <AppCardHeader title="Best next moves" />
-              <AppCardBody className="space-y-2 text-sm text-text-secondary">
-                <p>Add your first pet so the care team can tailor visits correctly.</p>
-                <p>Include breed, weight, and special instructions as soon as you have them.</p>
-              </AppCardBody>
-            </AppCard>
-          </div>
-
           <div className="rounded-2xl bg-accent-tertiary p-8 text-center">
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-accent-primary shadow-sm mb-4">
               <PawPrint className="h-7 w-7 text-text-inverse" />
@@ -74,23 +57,6 @@ export default function ClientPetsPage() {
         </div>
       ) : (
         <div className="mt-4 space-y-4">
-          <div className="grid gap-4 md:grid-cols-2">
-            <AppCard className="bg-[radial-gradient(circle_at_top_left,_rgba(251,191,36,0.10),_transparent_42%),linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.96))]">
-              <AppCardHeader title="Your pet profiles" />
-              <AppCardBody className="space-y-2 text-sm text-text-secondary">
-                <p>Each pet profile gives your care team the details they need before a visit, from identity and breed to special handling notes.</p>
-                <p>Open a profile any time to review or update care information.</p>
-              </AppCardBody>
-            </AppCard>
-            <AppCard>
-              <AppCardHeader title="Best next moves" />
-              <AppCardBody className="space-y-2 text-sm text-text-secondary">
-                <p>Open each pet to confirm routines, medications, and safety notes stay current.</p>
-                <p>Add another pet here any time your household changes.</p>
-              </AppCardBody>
-            </AppCard>
-          </div>
-
           <div className="space-y-3">
           {pets.map((pet) => (
             <div

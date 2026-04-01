@@ -3,7 +3,6 @@
 import { Suspense, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { OwnerAppShell, LayoutWrapper, PageHeader } from '@/components/layout';
-import { AppCard, AppCardBody, AppCardHeader } from '@/components/app';
 import { TableSkeleton } from '@/components/ui';
 import { PaymentsTab } from './tabs/PaymentsTab';
 import { FinanceTab } from './tabs/FinanceTab';
@@ -69,29 +68,6 @@ function MoneyContent() {
             </div>
           }
         />
-
-        <div className="mb-6 grid gap-4 xl:grid-cols-[minmax(0,1.75fr)_minmax(320px,1fr)]">
-          <AppCard className="bg-[radial-gradient(circle_at_top_left,_rgba(21,128,61,0.12),_transparent_42%),linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.96))]">
-            <AppCardHeader title="Your billing and revenue workspace" />
-            <AppCardBody className="space-y-3">
-              <p className="max-w-3xl text-sm leading-6 text-text-secondary">
-                Elite SaaS finance surfaces should help owners understand what has been collected, what still needs follow-through, and where growth or leakage is showing up, without feeling like an accounting back office.
-              </p>
-              <p className="text-sm leading-6 text-text-secondary">
-                Use payments for day-to-day collection health, finance for outstanding revenue, reports for executive summaries, and analytics when you need deeper trend visibility.
-              </p>
-            </AppCardBody>
-          </AppCard>
-
-          <AppCard>
-            <AppCardHeader title="Best next moves" />
-            <AppCardBody className="space-y-2 text-sm text-text-secondary">
-              <p>Keep payment collection close to the booking lifecycle so unpaid work gets attention quickly.</p>
-              <p>Review reports and analytics as decision tools, not separate systems owners have to learn from scratch.</p>
-              <p>Sitter pay belongs here too, but it should stay clearly separated from customer-facing billing operations.</p>
-            </AppCardBody>
-          </AppCard>
-        </div>
 
         {activeTab === 'payments' && <PaymentsTab />}
         {activeTab === 'finance' && <FinanceTab />}

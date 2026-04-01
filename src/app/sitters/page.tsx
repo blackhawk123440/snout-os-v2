@@ -13,15 +13,15 @@ type TeamTab = 'roster' | 'rankings' | 'growth' | 'payroll';
 const TABS: { id: TeamTab; label: string }[] = [
   { id: 'roster', label: 'Roster' },
   { id: 'rankings', label: 'Rankings' },
-  { id: 'growth', label: 'Growth' },
+  { id: 'growth', label: 'Tiers' },
   { id: 'payroll', label: 'Payroll' },
 ];
 
 const SUBTITLES: Record<TeamTab, string> = {
-  roster: 'Manage your sitter workforce',
-  rankings: 'Performance comparison',
-  growth: 'Reliability tiers and progression',
-  payroll: 'Pay runs, approvals, and exports',
+  roster: 'Active sitters and invitations',
+  rankings: 'Performance and scorecards',
+  growth: 'Reliability tiers and policy coverage',
+  payroll: 'Pay runs and payouts',
 };
 
 function TeamContent() {
@@ -44,7 +44,7 @@ function TeamContent() {
     <OwnerAppShell>
       <LayoutWrapper variant="wide">
         <PageHeader
-          title="Team"
+          title="Sitters"
           subtitle={SUBTITLES[activeTab]}
           actions={
             <div className="flex gap-1 rounded-lg border border-border-default bg-surface-primary p-0.5">

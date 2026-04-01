@@ -41,7 +41,7 @@ const MODULES = [
   {
     id: 'payment_tips',
     label: 'Payment & Tipping',
-    description: 'How payouts work (automatic on check-out via Stripe). Tip links and how clients can tip.',
+    description: 'How automatic payouts work after the 7-day hold, plus tip links and client tipping.',
   },
   {
     id: 'medication_admin',
@@ -122,26 +122,6 @@ export default function SitterTrainingPage() {
         <SitterErrorState title="Couldn't load training" subtitle={error instanceof Error ? error.message : 'Unable to load'} onRetry={() => void refetch()} />
       ) : (
       <div className="space-y-4">
-        <div className="grid gap-4 md:grid-cols-2">
-          <SitterCard>
-            <SitterCardBody>
-              <p className="text-sm font-semibold text-text-primary">Training should feel practical, not bureaucratic</p>
-              <p className="mt-2 text-sm leading-6 text-text-secondary">
-                These modules are here to make visits smoother, safer, and easier to complete confidently in the field.
-              </p>
-            </SitterCardBody>
-          </SitterCard>
-          <SitterCard>
-            <SitterCardBody>
-              <p className="text-sm font-semibold text-text-primary">Best next moves</p>
-              <div className="mt-2 space-y-2 text-sm text-text-secondary">
-                <p>Focus on safety, visit reports, and communication modules first.</p>
-                <p>Use the checklist below to keep track of anything still blocking your readiness.</p>
-              </div>
-            </SitterCardBody>
-          </SitterCard>
-        </div>
-
         {/* Progress */}
         <SitterCard>
           <SitterCardBody>

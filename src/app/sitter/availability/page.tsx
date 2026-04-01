@@ -88,26 +88,6 @@ export default function SitterAvailabilityPage() {
         />
       ) : (
         <div className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2">
-            <SitterCard>
-              <SitterCardBody>
-                <p className="text-sm font-semibold text-text-primary">Availability should stay easy to trust</p>
-                <p className="mt-2 text-sm leading-6 text-text-secondary">
-                  The team needs a clear picture of when you are open for work. Keep your weekly pattern current, then use overrides for the days that need special handling.
-                </p>
-              </SitterCardBody>
-            </SitterCard>
-            <SitterCard>
-              <SitterCardBody>
-                <p className="text-sm font-semibold text-text-primary">Best next moves</p>
-                <div className="mt-2 space-y-2 text-sm text-text-secondary">
-                  <p>Turn off availability when you need a clean pause from new assignments.</p>
-                  <p>Use date overrides for vacations, appointments, or unusual one-off openings.</p>
-                </div>
-              </SitterCardBody>
-            </SitterCard>
-          </div>
-
           {/* Master toggle */}
           <SitterCard>
             <SitterCardBody>

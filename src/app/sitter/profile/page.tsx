@@ -139,22 +139,6 @@ export default function SitterProfilePage() {
         />
       ) : profile ? (
         <div className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="rounded-2xl border border-border-default bg-[radial-gradient(circle_at_top_left,_rgba(14,165,233,0.10),_transparent_42%),linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.96))] p-5 shadow-sm">
-              <p className="text-sm font-semibold text-text-primary">Your sitter account should stay clear and dependable</p>
-              <p className="mt-2 text-sm leading-6 text-text-secondary">
-                This page brings together availability, payouts, training, and account basics so you always know whether your profile is ready for steady work.
-              </p>
-            </div>
-            <div className="rounded-2xl border border-border-default bg-surface-primary p-5 shadow-sm">
-              <p className="text-sm font-semibold text-text-primary">Best next moves</p>
-              <div className="mt-2 space-y-2 text-sm text-text-secondary">
-                <p>Keep availability current so assignments match the time you can actually work.</p>
-                <p>Finish payout setup and training modules early so nothing blocks future earnings.</p>
-              </div>
-            </div>
-          </div>
-
           {/* ── Personal Info ────────────────────────────────────────── */}
           <div className="rounded-2xl bg-accent-tertiary p-5">
               <div className="flex items-center gap-4">

@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { MessageCircle, ChevronRight, Send } from 'lucide-react';
+import { MessageCircle, ChevronRight } from 'lucide-react';
 import { LayoutWrapper, ClientRefreshButton } from '@/components/layout';
 import { AppErrorState } from '@/components/app';
 import { Button } from '@/components/ui';
@@ -124,17 +124,8 @@ export default function ClientMessagesPage() {
             </div>
           </div>
 
-          {/* Contextual footer */}
-          <div className="rounded-2xl bg-gradient-to-br from-accent-secondary via-surface-primary to-accent-secondary/30 border border-accent-secondary p-5 shadow-sm">
-            <div className="flex items-center gap-4">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-accent-primary shadow-sm">
-                <Send className="h-5 w-5 text-text-inverse" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-[14px] font-semibold text-text-primary">Need to reach your sitter?</p>
-                <p className="text-[13px] text-text-secondary mt-0.5">Open a conversation above, or book a new visit to start one. Some teams may also follow up by phone outside the app.</p>
-              </div>
-            </div>
+          <div className="rounded-2xl border border-border-default bg-surface-secondary px-4 py-3 text-sm text-text-secondary">
+            Open any thread to reply. New conversations start automatically when a booking is created.
           </div>
         </div>
       )}

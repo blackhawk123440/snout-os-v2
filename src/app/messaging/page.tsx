@@ -74,10 +74,10 @@ function MessagesContent() {
               <div className="flex-1">
                 <p className="text-sm font-medium text-text-primary">Native phone mode is active</p>
                 <p className="text-xs text-text-tertiary">
-                  Owners, sitters, and clients can use their normal phone numbers while the inbox and in-app coordination stay available.
-                  Add OpenPhone or Twilio in{' '}
+                  Owners, sitters, and clients can keep using their regular phone numbers.
+                  Add Twilio or OpenPhone in{' '}
                   <a href="/settings?section=integrations" className="font-medium text-accent-primary hover:underline">Settings</a>{' '}
-                  if you want a connected U.S. business line.
+                  to move messaging onto a connected business line.
                 </p>
               </div>
             </div>

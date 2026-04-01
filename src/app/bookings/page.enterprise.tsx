@@ -290,64 +290,27 @@ function BookingsContent() {
         />
 
         <Section>
-          <div className="grid gap-4 xl:grid-cols-[minmax(0,1.75fr)_minmax(320px,1fr)]">
-            <AppCard className="bg-[radial-gradient(circle_at_top_left,_rgba(15,118,110,0.12),_transparent_45%),linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.96))]">
-              <AppCardHeader title={activeView === 'calendar' ? 'Your care calendar' : 'Your bookings workspace'} />
-              <AppCardBody className="space-y-4">
-                <p className="max-w-3xl text-sm leading-6 text-text-secondary">
-                  {activeView === 'calendar'
-                    ? 'Use the calendar to see where the week is full, where coverage is thin, and which visits may need quick owner attention.'
-                    : 'Track every visit from request to completion with a calmer, customer-ready operating view. Search fast, catch assignment gaps, and keep the team focused on what needs action today.'}
-                </p>
-                <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                  <div className="rounded-2xl border border-border-default bg-surface-primary/80 px-4 py-3">
-                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-text-tertiary">Visible now</p>
-                    <p className="mt-2 text-2xl font-semibold tracking-tight text-text-primary">{bookingSummary.visible}</p>
-                    <p className="mt-1 text-xs text-text-secondary">Bookings on this page right now</p>
-                  </div>
-                  <div className="rounded-2xl border border-border-default bg-surface-primary/80 px-4 py-3">
-                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-text-tertiary">Ready to deliver</p>
-                    <p className="mt-2 text-2xl font-semibold tracking-tight text-text-primary">{bookingSummary.confirmed}</p>
-                    <p className="mt-1 text-xs text-text-secondary">Confirmed visits with the schedule in motion</p>
-                  </div>
-                  <div className="rounded-2xl border border-border-default bg-surface-primary/80 px-4 py-3">
-                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-text-tertiary">Needs coverage</p>
-                    <p className="mt-2 text-2xl font-semibold tracking-tight text-text-primary">{bookingSummary.unassigned}</p>
-                    <p className="mt-1 text-xs text-text-secondary">Visits without a sitter assigned yet</p>
-                  </div>
-                  <div className="rounded-2xl border border-border-default bg-surface-primary/80 px-4 py-3">
-                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-text-tertiary">Needs follow-through</p>
-                    <p className="mt-2 text-2xl font-semibold tracking-tight text-text-primary">{bookingSummary.pending + bookingSummary.paymentAttention}</p>
-                    <p className="mt-1 text-xs text-text-secondary">Pending approvals or unpaid completed work</p>
-                  </div>
-                </div>
-              </AppCardBody>
-            </AppCard>
-
-            <AppCard>
-              <AppCardHeader title="Best next moves" />
-              <AppCardBody className="space-y-3">
-                <div className="rounded-2xl border border-border-default bg-surface-secondary px-4 py-3">
-                  <p className="text-sm font-semibold text-text-primary">Keep the launch path simple</p>
-                  <p className="mt-1 text-sm leading-6 text-text-secondary">
-                    New workspaces usually ship fastest when the team focuses on clean booking intake, clear assignment, and one reliable communication path.
-                  </p>
-                </div>
-                <div className="space-y-2 text-sm text-text-secondary">
-                  <p>{bookingSummary.unassigned > 0 ? `${bookingSummary.unassigned} booking${bookingSummary.unassigned !== 1 ? 's' : ''} still need sitter coverage.` : 'All visible bookings have sitter coverage assigned.'}</p>
-                  <p>{bookingSummary.pending > 0 ? `${bookingSummary.pending} booking${bookingSummary.pending !== 1 ? 's' : ''} are still pending confirmation.` : 'No visible bookings are waiting on confirmation.'}</p>
-                  <p>{bookingSummary.paymentAttention > 0 ? `${bookingSummary.paymentAttention} booking${bookingSummary.paymentAttention !== 1 ? 's' : ''} may need payment follow-up.` : 'No visible bookings are showing payment follow-up risk.'}</p>
-                </div>
-                <div className="flex flex-wrap gap-2 pt-1">
-                  <Link href="/bookings/new">
-                    <Button size="sm" leftIcon={<Plus className="h-3.5 w-3.5" />}>Add booking</Button>
-                  </Link>
-                  <Button size="sm" variant="secondary" onClick={() => changeView(activeView === 'list' ? 'calendar' : 'list')}>
-                    Open {activeView === 'list' ? 'calendar' : 'list'}
-                  </Button>
-                </div>
-              </AppCardBody>
-            </AppCard>
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="rounded-2xl border border-border-default bg-surface-primary px-4 py-3">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-text-tertiary">Visible now</p>
+              <p className="mt-2 text-2xl font-semibold tracking-tight text-text-primary">{bookingSummary.visible}</p>
+              <p className="mt-1 text-xs text-text-secondary">Bookings in this view</p>
+            </div>
+            <div className="rounded-2xl border border-border-default bg-surface-primary px-4 py-3">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-text-tertiary">Confirmed</p>
+              <p className="mt-2 text-2xl font-semibold tracking-tight text-text-primary">{bookingSummary.confirmed}</p>
+              <p className="mt-1 text-xs text-text-secondary">Ready to deliver</p>
+            </div>
+            <div className="rounded-2xl border border-border-default bg-surface-primary px-4 py-3">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-text-tertiary">Unassigned</p>
+              <p className="mt-2 text-2xl font-semibold tracking-tight text-text-primary">{bookingSummary.unassigned}</p>
+              <p className="mt-1 text-xs text-text-secondary">Need sitter coverage</p>
+            </div>
+            <div className="rounded-2xl border border-border-default bg-surface-primary px-4 py-3">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-text-tertiary">Needs follow-up</p>
+              <p className="mt-2 text-2xl font-semibold tracking-tight text-text-primary">{bookingSummary.pending + bookingSummary.paymentAttention}</p>
+              <p className="mt-1 text-xs text-text-secondary">Pending or unpaid work</p>
+            </div>
           </div>
         </Section>
 
@@ -355,12 +318,6 @@ function BookingsContent() {
           <>
             <Section>
               <div className="rounded-2xl border border-border-default bg-surface-primary p-4 shadow-sm">
-                <div className="mb-4 flex flex-col gap-1">
-                  <p className="text-sm font-semibold text-text-primary">Find and manage live bookings</p>
-                  <p className="text-sm leading-6 text-text-secondary">
-                    Search across clients, services, or sitters, then narrow the queue only when you need a closer operating view.
-                  </p>
-                </div>
                 <div className="flex items-center gap-2">
                   <div className="relative flex-1">
                     <input
@@ -409,10 +366,7 @@ function BookingsContent() {
               <Section>
                 <div className="rounded-xl border border-border-default bg-surface-primary p-4">
                   <div className="flex items-center justify-between mb-3">
-                    <div>
-                      <p className="text-xs font-semibold text-text-tertiary uppercase tracking-wider">Refine this view</p>
-                      <p className="mt-1 text-sm text-text-secondary">Use filters when you need to isolate a date range, payment state, or coverage issue.</p>
-                    </div>
+                    <p className="text-xs font-semibold text-text-tertiary uppercase tracking-wider">Filters</p>
                     <div className="flex items-center gap-2">
                       {activeFilterCount > 0 && (
                         <button

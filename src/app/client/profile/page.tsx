@@ -5,7 +5,7 @@ import { signOut } from 'next-auth/react';
 import { Home, Phone, Share2 } from 'lucide-react';
 import { LayoutWrapper, ClientRefreshButton } from '@/components/layout';
 import { ChangePasswordSection } from '@/components/auth/ChangePasswordSection';
-import { AppCard, AppCardBody, AppCardHeader, AppErrorState } from '@/components/app';
+import { AppErrorState } from '@/components/app';
 import { Button, Modal } from '@/components/ui';
 import { toastSuccess, toastError } from '@/lib/toast';
 import {
@@ -58,23 +58,6 @@ export default function ClientProfilePage() {
         <AppErrorState title="Couldn't load profile" subtitle={error.message || 'Unable to load'} onRetry={() => void refetch()} />
       ) : profileData ? (
         <div className="space-y-4 mt-4 pb-8">
-          <div className="grid gap-4 md:grid-cols-2">
-            <AppCard className="bg-[radial-gradient(circle_at_top_left,_rgba(14,165,233,0.10),_transparent_42%),linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.96))]">
-              <AppCardHeader title="Your account should stay simple and trustworthy" />
-              <AppCardBody className="space-y-2 text-sm text-text-secondary">
-                <p>Keep contact details, home information, and emergency contacts up to date so your care team never has to guess when they are preparing for a visit.</p>
-                <p>This page is also where security and export controls live, so you always know how your account is being managed.</p>
-              </AppCardBody>
-            </AppCard>
-            <AppCard>
-              <AppCardHeader title="Best next moves" />
-              <AppCardBody className="space-y-2 text-sm text-text-secondary">
-                <p>Review your address and phone details before upcoming visits.</p>
-                <p>Add emergency contacts and home access information so the team can act confidently if plans change.</p>
-              </AppCardBody>
-            </AppCard>
-          </div>
-
           {/* Account header */}
           <div className="rounded-2xl bg-accent-tertiary p-5">
             <div className="flex items-center gap-4">
