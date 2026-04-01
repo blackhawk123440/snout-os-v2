@@ -8,6 +8,7 @@
 
 import { useSession } from 'next-auth/react';
 import { useMemo } from 'react';
+import { getPortalRole } from '@/lib/portal-role';
 
 interface User {
   id: string;
@@ -36,21 +37,11 @@ export function useAuth(): UseAuthReturn {
     }
 
     const sessionUser = session.user as any;
-    const hasSitterId = !!sessionUser.sitterId;
-    const hasClientId = !!sessionUser.clientId;
-    const sessionRole = sessionUser.role as string | undefined;
-    const normalizedRole =
-      sessionRole === 'client'
-        ? 'client'
-        : sessionRole === 'sitter'
-          ? 'sitter'
-          : sessionRole === 'owner'
-            ? 'owner'
-            : hasClientId
-              ? 'client'
-              : hasSitterId
-                ? 'sitter'
-                : 'owner';
+    const normalizedRole = getPortalRole({
+      role: sessionUser.role,
+      sitterId: sessionUser.sitterId,
+      clientId: sessionUser.clientId,
+    }) || 'owner';
     
     return {
       id: sessionUser.id || '',

@@ -127,6 +127,7 @@ export default defineConfig({
       NEXT_PUBLIC_ENABLE_MESSAGING_V1: 'true',
       ENABLE_E2E_AUTH: 'true',
       E2E_AUTH_KEY: process.env.E2E_AUTH_KEY || 'test-e2e-key-change-in-production',
+      SKIP_RUNTIME_VERIFICATION: 'true',
     },
   },
 });

@@ -13,6 +13,7 @@ import { isClientRoute } from "@/lib/client-routes";
 import { env } from "@/lib/env";
 import { getSessionSafe } from "@/lib/auth-helpers";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { getPortalRole } from "@/lib/portal-role";
 
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
@@ -25,6 +26,11 @@ export async function middleware(request: NextRequest) {
 
   // Get session to check role
   const session = await getSessionSafe();
+  const sessionRole = getPortalRole((session?.user ?? null) as {
+    role?: string | null;
+    sitterId?: string | null;
+    clientId?: string | null;
+  });
 
   // Public routes bypass ALL auth/role checks — must run first.
   // Sitter onboard and client setup are accessed via invite link before login.
@@ -52,10 +58,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // Client role: redirect owner/sitter routes to client portal
-  const isClient = session?.user && (
-    (session.user as any).clientId ||
-    (session.user as any).role === 'client'
-  );
+  const isClient = sessionRole === 'client';
   if (isClient && !pathname.startsWith('/api/')) {
     if (pathname.startsWith('/finance')) {
       return new NextResponse('Forbidden', { status: 403 });
@@ -84,10 +87,7 @@ export async function middleware(request: NextRequest) {
   // Phase 5.1: If sitter auth is enabled, check sitter restrictions first
   if (enableSitterAuth) {
     // Check if user is a sitter (has sitterId in session or role === 'sitter')
-    const isSitter = session?.user && (
-      (session.user as any).sitterId || 
-      (session.user as any).role === 'sitter'
-    );
+    const isSitter = sessionRole === 'sitter';
     
     // If user is authenticated as a sitter, enforce sitter restrictions
     if (isSitter) {
