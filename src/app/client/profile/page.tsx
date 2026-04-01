@@ -226,7 +226,7 @@ function ReferralSection() {
 
   const handleCopy = async () => {
     if (!data?.referralCode) return;
-    const text = `Book pet care with Snout and we both get $10 off! Use code ${data.referralCode} at snoutservices.com`;
+    const text = `Book pet care with Snout using code ${data.referralCode}. Once your first booking is paid, both households earn bonus points toward future booking credit.`;
     if (navigator.share) {
       try { await navigator.share({ text }); } catch {}
     } else {
@@ -247,7 +247,7 @@ function ReferralSection() {
       </div>
       <div className="px-5 pb-5">
         <p className="text-[13px] text-text-secondary mb-3">
-          Share your code and you both get $10 off your next booking.
+          Share your code. When a referred household pays for its first booking, both households earn bonus points toward future booking credit.
         </p>
         {data?.referralCode ? (
           <div className="space-y-3">
@@ -261,7 +261,7 @@ function ReferralSection() {
             </div>
             {data.referralCount > 0 && (
               <p className="text-[12px] text-text-tertiary">
-                {data.referralCount} friend{data.referralCount !== 1 ? 's' : ''} joined with your code
+                {data.qualifiedReferralCount} qualified of {data.referralCount} joined
               </p>
             )}
           </div>

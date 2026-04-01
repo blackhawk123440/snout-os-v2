@@ -92,6 +92,8 @@ const mockCreate = vi.fn().mockResolvedValue({ id: 'lr-1' });
 const mockUpdate = vi.fn().mockResolvedValue({ id: 'lr-1' });
 const mockEventLogCreate = vi.fn().mockResolvedValue({ id: 'evt-1' });
 const mockEventLogFindFirst = vi.fn().mockResolvedValue(null);
+const mockUserFindFirst = vi.fn();
+const mockBookingFindFirst = vi.fn();
 
 const mockDb = {
   loyaltyReward: {
@@ -102,6 +104,12 @@ const mockDb = {
   eventLog: {
     create: (...args: any[]) => mockEventLogCreate(...args),
     findFirst: (...args: any[]) => mockEventLogFindFirst(...args),
+  },
+  user: {
+    findFirst: (...args: any[]) => mockUserFindFirst(...args),
+  },
+  booking: {
+    findFirst: (...args: any[]) => mockBookingFindFirst(...args),
   },
 } as any;
 
@@ -195,6 +203,42 @@ describe('awardReferralBonus', () => {
     const result = await awardReferralBonus(mockDb, 'org-1', 'referrer-1', 'new-client-1');
     expect(result.awarded).toBe(false);
     expect(result.points).toBe(0);
+  });
+});
+
+describe('processQualifiedReferralBonus', () => {
+  beforeEach(() => { vi.clearAllMocks(); });
+
+  it('does not award when the referred client has no qualifying paid booking', async () => {
+    mockUserFindFirst.mockResolvedValueOnce({ id: 'user-2', clientId: 'client-2', referredBy: 'CODE-1234' });
+    mockBookingFindFirst.mockResolvedValueOnce(null);
+    const { processQualifiedReferralBonus } = await import('../loyalty-engine');
+
+    const result = await processQualifiedReferralBonus(mockDb, 'org-1', 'client-2');
+    expect(result).toEqual({
+      qualified: false,
+      awarded: false,
+      points: 0,
+      reason: 'No qualifying paid booking yet',
+    });
+  });
+
+  it('awards once the referred client has a paid booking', async () => {
+    mockUserFindFirst
+      .mockResolvedValueOnce({ id: 'user-2', clientId: 'client-2', referredBy: 'CODE-1234' })
+      .mockResolvedValueOnce({ clientId: 'referrer-1' });
+    mockBookingFindFirst.mockResolvedValueOnce({ id: 'booking-1' });
+    mockEventLogFindFirst.mockResolvedValueOnce(null);
+    mockFindFirst.mockResolvedValueOnce(null);
+    const { processQualifiedReferralBonus } = await import('../loyalty-engine');
+
+    const result = await processQualifiedReferralBonus(mockDb, 'org-1', 'client-2');
+    expect(result).toEqual({
+      qualified: true,
+      awarded: true,
+      points: REFERRAL_BONUS_POINTS,
+      reason: 'Referral bonus awarded',
+    });
   });
 });
 

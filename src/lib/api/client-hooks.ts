@@ -205,6 +205,16 @@ export interface ClientBillingData {
     receiptLink: string | null;
   }>;
   loyalty: { points: number; tier: string };
+  loyaltySummary: {
+    availablePoints: number;
+    redeemablePoints: number;
+    redeemableDiscount: number;
+  };
+  referrals: {
+    referralCode: string | null;
+    referralCount: number;
+    qualifiedReferralCount: number;
+  };
 }
 
 export interface ClientReport {
@@ -280,6 +290,8 @@ export interface ClientEmergencyContact {
 export interface ClientReferralData {
   referralCode: string;
   referralCount: number;
+  qualifiedReferralCount: number;
+  bonusPoints: number;
 }
 
 // ─── Query hooks ────────────────────────────────────────────────────

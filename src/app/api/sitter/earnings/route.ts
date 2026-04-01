@@ -98,10 +98,38 @@ export async function GET(request: NextRequest) {
       })
     );
 
+    queries.push(
+      (db as any).payoutTransfer.findMany({
+        where: { sitterId: ctx.sitterId },
+        select: { bookingId: true, status: true },
+      })
+    );
+
+    queries.push(
+      db.booking.findMany({
+        where: {
+          sitterId: ctx.sitterId,
+          status: 'completed',
+          paymentStatus: 'paid',
+        },
+        select: {
+          id: true,
+          totalPrice: true,
+          updatedAt: true,
+        },
+      })
+    );
+
     const results = await Promise.all(queries);
     const [completedAll, completedThisMonth, completedLastMonth] = results;
     const completedPeriod = periodFrom ? results[3] : null;
     const tipAgg = periodFrom ? results[4] : results[3];
+    const payoutTransfers = (periodFrom ? results[5] : results[4]) as Array<{ bookingId?: string | null; status?: string | null }>;
+    const paidCompletedBookings = (periodFrom ? results[6] : results[5]) as Array<{
+      id: string;
+      totalPrice: number | null;
+      updatedAt: Date | string;
+    }>;
 
     const tipsTotal = tipAgg?._sum?.tips ?? 0;
     const grossTotal = completedAll._sum.totalPrice ?? 0;
@@ -113,6 +141,28 @@ export async function GET(request: NextRequest) {
 
     const completedCount = completedAll._count;
     const avgPerVisit = completedCount > 0 ? earningsTotal / completedCount : 0;
+    const existingTransferBookingIds = new Set(
+      (payoutTransfers || [])
+        .map((transfer) => transfer.bookingId)
+        .filter((bookingId): bookingId is string => !!bookingId)
+    );
+    const scheduledPayoutBookings = (paidCompletedBookings || []).filter(
+      (booking) => !existingTransferBookingIds.has(booking.id)
+    );
+    const scheduledPayoutAmount = scheduledPayoutBookings.reduce((sum, booking) => {
+      const totalPrice = Number(booking.totalPrice ?? 0);
+      return sum + totalPrice * (commissionPct / 100);
+    }, 0);
+    const nextPayoutReleaseAt = scheduledPayoutBookings.length > 0
+      ? new Date(
+          Math.min(
+            ...scheduledPayoutBookings.map((booking) => {
+              const completedAt = new Date(booking.updatedAt);
+              return completedAt.getTime() + (7 * 24 * 60 * 60 * 1000);
+            })
+          )
+        ).toISOString()
+      : null;
 
     const response: Record<string, any> = {
       commissionPercentage: commissionPct,
@@ -127,6 +177,9 @@ export async function GET(request: NextRequest) {
       completedLastMonthCount: completedLastMonth._count,
       averagePerVisit: Math.round(avgPerVisit * 100) / 100,
       tipsTotal: Math.round(tipsTotal * 100) / 100,
+      scheduledPayoutAmount: Math.round(scheduledPayoutAmount * 100) / 100,
+      scheduledPayoutCount: scheduledPayoutBookings.length,
+      nextPayoutReleaseAt,
     };
 
     if (completedPeriod) {

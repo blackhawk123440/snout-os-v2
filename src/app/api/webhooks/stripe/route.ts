@@ -20,6 +20,7 @@ import {
   persistRefund,
 } from '@/lib/stripe-webhook-persist';
 import { publish, channels } from '@/lib/realtime/bus';
+import { processQualifiedReferralBonus } from '@/lib/loyalty/loyalty-engine';
 
 const WEBHOOK_CLAIM_TIMEOUT_MS = 5 * 60 * 1000;
 
@@ -98,6 +99,20 @@ async function markStripeWebhookEventFailed(eventId: string, error: unknown) {
       lastError: error instanceof Error ? error.message.slice(0, 1000) : String(error).slice(0, 1000),
     },
   });
+}
+
+async function tryProcessReferralQualification(
+  db: ReturnType<typeof getScopedDb>,
+  orgId: string,
+  clientId: string | null | undefined,
+  source: string
+) {
+  if (!clientId) return;
+  try {
+    await processQualifiedReferralBonus(db as any, orgId, clientId);
+  } catch (error) {
+    console.error(`[Stripe Webhook] Referral qualification failed during ${source}:`, error);
+  }
 }
 
 export async function POST(request: NextRequest) {
@@ -212,6 +227,12 @@ export async function POST(request: NextRequest) {
             status: 'success',
             metadata: { stripeEventType: event.type },
           }).catch(() => {});
+          await tryProcessReferralQualification(
+            db,
+            booking.orgId || orgId,
+            booking.clientId,
+            'payment_intent.succeeded'
+          );
           // Notify owner dashboard via SSE
           publish(channels.ownerOps(booking.orgId || orgId), {
             type: 'payment.received',
@@ -598,6 +619,15 @@ export async function POST(request: NextRequest) {
             status: 'success',
             metadata: { sessionId: session.id, amount: session.amount_total, bookingType },
           });
+
+          if (!isDeposit) {
+            await tryProcessReferralQualification(
+              db,
+              sessionOrgId,
+              booking.clientId,
+              'checkout.session.completed'
+            );
+          }
         }
       }
     }

@@ -36,8 +36,9 @@ export const OWNER_SIDEBAR_SECTIONS: SidebarSection[] = [
     items: [
       { label: 'Dashboard', href: '/dashboard', icon: 'fas fa-chart-line' },
       { label: 'Bookings', href: '/bookings', icon: 'fas fa-calendar-check' },
+      { label: 'Calendar', href: '/calendar', icon: 'fas fa-calendar-alt' },
       { label: 'Clients', href: '/clients', icon: 'fas fa-address-book' },
-      { label: 'Team', href: '/sitters', icon: 'fas fa-user-friends' },
+      { label: 'Sitters', href: '/sitters', icon: 'fas fa-user-friends' },
       { label: 'Messages', href: '/messaging', icon: 'fas fa-comments' },
       { label: 'Billing', href: '/money', icon: 'fas fa-dollar-sign' },
       { label: 'Settings', href: '/settings', icon: 'fas fa-cog' },
@@ -89,75 +90,46 @@ const OWNER_SIDEBAR_NAV_FLAT = flattenSidebarItems(OWNER_SIDEBAR_SECTIONS);
 const OWNER_PRIMARY_NAV: OwnerNavItem[] = [
   { label: 'Dashboard', href: '/dashboard', icon: 'fas fa-chart-line' },
   { label: 'Bookings', href: '/bookings', icon: 'fas fa-calendar-check' },
-  { label: 'Clients', href: '/clients', icon: 'fas fa-address-book' },
+  { label: 'Calendar', href: '/calendar', icon: 'fas fa-calendar-alt' },
   { label: 'Messages', href: '/messaging', icon: 'fas fa-comments' },
+  { label: 'Billing', href: '/money', icon: 'fas fa-dollar-sign' },
 ];
 
 const HEADER_MAP: Array<{ match: (p: string) => boolean; title: string; subtitle: string }> = [
   {
     match: (p) => p.startsWith('/dashboard'),
     title: 'Dashboard',
-    subtitle: 'Business health and operator quick actions',
-  },
-  {
-    match: (p) => p.startsWith('/calendar'),
-    title: 'Dispatch Calendar',
-    subtitle: 'Sitter schedules, gaps, and daily operations',
+    subtitle: 'Today’s business health and next actions',
   },
   {
     match: (p) => p.startsWith('/bookings'),
     title: 'Bookings',
-    subtitle: 'Manage visits, assignments, and execution flow',
+    subtitle: 'Requests, assignments, and service status',
   },
   {
     match: (p) => p.startsWith('/calendar'),
     title: 'Calendar',
-    subtitle: 'Schedules, overlaps, and coverage controls',
+    subtitle: 'Schedules, coverage, and conflicts',
   },
   {
     match: (p) => p.startsWith('/clients'),
     title: 'Clients',
-    subtitle: 'CRM, pets, and waitlist management',
+    subtitle: 'Households, pets, and booking history',
   },
   {
     match: (p) => p.startsWith('/sitters'),
-    title: 'Team',
-    subtitle: 'Workforce management, performance, and pay',
-  },
-  {
-    match: (p) => p.startsWith('/waitlist'),
-    title: 'Waitlist',
-    subtitle: 'Clients waiting for availability — manage and notify',
+    title: 'Sitters',
+    subtitle: 'Availability, performance, and payroll readiness',
   },
   {
     match: (p) => p.startsWith('/messaging'),
     title: 'Messages',
-    subtitle: 'Conversations and thread management',
+    subtitle: 'Client and sitter conversations',
   },
   {
     match: (p) => p.startsWith('/money'),
     title: 'Billing',
-    subtitle: 'Payments, revenue, payouts, and financial visibility',
-  },
-  {
-    match: (p) => p.startsWith('/numbers'),
-    title: 'Numbers',
-    subtitle: 'Twilio number inventory and readiness status',
-  },
-  {
-    match: (p) => p.startsWith('/assignments'),
-    title: 'Assignments',
-    subtitle: 'Number-to-sitter-to-thread routing assignments',
-  },
-  {
-    match: (p) => p.startsWith('/twilio-setup'),
-    title: 'Twilio Setup',
-    subtitle: 'Credentials, webhooks, masking, and test messaging',
-  },
-  {
-    match: (p) => p.startsWith('/automations') || p.startsWith('/automation'),
-    title: 'Automations',
-    subtitle: 'Templates, rules, and failure management',
+    subtitle: 'Payments, payouts, and ledger status',
   },
   {
     match: (p) => p.startsWith('/ops/automation-failures'),
@@ -222,7 +194,7 @@ const HEADER_MAP: Array<{ match: (p: string) => boolean; title: string; subtitle
   {
     match: (p) => p.startsWith('/settings'),
     title: 'Settings',
-    subtitle: 'Pricing, services, areas, and company controls',
+    subtitle: 'Business setup, integrations, and policies',
   },
 ];
 

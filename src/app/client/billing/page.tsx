@@ -63,14 +63,14 @@ export default function ClientBillingPage() {
           <div className="rounded-2xl border border-border-default bg-[radial-gradient(circle_at_top_left,rgba(34,197,94,0.08),transparent_40%),linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.96))] p-5">
             <div className="grid gap-4 md:grid-cols-[minmax(0,1.8fr)_minmax(220px,1fr)]">
               <div>
-                <p className="text-sm font-semibold text-text-primary">Billing should feel clear, not stressful</p>
+                <p className="text-sm font-semibold text-text-primary">Billing at a glance</p>
                 <p className="mt-2 text-sm leading-6 text-text-secondary">
-                  This page is built to help you understand what is due, what has already been paid, and where rewards or saved payment methods can make future bookings easier.
+                  See what is due, what has already been paid, and what rewards you can use on the next booking.
                 </p>
               </div>
               <div className="space-y-2 text-sm text-text-secondary">
                 <p>Unpaid invoices stay at the top so you can resolve them fast.</p>
-                <p>History, loyalty, bundles, and payment methods stay in one place so billing feels predictable.</p>
+                <p>Rewards and referrals stay visible so savings are easy to use.</p>
               </div>
             </div>
           </div>
@@ -97,7 +97,7 @@ export default function ClientBillingPage() {
           </div>
 
           {/* KPI strip */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
             <div className="rounded-2xl bg-surface-primary shadow-sm p-4">
               <p className="text-[11px] font-semibold text-text-tertiary uppercase tracking-wider">Payments</p>
               <p className="mt-2 text-2xl font-bold text-text-primary tabular-nums">{paidCount}</p>
@@ -105,6 +105,22 @@ export default function ClientBillingPage() {
             <div className="rounded-2xl bg-surface-primary shadow-sm p-4">
               <p className="text-[11px] font-semibold text-text-tertiary uppercase tracking-wider">Total paid</p>
               <p className="mt-2 text-2xl font-bold text-text-primary tabular-nums">${totalPaid.toFixed(0)}</p>
+            </div>
+            <div className="rounded-2xl bg-surface-primary shadow-sm p-4">
+              <p className="text-[11px] font-semibold text-text-tertiary uppercase tracking-wider">Rewards</p>
+              <p className="mt-2 text-2xl font-bold text-text-primary tabular-nums">{data.loyaltySummary.availablePoints}</p>
+              <p className="mt-1 text-[12px] text-text-secondary">
+                {data.loyaltySummary.redeemableDiscount > 0
+                  ? `$${data.loyaltySummary.redeemableDiscount} ready to use`
+                  : 'Keep booking to unlock credit'}
+              </p>
+            </div>
+            <div className="rounded-2xl bg-surface-primary shadow-sm p-4">
+              <p className="text-[11px] font-semibold text-text-tertiary uppercase tracking-wider">Referrals</p>
+              <p className="mt-2 text-2xl font-bold text-text-primary tabular-nums">{data.referrals.referralCount}</p>
+              <p className="mt-1 text-[12px] text-text-secondary">
+                {data.referrals.qualifiedReferralCount} qualified for points
+              </p>
             </div>
           </div>
 
@@ -220,6 +236,11 @@ export default function ClientBillingPage() {
                         <div className="h-2 w-full overflow-hidden rounded-full bg-surface-tertiary mt-2">
                           <div className="h-full rounded-full bg-accent-primary transition-[width]" style={{ width: `${Math.min(100, progressPct * 100)}%` }} />
                         </div>
+                        <p className="mt-2 text-[12px] text-text-tertiary">
+                          {data.loyaltySummary.redeemableDiscount > 0
+                            ? `${data.loyaltySummary.redeemablePoints} points can be redeemed for $${data.loyaltySummary.redeemableDiscount} off now.`
+                            : 'Rewards unlock in 100-point steps for booking credit.'}
+                        </p>
                         {points >= 100 && (
                           <Button
                             size="sm"
@@ -247,6 +268,25 @@ export default function ClientBillingPage() {
                     </div>
                   );
                 })()}
+              </div>
+            </div>
+          )}
+
+          {data.referrals.referralCode && (
+            <div className="rounded-2xl bg-surface-primary shadow-sm overflow-hidden">
+              <div className="px-5 pt-5 pb-3 flex items-center justify-between">
+                <h2 className="text-[11px] font-semibold text-text-tertiary uppercase tracking-wider">Referral credit</h2>
+                <span className="text-[11px] font-semibold text-text-secondary">
+                  {data.referrals.qualifiedReferralCount} qualified
+                </span>
+              </div>
+              <div className="px-5 pb-5">
+                <p className="text-[13px] text-text-secondary">
+                  Share <span className="font-mono font-semibold text-text-primary">{data.referrals.referralCode}</span>. Bonus points are awarded after the referred household pays for its first booking.
+                </p>
+                <p className="mt-2 text-[12px] text-text-tertiary">
+                  {data.referrals.referralCount} joined with your code. {data.referrals.qualifiedReferralCount} have completed the paid first-booking step.
+                </p>
               </div>
             </div>
           )}

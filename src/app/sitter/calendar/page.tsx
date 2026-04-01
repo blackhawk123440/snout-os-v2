@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ChevronLeft, ChevronRight, PawPrint, AlertTriangle } from 'lucide-react';
+import { ChevronLeft, ChevronRight, PawPrint, AlertTriangle, CalendarCheck2, Clock3, Link2 } from 'lucide-react';
 import { Button } from '@/components/ui';
 import {
   SitterCard,
@@ -120,6 +120,8 @@ export default function SitterCalendarPage() {
 
   const bookingsForDay = (date: Date) => bookings.filter((b) => isSameDay(new Date(b.startAt), date));
   const googleForDay = (date: Date) => googleEvents.filter((e) => !e.allDay && isSameDay(new Date(e.start), date));
+  const dayBookings = bookingsForDay(currentDate);
+  const dayGoogleEvents = googleForDay(currentDate);
 
   const weekDays = useMemo(() => {
     const start = new Date(currentDate);
@@ -129,29 +131,63 @@ export default function SitterCalendarPage() {
 
   return (
     <div className="mx-auto max-w-4xl pb-8">
-      <SitterPageHeader title="Calendar" subtitle={formatDateLabel(currentDate)} action={<Button variant="secondary" size="sm" onClick={() => void refetch()} disabled={loading}>Refresh</Button>} />
+      <SitterPageHeader
+        title="Calendar"
+        subtitle={formatDateLabel(currentDate)}
+        action={<Button variant="secondary" size="sm" onClick={() => void refetch()} disabled={loading}>Refresh</Button>}
+      />
+
+      <div className="mb-4 grid gap-3 sm:grid-cols-3">
+        <div className="rounded-2xl border border-border-default bg-surface-primary px-4 py-3">
+          <div className="flex items-center gap-2 text-text-tertiary">
+            <CalendarCheck2 className="h-4 w-4" />
+            <p className="text-xs font-semibold uppercase tracking-wide">Today</p>
+          </div>
+          <p className="mt-2 text-2xl font-semibold text-text-primary">{dayBookings.length}</p>
+          <p className="text-sm text-text-secondary">Assigned visits</p>
+        </div>
+        <div className="rounded-2xl border border-border-default bg-surface-primary px-4 py-3">
+          <div className="flex items-center gap-2 text-text-tertiary">
+            <Clock3 className="h-4 w-4" />
+            <p className="text-xs font-semibold uppercase tracking-wide">Personal</p>
+          </div>
+          <p className="mt-2 text-2xl font-semibold text-text-primary">{dayGoogleEvents.length}</p>
+          <p className="text-sm text-text-secondary">Google events in view</p>
+        </div>
+        <div className="rounded-2xl border border-border-default bg-surface-primary px-4 py-3">
+          <div className="flex items-center gap-2 text-text-tertiary">
+            <AlertTriangle className="h-4 w-4" />
+            <p className="text-xs font-semibold uppercase tracking-wide">Attention</p>
+          </div>
+          <p className="mt-2 text-2xl font-semibold text-text-primary">{conflictIds.size}</p>
+          <p className="text-sm text-text-secondary">Schedule conflicts</p>
+        </div>
+      </div>
 
       {/* Google Calendar connection */}
       {!googleConnected && (
-        <SitterCard className="mb-4 border-status-info-border bg-status-info-bg">
+        <SitterCard className="mb-4 border-border-default bg-surface-primary">
           <SitterCardBody>
             <div className="flex items-center justify-between gap-3">
               <div>
-                <p className="text-sm font-medium text-status-info-text">Connect Google Calendar</p>
-                <p className="text-xs text-status-info-text">See all your events and auto-sync Snout visits.</p>
+                <p className="text-sm font-medium text-text-primary">Connect Google Calendar</p>
+                <p className="text-xs text-text-secondary">Snout OS stays in control. Google gets a mirror of your assigned bookings.</p>
               </div>
               {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- API route triggers OAuth redirect, not client navigation */}
-              <a href="/api/integrations/google/start?returnUrl=/sitter/calendar" className="min-h-[44px] inline-flex items-center rounded-lg bg-accent-primary px-4 text-sm font-semibold text-text-inverse hover:opacity-90 transition">Connect</a>
+              <a href="/api/integrations/google/start?returnUrl=/sitter/calendar" className="min-h-[44px] inline-flex items-center gap-2 rounded-lg bg-accent-primary px-4 text-sm font-semibold text-text-inverse hover:opacity-90 transition">
+                <Link2 className="h-4 w-4" />
+                Connect
+              </a>
             </div>
           </SitterCardBody>
         </SitterCard>
       )}
       {googleConnected && (
-        <p className="mb-3 flex items-center gap-1.5 text-xs text-text-tertiary"><span className="h-2 w-2 rounded-full bg-status-success-fill" /> Google Calendar synced</p>
+        <p className="mb-3 flex items-center gap-1.5 text-xs text-text-tertiary"><span className="h-2 w-2 rounded-full bg-status-success-fill" /> Google Calendar connected for mirror-only sync</p>
       )}
 
       {/* View mode + navigation */}
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border-default bg-surface-primary p-3">
         <div className="flex rounded-xl border border-border-default p-0.5">
           {(['day', 'week', 'list'] as const).map((mode) => (
             <button key={mode} type="button" onClick={() => setViewMode(mode)} className={`rounded-lg px-3 py-1.5 text-sm font-medium transition min-h-[44px] ${viewMode === mode ? 'bg-surface-tertiary text-text-primary' : 'text-text-secondary hover:text-text-primary'}`}>
@@ -169,7 +205,7 @@ export default function SitterCalendarPage() {
       {loading ? (<SitterSkeletonList count={3} />) : error ? (<SitterErrorState title="Couldn't load calendar" subtitle={error instanceof Error ? error.message : String(error)} onRetry={() => void refetch()} />) : viewMode === 'list' ? (
         <ListView bookings={bookings} googleEvents={googleEvents} conflictIds={conflictIds} onView={(id) => router.push(`/sitter/bookings/${id}`)} />
       ) : viewMode === 'day' ? (
-        <DayView date={currentDate} bookings={bookingsForDay(currentDate)} googleEvents={googleForDay(currentDate)} conflictIds={conflictIds} onView={(id) => router.push(`/sitter/bookings/${id}`)} />
+        <DayView date={currentDate} bookings={dayBookings} googleEvents={dayGoogleEvents} conflictIds={conflictIds} onView={(id) => router.push(`/sitter/bookings/${id}`)} />
       ) : (
         <WeekView days={weekDays} bookingsForDay={bookingsForDay} googleForDay={googleForDay} conflictIds={conflictIds} currentDate={currentDate} onView={(id) => router.push(`/sitter/bookings/${id}`)} />
       )}

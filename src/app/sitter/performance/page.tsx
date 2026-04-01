@@ -42,6 +42,8 @@ const TIER_BENEFITS = [
   { tier: 'preferred', label: 'Preferred', commission: '85%', perks: ['Top priority', 'Holiday pay', 'Mentorship', 'Pool leadership'] },
 ];
 
+const TIER_SEQUENCE = TIER_BENEFITS.map((item) => item.tier);
+
 const tierColor = (tier: string) => {
   switch (tier.toLowerCase()) {
     case 'preferred': return 'bg-status-warning-bg text-status-warning-text border-status-warning-border';
@@ -75,6 +77,11 @@ export default function SitterPerformancePage() {
   }
 
   const thresholds = data.tierThresholds || {};
+  const currentTierIndex = Math.max(0, TIER_SEQUENCE.indexOf(data.tier.toLowerCase()));
+  const nextTier = currentTierIndex >= 0 && currentTierIndex < TIER_SEQUENCE.length - 1
+    ? TIER_BENEFITS[currentTierIndex + 1]
+    : null;
+  const currentTierBenefits = TIER_BENEFITS[currentTierIndex] || TIER_BENEFITS[0];
 
   return (
     <div className="mx-auto max-w-3xl pb-8">
@@ -99,6 +106,14 @@ export default function SitterPerformancePage() {
                 {data.rolling26w != null && <p className="mt-0.5 text-xs text-text-tertiary">26-week average: {data.rolling26w.toFixed(1)}</p>}
                 {data.provisional && <p className="mt-0.5 text-xs text-status-warning-text-secondary">Provisional \u2014 complete 15+ visits to activate</p>}
                 {data.atRisk && <p className="mt-0.5 text-xs text-status-danger-text-secondary">At risk: {data.atRiskReason || 'Below tier minimum'}</p>}
+                <p className="mt-2 text-xs text-text-secondary">
+                  Current perks: {currentTierBenefits.perks.join(' · ')}
+                </p>
+                {nextTier && (
+                  <p className="mt-1 text-xs text-text-tertiary">
+                    Next unlock: {nextTier.label} tier at stronger score consistency and response habits.
+                  </p>
+                )}
               </div>
             </div>
           </SitterCardBody>
@@ -204,6 +219,26 @@ export default function SitterPerformancePage() {
                     <p className="text-sm text-text-secondary">{action}</p>
                   </div>
                 ))}
+              </div>
+            </SitterCardBody>
+          </SitterCard>
+        )}
+
+        {nextTier && (
+          <SitterCard>
+            <SitterCardHeader><h3 className="font-semibold text-text-primary">Next Tier Unlock</h3></SitterCardHeader>
+            <SitterCardBody>
+              <div className="rounded-xl border border-border-default bg-surface-secondary p-4">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-semibold text-text-primary">{nextTier.label}</p>
+                    <p className="mt-1 text-xs text-text-secondary">{nextTier.perks.join(' · ')}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs text-text-tertiary">Commission</p>
+                    <p className="text-sm font-semibold text-text-primary">{nextTier.commission}</p>
+                  </div>
+                </div>
               </div>
             </SitterCardBody>
           </SitterCard>

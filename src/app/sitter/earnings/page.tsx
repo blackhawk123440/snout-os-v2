@@ -26,6 +26,11 @@ interface EarningsData {
   completedThisMonthCount: number;
   completedLastMonthCount: number;
   averagePerVisit: number;
+  scheduledPayoutAmount: number;
+  scheduledPayoutCount: number;
+  nextPayoutReleaseAt: string | null;
+  periodEarnings?: number;
+  periodCount?: number;
 }
 
 interface CompletedJob {
@@ -122,16 +127,16 @@ export default function SitterEarningsPage() {
         <div className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
             <div className="rounded-2xl border border-border-default bg-[radial-gradient(circle_at_top_left,_rgba(34,197,94,0.10),_transparent_42%),linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.96))] p-5 shadow-sm">
-              <p className="text-sm font-semibold text-text-primary">Earnings should feel transparent</p>
+              <p className="text-sm font-semibold text-text-primary">Clear earnings, calm payout timing</p>
               <p className="mt-2 text-sm leading-6 text-text-secondary">
-                This page is here to help you understand what you have earned, what is still pending payout, and how completed visits are turning into real take-home pay.
+                Track completed-visit pay, see what is already on the way, and know when the next payout will be released.
               </p>
             </div>
             <div className="rounded-2xl border border-border-default bg-surface-primary p-5 shadow-sm">
-              <p className="text-sm font-semibold text-text-primary">Best next moves</p>
+              <p className="text-sm font-semibold text-text-primary">How payouts work</p>
               <div className="mt-2 space-y-2 text-sm text-text-secondary">
-                <p>Use completed jobs to confirm visit-level pay details.</p>
-                <p>Use payout transfers to track when money is actually moving out.</p>
+                <p>Completed, paid visits move into a 7-day hold automatically.</p>
+                <p>Once the hold ends, the transfer appears in your payout history.</p>
               </div>
             </div>
           </div>
@@ -173,16 +178,25 @@ export default function SitterEarningsPage() {
           </div>
 
           <div className="rounded-2xl bg-surface-primary shadow-sm p-5">
-            <p className="text-[11px] font-semibold text-text-tertiary uppercase tracking-wider">Next payout</p>
-            {transferSummary.hasPaidHistory && transferSummary.nextPayoutDate ? (
+            <p className="text-[11px] font-semibold text-text-tertiary uppercase tracking-wider">Next release</p>
+            {data.nextPayoutReleaseAt ? (
+              <>
+                <p className="mt-2 text-2xl font-bold text-text-primary">
+                  {formatDateUtil(data.nextPayoutReleaseAt)}
+                </p>
+                <p className="mt-1 text-xs text-text-tertiary">
+                  {data.scheduledPayoutCount} visit{data.scheduledPayoutCount !== 1 ? 's' : ''} in queue
+                </p>
+              </>
+            ) : transferSummary.hasPaidHistory && transferSummary.nextPayoutDate ? (
               <>
                 <p className="mt-2 text-2xl font-bold text-text-primary">
                   {formatDateUtil(transferSummary.nextPayoutDate)}
                 </p>
-                <p className="mt-1 text-xs text-text-tertiary">Estimated</p>
+                <p className="mt-1 text-xs text-text-tertiary">Based on recent transfer history</p>
               </>
             ) : (
-              <p className="mt-2 text-sm text-text-secondary">After first completed visit</p>
+              <p className="mt-2 text-sm text-text-secondary">After your first paid, completed visit</p>
             )}
           </div>
 
@@ -204,9 +218,9 @@ export default function SitterEarningsPage() {
             {/* Payout status */}
             <div className="grid grid-cols-2 divide-x divide-border-muted border-b border-border-muted">
               <div className="p-5 bg-accent-tertiary/50">
-                <p className="text-[11px] font-semibold text-accent-primary uppercase tracking-wider">Pending</p>
-                <p className="mt-2 text-xl font-bold text-text-primary tabular-nums">${(transferSummary.pendingCents / 100).toFixed(2)}</p>
-                <p className="mt-1 text-xs text-text-tertiary">Awaiting payout</p>
+                <p className="text-[11px] font-semibold text-accent-primary uppercase tracking-wider">Scheduled</p>
+                <p className="mt-2 text-xl font-bold text-text-primary tabular-nums">${data.scheduledPayoutAmount.toFixed(2)}</p>
+                <p className="mt-1 text-xs text-text-tertiary">Releases 7 days after completion</p>
               </div>
               <div className="p-5">
                 <p className="text-[11px] font-semibold text-text-tertiary uppercase tracking-wider">Paid (30d)</p>
@@ -301,7 +315,7 @@ export default function SitterEarningsPage() {
           </div>
 
           <p className="text-center text-xs text-text-tertiary">
-            Earnings are based on completed bookings. Payouts are sent to your connected Stripe account.
+            Completed paid bookings enter a 7-day hold, then payouts are sent to your connected Stripe account automatically.
           </p>
         </div>
       ) : null}

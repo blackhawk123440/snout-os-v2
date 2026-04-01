@@ -23,7 +23,8 @@ export async function GET() {
 
   const db = getScopedDb(ctx);
   try {
-    const [unpaidBookings, clientBookings, loyalty] = await Promise.all([
+    const userDb = db.user as any;
+    const [unpaidBookings, clientBookings, loyalty, referralUser] = await Promise.all([
       db.booking.findMany({
         where: {
           clientId: ctx.clientId,
@@ -58,6 +59,10 @@ export async function GET() {
         where: { clientId: ctx.clientId },
         select: { points: true, tier: true },
       }),
+      userDb.findUnique({
+        where: { id: ctx.userId },
+        select: { referralCode: true },
+      }).catch(() => null),
     ]);
     const clientBookingIds = (clientBookings || []).map((b) => b.id);
     const paymentHistory = await db.stripeCharge.findMany({
@@ -129,6 +134,43 @@ export async function GET() {
       .sort((a, b) => (new Date(b.paidAt).getTime() || 0) - (new Date(a.paidAt).getTime() || 0))
       .slice(0, 10);
 
+    const availablePoints = loyalty?.points ?? 0;
+    const redeemablePoints = Math.floor(availablePoints / 100) * 100;
+    const redeemableDiscount = (redeemablePoints / 100) * 5;
+    const referralCode = referralUser?.referralCode ?? null;
+    let referralCount = 0;
+    let qualifiedReferralCount = 0;
+
+    if (referralCode) {
+      const referredUsers = await userDb.findMany({
+        where: { referredBy: referralCode },
+        select: { clientId: true },
+      }).catch(() => []);
+
+      referralCount = referredUsers.length;
+
+      const referredClientIds = referredUsers
+        .map((user: { clientId?: string | null }) => user.clientId)
+        .filter((clientId: string | null | undefined): clientId is string => !!clientId);
+
+      if (referredClientIds.length > 0) {
+        const qualifiedBookings = await db.booking.findMany({
+          where: {
+            clientId: { in: referredClientIds },
+            paymentStatus: 'paid',
+            status: { in: ['confirmed', 'completed'] },
+          },
+          select: { clientId: true },
+        });
+
+        qualifiedReferralCount = new Set(
+          qualifiedBookings
+            .map((booking) => booking.clientId)
+            .filter((clientId): clientId is string => !!clientId)
+        ).size;
+      }
+    }
+
     return NextResponse.json({
       invoices,
       payments,
@@ -136,6 +178,16 @@ export async function GET() {
       loyalty: loyalty
         ? { points: loyalty.points, tier: loyalty.tier }
         : { points: 0, tier: 'bronze' },
+      loyaltySummary: {
+        availablePoints,
+        redeemablePoints,
+        redeemableDiscount,
+      },
+      referrals: {
+        referralCode,
+        referralCount,
+        qualifiedReferralCount,
+      },
     });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Unknown error';

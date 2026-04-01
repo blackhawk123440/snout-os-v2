@@ -3,6 +3,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const mockBookingFindMany = vi.fn();
 const mockLoyaltyFindFirst = vi.fn();
 const mockStripeChargeFindMany = vi.fn();
+const mockUserFindUnique = vi.fn();
+const mockUserFindMany = vi.fn();
 
 vi.mock('@/lib/request-context', () => ({
   getRequestContext: vi.fn(),
@@ -24,6 +26,10 @@ vi.mock('@/lib/tenancy', () => ({
     },
     stripeCharge: {
       findMany: (...args: unknown[]) => mockStripeChargeFindMany(...args),
+    },
+    user: {
+      findUnique: (...args: unknown[]) => mockUserFindUnique(...args),
+      findMany: (...args: unknown[]) => mockUserFindMany(...args),
     },
   })),
 }));
@@ -66,6 +72,8 @@ describe('GET /api/client/billing', () => {
         },
       ]);
     mockLoyaltyFindFirst.mockResolvedValueOnce({ points: 42, tier: 'silver' });
+    mockUserFindUnique.mockResolvedValueOnce(null);
+    mockUserFindMany.mockResolvedValueOnce([]);
     mockStripeChargeFindMany.mockResolvedValueOnce([
       {
         id: 'ch_paid_1',
@@ -98,6 +106,20 @@ describe('GET /api/client/billing', () => {
         amount: 25,
         bookingReference: 'b-paid',
         invoiceReference: 'ch_paid_1',
+      })
+    );
+    expect(body.loyaltySummary).toEqual(
+      expect.objectContaining({
+        availablePoints: 42,
+        redeemablePoints: 0,
+        redeemableDiscount: 0,
+      })
+    );
+    expect(body.referrals).toEqual(
+      expect.objectContaining({
+        referralCode: null,
+        referralCount: 0,
+        qualifiedReferralCount: 0,
       })
     );
   });

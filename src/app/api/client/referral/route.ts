@@ -1,6 +1,6 @@
 /**
  * GET /api/client/referral
- * Returns the client's referral code and referral count.
+ * Returns the client's referral code and referral summary.
  * Auto-generates a referral code if none exists.
  */
 
@@ -60,11 +60,39 @@ export async function GET() {
     }
 
     // Count referrals
-    const referralCount = await userDb.count({
+    const referredUsers = await userDb.findMany({
       where: { referredBy: referralCode },
-    });
+      select: { clientId: true },
+    }).catch(() => []);
 
-    return NextResponse.json({ referralCode, referralCount });
+    const referralCount = referredUsers.length;
+    const referredClientIds = referredUsers
+      .map((user: { clientId?: string | null }) => user.clientId)
+      .filter((clientId: string | null | undefined): clientId is string => !!clientId);
+
+    let qualifiedReferralCount = 0;
+    if (referredClientIds.length > 0) {
+      const qualifiedBookings = await db.booking.findMany({
+        where: {
+          clientId: { in: referredClientIds },
+          paymentStatus: 'paid',
+          status: { in: ['confirmed', 'completed'] },
+        },
+        select: { clientId: true },
+      });
+      qualifiedReferralCount = new Set(
+        qualifiedBookings
+          .map((booking) => booking.clientId)
+          .filter((clientId): clientId is string => !!clientId)
+      ).size;
+    }
+
+    return NextResponse.json({
+      referralCode,
+      referralCount,
+      qualifiedReferralCount,
+      bonusPoints: 50,
+    });
   } catch (error) {
     const msg = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json({ error: 'Failed to load referral', message: msg }, { status: 500 });

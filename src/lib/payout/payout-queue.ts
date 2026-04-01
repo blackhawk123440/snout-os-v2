@@ -29,21 +29,31 @@ export const payoutQueue = queueEnabled ? new Queue("payouts", {
 }) : disabledQueue("payouts");
 
 const JOB_PREFIX = "payout";
+export const PAYOUT_HOLD_DAYS = 7;
+const PAYOUT_HOLD_MS = PAYOUT_HOLD_DAYS * 24 * 60 * 60 * 1000;
 
 export function getPayoutJobId(bookingId: string): string {
   return `${JOB_PREFIX}:${bookingId}`;
+}
+
+export function getPayoutDelayMs(completedAt?: Date | string | null): number {
+  const completedTime = completedAt ? new Date(completedAt).getTime() : Date.now();
+  if (Number.isNaN(completedTime)) return PAYOUT_HOLD_MS;
+  return Math.max(0, completedTime + PAYOUT_HOLD_MS - Date.now());
 }
 
 export async function enqueuePayoutForBooking(params: {
   orgId: string;
   bookingId: string;
   sitterId: string;
+  completedAt?: Date | string | null;
   correlationId?: string;
 }): Promise<void> {
   if (!queueEnabled) return;
-  const { orgId, bookingId, sitterId } = params;
+  const { orgId, bookingId, sitterId, completedAt } = params;
   const jobId = getPayoutJobId(bookingId);
   const jobCorrelationId = params.correlationId ?? resolveCorrelationId();
+  const delay = getPayoutDelayMs(completedAt);
 
   const existing = await payoutQueue.getJob(jobId);
   if (existing && !["failed", "completed"].includes(await existing.getState())) {
@@ -52,8 +62,8 @@ export async function enqueuePayoutForBooking(params: {
 
   const job = await payoutQueue.add(
     "process-payout",
-    { orgId, bookingId, sitterId, correlationId: jobCorrelationId },
-    { jobId }
+    { orgId, bookingId, sitterId, completedAt: completedAt ?? new Date().toISOString(), correlationId: jobCorrelationId },
+    { jobId, delay }
   );
 
   await logEvent({
@@ -72,7 +82,7 @@ export async function enqueuePayoutForBooking(params: {
     resourceType: "booking",
     resourceId: bookingId,
     correlationId: jobCorrelationId,
-    payload: { orgId, bookingId, sitterId, correlationId: jobCorrelationId },
+    payload: { orgId, bookingId, sitterId, completedAt: completedAt ?? new Date().toISOString(), correlationId: jobCorrelationId },
   });
 }
 

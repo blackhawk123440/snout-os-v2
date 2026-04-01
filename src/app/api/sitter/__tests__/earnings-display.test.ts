@@ -55,12 +55,21 @@ describe('GET /api/sitter/earnings', () => {
     // Default: return zero aggregates for any call
     mockBookingAggregate.mockResolvedValue({ _sum: { totalPrice: null }, _count: 0 });
     mockEarningAggregate.mockResolvedValue({ _sum: { tips: null } });
+    mockTransferFindMany.mockResolvedValue([]);
+    mockBookingFindMany.mockResolvedValue([]);
   });
 
-  it('returns earnings with tipsTotal from SitterEarning', async () => {
+  it('returns earnings with tipsTotal and scheduled payout visibility', async () => {
     // All aggregate calls return the same value for simplicity (avoids parallel mock ordering issues)
     mockBookingAggregate.mockResolvedValue({ _sum: { totalPrice: 500 }, _count: 5 });
     mockEarningAggregate.mockResolvedValue({ _sum: { tips: 25 } });
+    mockBookingFindMany.mockResolvedValue([
+      {
+        id: 'b-scheduled',
+        totalPrice: 100,
+        updatedAt: new Date('2026-03-20T12:00:00.000Z'),
+      },
+    ]);
 
     const { GET } = await import('@/app/api/sitter/earnings/route');
     const url = new URL('http://localhost/api/sitter/earnings');
@@ -74,6 +83,9 @@ describe('GET /api/sitter/earnings', () => {
     expect(data.tipsTotal).toBe(25);
     expect(data.completedBookingsCount).toBe(5);
     expect(data.commissionPercentage).toBe(80);
+    expect(data.scheduledPayoutAmount).toBe(80);
+    expect(data.scheduledPayoutCount).toBe(1);
+    expect(data.nextPayoutReleaseAt).toBe('2026-03-27T12:00:00.000Z');
   });
 });
 

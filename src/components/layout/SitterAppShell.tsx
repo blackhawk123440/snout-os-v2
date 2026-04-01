@@ -171,7 +171,7 @@ export function SitterAppShell({ children }: SitterAppShellProps) {
         {NAV_ITEMS.map((item) => {
           const active = isActive(item.href);
           const showDot =
-            (item.id === 'messages' && hasUnreadMessages);
+            (item.id === 'inbox' && hasUnreadMessages);
           return (
             <Link
               key={item.href}

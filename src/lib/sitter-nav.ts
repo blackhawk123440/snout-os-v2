@@ -4,38 +4,41 @@
  * Source of truth for sitter app structure.
  *
  * Architecture:
- * - Bottom nav: 5 primary tabs (Home, Today, Messages, Earnings, Profile)
- * - Profile → More section: secondary pages (Calendar, Pets, Reports, Performance, Training, Call Out)
- * - Home is the dashboard overview; Today is the operational check-in/out work view
+ * - Bottom nav: 5 primary tabs (Today, Calendar, Bookings, Inbox, Profile)
+ * - Profile → More section: secondary pages (Earnings, Performance, Availability, Pets, Reports, Training, Call Out)
+ * - Today is the operational check-in/out work view
  */
 
 export type FeatureStatus = 'live' | 'coming_soon' | 'beta';
 
 export const SITTER_TABS = [
-  { id: 'home', label: 'Home', href: '/sitter/dashboard', icon: 'fas fa-th-large' },
   { id: 'today', label: 'Today', href: '/sitter/today', icon: 'fas fa-calendar-day' },
+  { id: 'calendar', label: 'Calendar', href: '/sitter/calendar', icon: 'fas fa-calendar-alt' },
   { id: 'bookings', label: 'Bookings', href: '/sitter/bookings', icon: 'fas fa-clipboard-list' },
-  { id: 'messages', label: 'Messages', href: '/sitter/inbox', icon: 'fas fa-inbox' },
-  { id: 'reports', label: 'Reports', href: '/sitter/reports', icon: 'fas fa-file-alt' },
-  { id: 'earnings', label: 'Earnings', href: '/sitter/earnings', icon: 'fas fa-wallet' },
+  { id: 'inbox', label: 'Inbox', href: '/sitter/inbox', icon: 'fas fa-inbox' },
   { id: 'profile', label: 'Profile', href: '/sitter/profile', icon: 'fas fa-user' },
+  { id: 'earnings', label: 'Earnings', href: '/sitter/earnings', icon: 'fas fa-wallet' },
+  { id: 'performance', label: 'Performance', href: '/sitter/performance', icon: 'fas fa-chart-line' },
+  { id: 'availability', label: 'Availability', href: '/sitter/availability', icon: 'fas fa-clock' },
+  { id: 'reports', label: 'Reports', href: '/sitter/reports', icon: 'fas fa-file-alt' },
 ] as const;
 
 /** Mobile bottom nav — 5 core items for touch ergonomics. */
 export const SITTER_BOTTOM_TABS = [
-  SITTER_TABS[0], // Home (dashboard)
-  SITTER_TABS[1], // Today (work view)
-  SITTER_TABS[3], // Messages
-  SITTER_TABS[5], // Earnings
-  SITTER_TABS[6], // Profile
+  SITTER_TABS[0], // Today
+  SITTER_TABS[1], // Calendar
+  SITTER_TABS[2], // Bookings
+  SITTER_TABS[3], // Inbox
+  SITTER_TABS[4], // Profile
 ] as const;
 
 /** Secondary pages accessible from Profile → More section. */
 export const SITTER_MORE_LINKS = [
-  { href: '/sitter/calendar', label: 'Calendar', icon: 'fas fa-calendar-alt' },
+  { href: '/sitter/earnings', label: 'Earnings', icon: 'fas fa-wallet' },
+  { href: '/sitter/performance', label: 'Performance', icon: 'fas fa-chart-line' },
+  { href: '/sitter/availability', label: 'Availability', icon: 'fas fa-clock' },
   { href: '/sitter/pets', label: 'Pets', icon: 'fas fa-paw' },
   { href: '/sitter/reports', label: 'Reports', icon: 'fas fa-file-alt' },
-  { href: '/sitter/performance', label: 'Performance', icon: 'fas fa-chart-line' },
   { href: '/sitter/training', label: 'Training', icon: 'fas fa-graduation-cap' },
   { href: '/sitter/callout', label: 'Call Out', icon: 'fas fa-phone' },
 ] as const;

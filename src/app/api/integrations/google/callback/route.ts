@@ -21,14 +21,17 @@ export async function GET(request: NextRequest) {
   const code = searchParams.get('code');
   const state = searchParams.get('state');
   const error = searchParams.get('error');
+  const redirectBase = user.role === 'sitter' ? '/sitter/calendar' : '/settings?section=integrations';
+  const redirectWithError = (code: string) =>
+    NextResponse.redirect(new URL(`${redirectBase}${redirectBase.includes('?') ? '&' : '?'}google=${code}`, request.url));
 
   if (error) {
     console.error('[Google OAuth Callback] OAuth error:', error);
-    return NextResponse.redirect(new URL('/sitters?error=oauth_failed', request.url));
+    return redirectWithError('oauth_failed');
   }
 
   if (!code || !state) {
-    return NextResponse.redirect(new URL('/sitters?error=invalid_callback', request.url));
+    return redirectWithError('invalid_callback');
   }
 
   const orgId = (user as any).orgId ?? 'default';
@@ -40,17 +43,17 @@ export async function GET(request: NextRequest) {
     const verified = decodeAndVerifyOAuthState(state, { orgId, userId });
     if (!verified) {
       await logOAuthCallbackRejection('invalid_state', { orgId, userId, reason: 'expired_or_mismatch' });
-      return NextResponse.redirect(new URL('/sitters?error=invalid_state', request.url));
+      return redirectWithError('invalid_state');
     }
     const { sitterId } = verified;
 
     if (!sitterId) {
-      return NextResponse.redirect(new URL('/sitters?error=invalid_state', request.url));
+      return redirectWithError('invalid_state');
     }
 
     // Permission check: sitter can only connect their own calendar, owner/admin can connect any
     if (user.role === 'sitter' && user.sitterId !== sitterId) {
-      return NextResponse.redirect(new URL('/sitters?error=forbidden', request.url));
+      return redirectWithError('forbidden');
     }
 
     // Tenancy: ensure sitter belongs to caller's org before updating
@@ -59,7 +62,7 @@ export async function GET(request: NextRequest) {
       select: { id: true },
     });
     if (!sitter) {
-      return NextResponse.redirect(new URL('/sitters?error=sitter_not_found', request.url));
+      return redirectWithError('sitter_not_found');
     }
 
     const clientId = env.GOOGLE_CLIENT_ID;
@@ -67,7 +70,7 @@ export async function GET(request: NextRequest) {
     const redirectUri = `${env.NEXT_PUBLIC_APP_URL || request.nextUrl.origin}/api/integrations/google/callback`;
 
     if (!clientId || !clientSecret) {
-      return NextResponse.redirect(new URL('/sitters?error=not_configured', request.url));
+      return redirectWithError('not_configured');
     }
 
     const oauth2Client = new google.auth.OAuth2(clientId, clientSecret, redirectUri);
@@ -76,7 +79,7 @@ export async function GET(request: NextRequest) {
     const { tokens } = await oauth2Client.getToken(code);
 
     if (!tokens.access_token) {
-      return NextResponse.redirect(new URL('/sitters?error=no_token', request.url));
+      return redirectWithError('no_token');
     }
 
     // Calculate token expiry
@@ -97,10 +100,10 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    // Redirect to sitter calendar tab
-    return NextResponse.redirect(new URL(`/sitters/${sitterId}?tab=calendar&connected=true`, request.url));
+    const successSeparator = redirectBase.includes('?') ? '&' : '?';
+    return NextResponse.redirect(new URL(`${redirectBase}${successSeparator}google=connected&sitterId=${encodeURIComponent(sitterId)}`, request.url));
   } catch (error: any) {
     console.error('[Google OAuth Callback] Failed to process callback:', error);
-    return NextResponse.redirect(new URL('/sitters?error=callback_failed', request.url));
+    return redirectWithError('callback_failed');
   }
 }

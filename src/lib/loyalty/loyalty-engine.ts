@@ -229,3 +229,54 @@ export async function awardReferralBonus(
 
   return { awarded: true, points: REFERRAL_BONUS_POINTS };
 }
+
+/**
+ * Awards a referral bonus only after the referred household has a paid booking.
+ * Safe to call multiple times from payment webhooks.
+ */
+export async function processQualifiedReferralBonus(
+  db: PrismaClient,
+  orgId: string,
+  clientId: string
+): Promise<{ qualified: boolean; awarded: boolean; points: number; reason: string }> {
+  const userDb = db.user as any;
+  const referredUser = await userDb.findFirst({
+    where: { orgId, clientId },
+    select: { id: true, clientId: true, referredBy: true },
+  }).catch(() => null);
+
+  if (!referredUser?.referredBy || !referredUser.clientId) {
+    return { qualified: false, awarded: false, points: 0, reason: 'No referral code on file' };
+  }
+
+  const qualifyingBooking = await db.booking.findFirst({
+    where: {
+      orgId,
+      clientId,
+      paymentStatus: 'paid',
+      status: { in: ['confirmed', 'completed'] },
+    },
+    select: { id: true },
+  });
+
+  if (!qualifyingBooking) {
+    return { qualified: false, awarded: false, points: 0, reason: 'No qualifying paid booking yet' };
+  }
+
+  const referrer = await userDb.findFirst({
+    where: { orgId, referralCode: referredUser.referredBy },
+    select: { clientId: true },
+  }).catch(() => null);
+
+  if (!referrer?.clientId) {
+    return { qualified: false, awarded: false, points: 0, reason: 'Referrer not found' };
+  }
+
+  const result = await awardReferralBonus(db, orgId, referrer.clientId, clientId);
+  return {
+    qualified: true,
+    awarded: result.awarded,
+    points: result.points,
+    reason: result.awarded ? 'Referral bonus awarded' : result.error || 'Referral bonus already processed',
+  };
+}

@@ -22,9 +22,6 @@ import {
   CalendarDays,
   BookOpen,
   FileInput,
-  Check,
-  AlertCircle,
-  Clock,
   ChevronRight,
   RefreshCw,
   Phone,
@@ -82,22 +79,22 @@ const CATEGORIES: CategoryConfig[] = [
   {
     key: 'messaging',
     label: 'Messaging',
-    description: 'How your business handles calls and texts. Start with native phone numbers or add a connector later.',
+    description: 'Twilio is the launch path for routed business messaging. OpenPhone and native mode stay secondary.',
     icon: <MessageSquare className="h-5 w-5" />,
     field: 'messagingProvider',
     statusKey: 'messaging',
     options: [
-      { value: 'none', label: 'Native phone mode — owner, sitter, and client use normal numbers', available: true },
-      { value: 'openphone', label: 'OpenPhone — optional U.S. shared business line', available: true },
-      { value: 'twilio', label: 'Twilio — optional U.S. masked numbers and automation', available: true },
+      { value: 'twilio', label: 'Twilio — routed business messaging and masked workflows', available: true },
+      { value: 'openphone', label: 'OpenPhone — shared business line', available: true },
+      { value: 'none', label: 'Native phone mode — no connector', available: true },
     ],
-    setupLink: '/settings?section=integrations',
-    setupLabel: 'Configure',
+    setupLink: '/settings?section=twilio',
+    setupLabel: 'Open Twilio setup',
   },
   {
     key: 'payment',
     label: 'Payments',
-    description: 'How you charge clients and pay sitters.',
+    description: 'Stripe handles checkout, payment capture before service, and sitter payouts.',
     icon: <CreditCard className="h-5 w-5" />,
     field: 'paymentProvider',
     statusKey: 'payment',
@@ -106,27 +103,27 @@ const CATEGORIES: CategoryConfig[] = [
       { value: 'square', label: 'Square', available: false },
       { value: 'none', label: 'None — manual invoicing', available: true },
     ],
-    setupLink: '/integrations',
-    setupLabel: 'Stripe settings',
+    setupLink: '/settings?section=integrations',
+    setupLabel: 'Review launch status',
   },
   {
     key: 'calendar',
     label: 'Calendar',
-    description: 'Sync sitter schedules with external calendars.',
+    description: 'Snout OS stays the source of truth. Google mirrors assigned bookings for sitter visibility.',
     icon: <CalendarDays className="h-5 w-5" />,
     field: 'calendarProvider',
     statusKey: 'calendar',
     options: [
+      { value: 'google', label: 'Google Calendar — one-way mirror from Snout OS', available: true },
       { value: 'none', label: 'None — in-app calendar only', available: true },
-      { value: 'google', label: 'Google Calendar — bidirectional sync', available: true },
     ],
     setupLink: '/sitters',
-    setupLabel: 'Connect sitters',
+    setupLabel: 'Connect sitter calendars',
   },
   {
     key: 'accounting',
     label: 'Accounting',
-    description: 'Sync revenue and expenses with your accounting software.',
+    description: 'Built-in ledger is enough for MVP. External accounting can stay secondary.',
     icon: <BookOpen className="h-5 w-5" />,
     field: 'accountingProvider',
     statusKey: 'accounting',
@@ -139,14 +136,14 @@ const CATEGORIES: CategoryConfig[] = [
   {
     key: 'bookingIntake',
     label: 'Booking Intake',
-    description: 'How new clients submit booking requests to your business.',
+    description: 'Choose the cleanest path for new requests. Portal-first is the default MVP posture.',
     icon: <FileInput className="h-5 w-5" />,
     field: 'bookingIntake',
     statusKey: 'bookingIntake',
     options: [
-      { value: 'embedded_form', label: 'Embedded form — add to your website', available: true },
-      { value: 'client_portal', label: 'Client portal — clients book directly', available: true },
-      { value: 'both', label: 'Both — form + portal', available: true },
+      { value: 'client_portal', label: 'Client portal — logged-in clients book directly', available: true },
+      { value: 'both', label: 'Both — portal + embedded form', available: true },
+      { value: 'embedded_form', label: 'Embedded form — website intake only', available: true },
     ],
   },
 ];
@@ -356,13 +353,13 @@ export function IntegrationStackSection() {
         <div className="p-5">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="max-w-2xl">
-              <p className="text-sm font-semibold text-text-primary">Choose your business stack</p>
+              <p className="text-sm font-semibold text-text-primary">Launch-critical integrations</p>
               <p className="mt-1 text-sm text-text-secondary">
-                Start with the essentials that shape the customer experience: how people contact you, how you get paid, and how new bookings come in. Specialist connector setup can stay secondary until you actually need it.
+                Keep the launch path simple: Twilio for production messaging, Stripe for payments and payouts, Google Calendar for sitter visibility, and one clean booking intake path.
               </p>
             </div>
             <Badge variant={readyCount >= 3 ? 'success' : 'warning'}>
-              {readyCount >= 3 ? 'Core stack in place' : 'Core setup in progress'}
+              {readyCount >= 3 ? 'Launch stack in progress' : 'Launch setup needed'}
             </Badge>
           </div>
 
@@ -414,19 +411,19 @@ export function IntegrationStackSection() {
 
       <Card>
         <div className="p-4">
-          <p className="text-sm font-semibold text-text-primary">Recommended launch path</p>
+          <p className="text-sm font-semibold text-text-primary">MVP rules</p>
           <div className="mt-3 grid gap-3 md:grid-cols-3">
             <div className="rounded-xl border border-border-default bg-surface-secondary px-4 py-3">
-              <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">Start simple</p>
-              <p className="mt-1 text-sm text-text-secondary">Native phone mode, Stripe, and client portal booking are enough for a real launch.</p>
+              <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">Messaging</p>
+              <p className="mt-1 text-sm text-text-secondary">Twilio is the production path. OpenPhone and native mode stay secondary.</p>
             </div>
             <div className="rounded-xl border border-border-default bg-surface-secondary px-4 py-3">
-              <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">Add connectors later</p>
-              <p className="mt-1 text-sm text-text-secondary">OpenPhone, Twilio, Google Calendar, and accounting sync are upgrades, not prerequisites.</p>
+              <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">Money</p>
+              <p className="mt-1 text-sm text-text-secondary">Clients pay before service. Stripe powers charge capture and sitter payout flow.</p>
             </div>
             <div className="rounded-xl border border-border-default bg-surface-secondary px-4 py-3">
-              <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">Use support tools only when needed</p>
-              <p className="mt-1 text-sm text-text-secondary">Number management, routing, and provider diagnostics can stay out of the main owner workflow until you need them.</p>
+              <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">Calendar</p>
+              <p className="mt-1 text-sm text-text-secondary">Snout OS is the source of truth. Google mirrors sitter bookings for visibility only.</p>
             </div>
           </div>
         </div>
@@ -451,9 +448,7 @@ export function IntegrationStackSection() {
             <div>
               <p className="text-sm text-text-primary font-medium">Native phone mode is active</p>
               <p className="text-xs text-text-secondary mt-1">
-                The workspace can run without Twilio or OpenPhone. Owners, sitters, and clients can use their regular phone numbers,
-                while in-app messaging and portal workflows remain available. Add a U.S. connector later if you want a dedicated business line,
-                masked routing, or deeper SMS automation.
+                This keeps messaging simple, but it is not the launch-blocking setup path. Switch to Twilio when you want routed business messaging and masked workflows.
               </p>
             </div>
           </div>
@@ -462,9 +457,9 @@ export function IntegrationStackSection() {
 
       <Card>
         <div className="p-4">
-          <p className="text-sm font-semibold text-text-primary">Specialist setup</p>
+          <p className="text-sm font-semibold text-text-primary">Secondary tools</p>
           <p className="mt-1 text-sm text-text-secondary">
-            These tools are still available when you need deeper connector work, but they don’t need to lead the setup journey.
+            Keep these out of the main owner workflow until you need them.
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
             <Link href="/settings?section=openphone">

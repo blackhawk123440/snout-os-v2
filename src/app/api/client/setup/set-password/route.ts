@@ -52,19 +52,7 @@ export async function POST(request: NextRequest) {
           data: { referredBy: referralCode },
         });
 
-        // Award referral bonus to the referrer (if they have a client profile)
-        if (referrer.clientId && user.clientId) {
-          try {
-            const { awardReferralBonus } = await import('@/lib/loyalty/loyalty-engine');
-            await awardReferralBonus(prisma as any, user.orgId || 'default', referrer.clientId, user.clientId);
-            referralApplied = true;
-          } catch (loyaltyErr) {
-            console.error('[client/setup] Referral bonus failed (non-blocking):', loyaltyErr);
-            referralError = 'Referral code accepted but bonus could not be applied';
-          }
-        } else {
-          referralApplied = true; // Code accepted, bonus deferred until client profiles exist
-        }
+        referralApplied = true;
       } else {
         referralError = 'Invalid referral code';
       }
@@ -84,6 +72,7 @@ export async function POST(request: NextRequest) {
       success: true,
       email: user.email,
       referralApplied,
+      referralPendingQualification: referralApplied,
       ...(referralError ? { referralError } : {}),
     });
   } catch (error: unknown) {

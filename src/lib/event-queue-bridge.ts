@@ -121,6 +121,7 @@ export function initializeEventQueueBridge(): void {
           orgId,
           bookingId,
           sitterId: context.booking.sitterId,
+          completedAt: context.booking?.updatedAt || new Date().toISOString(),
           correlationId: context.correlationId,
         }).catch((e) => console.error("[EventQueueBridge] Failed to enqueue payout:", e));
       }
