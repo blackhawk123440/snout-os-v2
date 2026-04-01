@@ -11,6 +11,16 @@ import { env } from "./env";
 import * as bcrypt from "bcryptjs";
 import { isBuildPhase, shouldSilenceBuildWarnings } from "./runtime-phase";
 
+const AUTH_PRIVILEGED_ROLES = new Set(["owner", "admin", "superadmin"]);
+
+function logAuthEvent(event: string, details?: Record<string, unknown>) {
+  if (details) {
+    console.info(`[NextAuth] ${event}`, details);
+    return;
+  }
+  console.info(`[NextAuth] ${event}`);
+}
+
 /**
  * NextAuth configuration with credentials provider
  */
@@ -95,13 +105,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        const hasEmail = !!credentials?.email;
-        const hasPassword = !!credentials?.password;
-        let outcome = "unknown";
-        let userFound = false;
-        let userHasPasswordHash = false;
-        let passwordValid: boolean | null = null;
-        let bypassedPassword = false;
         const enableE2eAuth =
           process.env.NODE_ENV !== 'production' && (
             process.env.ENABLE_E2E_AUTH === "true" ||
@@ -116,15 +119,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         }
         
         if (!credentials?.email || !credentials?.password) {
-          console.log('[NextAuth] Missing credentials');
-          outcome = "missing_credentials";
+          logAuthEvent('authorize_rejected', { reason: 'missing_credentials' });
           return null;
         }
 
         // Find user by email
         let user;
         try {
-          console.log('[NextAuth] Querying database for user...');
           // Note: API schema doesn't have sitterId directly, it's a relation
           // We'll get it via the sitter relation if needed
           // Use type assertion since Prisma client types may not match exactly
@@ -142,32 +143,23 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               client: { select: { id: true } },
             },
           });
-          console.log('[NextAuth] User query result:', user ? 'Found' : 'Not found');
-          userFound = !!user;
-          userHasPasswordHash = !!user?.passwordHash;
         } catch (error: any) {
-          console.error('[NextAuth] Database error during authorize:', error);
-          console.error('[NextAuth] Error message:', error?.message);
-          console.error('[NextAuth] Error code:', error?.code);
-          console.error('[NextAuth] Error stack:', error?.stack);
-          outcome = "db_error";
+          console.error('[NextAuth] authorize database lookup failed', {
+            code: error?.code,
+            message: error?.message,
+          });
           return null;
         }
 
         if (!user) {
-          console.log('[NextAuth] User not found in database');
-          outcome = "user_not_found";
+          logAuthEvent('authorize_rejected', { reason: 'invalid_credentials' });
           return null;
         }
 
         if ((user as any).deletedAt) {
-          console.log('[NextAuth] Account has been deleted');
-          outcome = "account_deleted";
+          logAuthEvent('authorize_rejected', { reason: 'account_unavailable', userId: user.id });
           return null;
         }
-
-        console.log('[NextAuth] User found, checking password...');
-        console.log('[NextAuth] User has passwordHash:', !!user.passwordHash);
 
         // Credentials auth requires a bcrypt password hash.
         if (user.passwordHash) {
@@ -176,29 +168,25 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               credentials.password as string,
               user.passwordHash
             );
-            console.log('[NextAuth] Password comparison result:', isValid);
-            passwordValid = isValid;
             if (!isValid) {
               // For E2E tests, allow bypassing password when E2E_AUTH is enabled
               // This allows deterministic E2E authentication without password verification
               if (enableE2eAuth) {
-                // Allow login for E2E - password check bypassed
-                console.log('[NextAuth] E2E auth enabled - bypassing password check');
-                bypassedPassword = true;
+                logAuthEvent('authorize_bypass_enabled', { userId: user.id, reason: 'e2e_auth' });
               } else {
-                console.log('[NextAuth] Password invalid');
-                outcome = "password_invalid";
+                logAuthEvent('authorize_rejected', { reason: 'invalid_credentials' });
                 return null;
               }
             }
           } catch (error: any) {
-            console.error('[NextAuth] Password comparison error:', error);
-            outcome = "password_compare_error";
+            console.error('[NextAuth] password verification failed', {
+              userId: user.id,
+              message: error?.message,
+            });
             return null;
           }
         } else {
-          console.log('[NextAuth] No password hash found for user');
-          outcome = "missing_password_hash";
+          logAuthEvent('authorize_rejected', { reason: 'password_auth_unavailable', userId: user.id });
           return null;
         }
 
@@ -212,8 +200,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           clientId = client?.id || null;
         }
 
-        console.log('[NextAuth] Authentication successful');
-        outcome = "success";
+        logAuthEvent('authorize_success', { userId: user.id, role: (user as any).role });
         return {
           id: user.id,
           email: user.email,
@@ -275,8 +262,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             const changedAtSec = Math.floor(dbUser.passwordChangedAt.getTime() / 1000);
             if (changedAtSec > (token.iat as number)) return {};
           }
-        } catch {
-          // DB unavailable — allow token to continue (fail-open for availability)
+        } catch (error) {
+          console.error('[NextAuth] session verification failed; invalidating JWT', {
+            userId: token.id,
+            role: token.role,
+            privileged: AUTH_PRIVILEGED_ROLES.has(String(token.role || '')),
+            message: error instanceof Error ? error.message : String(error),
+          });
+          return {};
         }
       }
 

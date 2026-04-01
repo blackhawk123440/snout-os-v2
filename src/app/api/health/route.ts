@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { checkRedisConnection } from "@/lib/health-checks";
 import { getRuntimeEnvName, isRedisRequiredEnv } from "@/lib/runtime-env";
 import { getRuntimeDiagnostics, getStagingInfraRecommendations } from "@/lib/runtime-diagnostics";
+import { isBuildPhase } from "@/lib/runtime-phase";
 
 function getVersion(): string {
   return (
@@ -36,7 +37,7 @@ export async function GET() {
     dbStatus = "error";
   }
 
-  const redisRequired = isRedisRequiredEnv();
+  const redisRequired = !isBuildPhase && isRedisRequiredEnv();
   try {
     const redis = await checkRedisConnection();
     redisStatus = redis.connected ? "ok" : redisRequired ? "error" : "degraded";

@@ -11,12 +11,15 @@ import { attachQueueWorkerInstrumentation, recordQueueJobQueued } from '@/lib/qu
 import { resolveCorrelationId } from '@/lib/correlation-id';
 import { processInboundReconcileJob, type InboundExternalEvent } from '@/lib/calendar/bidirectional-adapter';
 import { createRedisConnection } from '@/lib/redis-config';
+import { isBuildPhase } from '@/lib/runtime-phase';
 
 const DEAD_LETTER_AFTER_ATTEMPTS = 5;
 
-const connection = createRedisConnection();
+const queueEnabled = !isBuildPhase && !!process.env.REDIS_URL;
+const connection = queueEnabled ? createRedisConnection() : undefined;
+const disabledQueue = (name: string) => ({ name } as unknown as Queue);
 
-export const calendarQueue = new Queue('calendar-sync', {
+export const calendarQueue = queueEnabled ? new Queue('calendar-sync', {
   connection,
   defaultJobOptions: {
     attempts: 5,
@@ -24,7 +27,7 @@ export const calendarQueue = new Queue('calendar-sync', {
     removeOnComplete: 100,
     removeOnFail: 50,
   },
-});
+}) : disabledQueue('calendar-sync');
 
 export type CalendarJobType =
   | { type: 'upsert'; bookingId: string; orgId: string; correlationId?: string }
@@ -34,6 +37,7 @@ export type CalendarJobType =
   | { type: 'inboundPoll'; orgId?: string; correlationId?: string };
 
 export async function enqueueCalendarSync(job: CalendarJobType): Promise<string | null> {
+  if (!queueEnabled) return null;
   const jobCorrelationId = job.correlationId ?? resolveCorrelationId();
   const payload = { ...job, correlationId: jobCorrelationId };
 
@@ -70,6 +74,9 @@ export async function enqueueCalendarSync(job: CalendarJobType): Promise<string 
 }
 
 function createCalendarWorker(): Worker {
+  if (!queueEnabled || !connection) {
+    throw new Error("Calendar worker unavailable during build or without REDIS_URL");
+  }
   const workerInstance = new Worker(
     'calendar-sync',
     async (job) => {
@@ -273,6 +280,7 @@ function createCalendarWorker(): Worker {
  * Finds sitters with calendar sync enabled and enqueues inboundReconcile jobs.
  */
 export async function scheduleInboundCalendarSync(): Promise<void> {
+  if (!queueEnabled) return;
   const { ENABLE_GOOGLE_BIDIRECTIONAL_SYNC } = await import('@/lib/flags');
   if (!ENABLE_GOOGLE_BIDIRECTIONAL_SYNC) {
     console.log('[Calendar Queue] Inbound sync disabled (ENABLE_GOOGLE_BIDIRECTIONAL_SYNC=false)');

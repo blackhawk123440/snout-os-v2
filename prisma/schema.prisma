@@ -2531,9 +2531,13 @@ model StripeWebhookEvent {
   id            String   @id @default(uuid())
   stripeEventId String   @unique
   type          String
-  processedAt   DateTime @default(now())
+  status        String   @default("processing")
+  claimedAt     DateTime @default(now())
+  processedAt   DateTime?
+  lastError     String?  @db.Text
 
   @@index([stripeEventId])
+  @@index([status, claimedAt])
 }
 
 model DailyOrgStats {

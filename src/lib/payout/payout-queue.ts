@@ -12,10 +12,13 @@ import { logEvent } from "@/lib/log-event";
 import { attachQueueWorkerInstrumentation, recordQueueJobQueued } from "@/lib/queue-observability";
 import { resolveCorrelationId } from "@/lib/correlation-id";
 import { createRedisConnection } from "@/lib/redis-config";
+import { isBuildPhase } from "@/lib/runtime-phase";
 
-const connection = createRedisConnection();
+const queueEnabled = !isBuildPhase && !!process.env.REDIS_URL;
+const connection = queueEnabled ? createRedisConnection() : undefined;
+const disabledQueue = (name: string) => ({ name } as unknown as Queue);
 
-export const payoutQueue = new Queue("payouts", {
+export const payoutQueue = queueEnabled ? new Queue("payouts", {
   connection,
   defaultJobOptions: {
     attempts: 3,
@@ -23,7 +26,7 @@ export const payoutQueue = new Queue("payouts", {
     removeOnComplete: 100,
     removeOnFail: 50,
   },
-});
+}) : disabledQueue("payouts");
 
 const JOB_PREFIX = "payout";
 
@@ -37,6 +40,7 @@ export async function enqueuePayoutForBooking(params: {
   sitterId: string;
   correlationId?: string;
 }): Promise<void> {
+  if (!queueEnabled) return;
   const { orgId, bookingId, sitterId } = params;
   const jobId = getPayoutJobId(bookingId);
   const jobCorrelationId = params.correlationId ?? resolveCorrelationId();
@@ -73,6 +77,9 @@ export async function enqueuePayoutForBooking(params: {
 }
 
 export function initializePayoutWorker(): Worker {
+  if (!queueEnabled || !connection) {
+    throw new Error("Payout worker unavailable during build or without REDIS_URL");
+  }
   const worker = new Worker(
     "payouts",
     async (job) => {

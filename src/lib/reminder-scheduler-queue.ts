@@ -17,10 +17,13 @@ import { logEventFromLogger } from "@/lib/event-logger";
 import { attachQueueWorkerInstrumentation, recordQueueJobQueued } from "@/lib/queue-observability";
 import { resolveCorrelationId } from "@/lib/correlation-id";
 import { createRedisConnection } from "@/lib/redis-config";
+import { isBuildPhase } from "@/lib/runtime-phase";
 
-const connection = createRedisConnection();
+const queueEnabled = !isBuildPhase && !!process.env.REDIS_URL;
+const connection = queueEnabled ? createRedisConnection() : undefined;
+const disabledQueue = (name: string) => ({ name } as unknown as Queue);
 
-export const reminderSchedulerQueue = new Queue("reminder-scheduler", {
+export const reminderSchedulerQueue = queueEnabled ? new Queue("reminder-scheduler", {
   connection,
   defaultJobOptions: {
     attempts: 2,
@@ -28,7 +31,7 @@ export const reminderSchedulerQueue = new Queue("reminder-scheduler", {
     removeOnComplete: 50,
     removeOnFail: 20,
   },
-});
+}) : disabledQueue("reminder-scheduler");
 
 export interface ReminderTickJobData {
   orgId: string;
@@ -146,6 +149,9 @@ export async function processRemindersForOrg(
  * Dispatcher: get all orgs and enqueue per-org tick jobs.
  */
 export async function runReminderDispatcher(): Promise<{ orgsProcessed: number }> {
+  if (!queueEnabled) {
+    return { orgsProcessed: 0 };
+  }
   const orgs = await (prisma as any).org.findMany({
     select: { id: true },
   });
@@ -179,6 +185,9 @@ export async function runReminderDispatcher(): Promise<{ orgsProcessed: number }
  * Create worker for reminder scheduler.
  */
 export function createReminderSchedulerWorker(): Worker {
+  if (!queueEnabled || !connection) {
+    throw new Error("Reminder scheduler unavailable during build or without REDIS_URL");
+  }
   const worker = new Worker(
     "reminder-scheduler",
     async (job) => {
@@ -236,6 +245,7 @@ const REMINDER_DISPATCHER_CRON = "*/15 * * * *"; // Every 15 minutes
  * Removes existing repeatable to avoid duplicates on restart.
  */
 export async function scheduleReminderDispatcher(): Promise<void> {
+  if (!queueEnabled) return;
   const repeatableJobs = await reminderSchedulerQueue.getRepeatableJobs();
   for (const job of repeatableJobs) {
     if (job.name === "reminder-dispatcher") {

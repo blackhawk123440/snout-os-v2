@@ -2,23 +2,26 @@ import { Queue, Worker } from "bullmq";
 import { attachQueueWorkerInstrumentation } from "@/lib/queue-observability";
 import { resolveCorrelationId } from "@/lib/correlation-id";
 import { createRedisConnection } from "@/lib/redis-config";
+import { isBuildPhase } from "@/lib/runtime-phase";
 
 // Redis connection
-const connection = createRedisConnection();
+const queueEnabled = !isBuildPhase && !!process.env.REDIS_URL;
+const connection = queueEnabled ? createRedisConnection() : undefined;
+const disabledQueue = (name: string) => ({ name } as unknown as Queue);
 
 // Create queues
-export const summaryQueue = new Queue("daily-summary", { connection });
-export const reconciliationQueue = new Queue("reconciliation", { connection }); // Phase 7.2: Price reconciliation
+export const summaryQueue = queueEnabled ? new Queue("daily-summary", { connection }) : disabledQueue("daily-summary");
+export const reconciliationQueue = queueEnabled ? new Queue("reconciliation", { connection }) : disabledQueue("reconciliation"); // Phase 7.2: Price reconciliation
 
-export const summaryWorker = new Worker(
+export const summaryWorker = queueEnabled && connection ? new Worker(
   "daily-summary",
   async (job) => {
     const { processDailySummary } = await import("../worker/automation-worker");
     return await processDailySummary();
   },
   { connection }
-);
-attachQueueWorkerInstrumentation(summaryWorker, (job) => ({
+): null;
+if (summaryWorker) attachQueueWorkerInstrumentation(summaryWorker, (job) => ({
   orgId: "default",
   subsystem: "summary",
   resourceType: "system",
@@ -28,15 +31,15 @@ attachQueueWorkerInstrumentation(summaryWorker, (job) => ({
 }));
 
 // Phase 7.2: Pricing reconciliation worker
-export const reconciliationWorker = new Worker(
+export const reconciliationWorker = queueEnabled && connection ? new Worker(
   "reconciliation",
   async (job) => {
     const { processPricingReconciliation } = await import("../worker/reconciliation-worker");
     return await processPricingReconciliation();
   },
   { connection }
-);
-attachQueueWorkerInstrumentation(reconciliationWorker, (job) => ({
+): null;
+if (reconciliationWorker) attachQueueWorkerInstrumentation(reconciliationWorker, (job) => ({
   orgId: "default",
   subsystem: "reconciliation",
   resourceType: "system",
@@ -48,6 +51,7 @@ attachQueueWorkerInstrumentation(reconciliationWorker, (job) => ({
 // Reminder scheduling: see reminder-scheduler-queue.ts (org-scoped, no global scan)
 
 export async function scheduleDailySummary() {
+  if (!summaryQueue) return;
   // Schedule daily summary at 9 PM
   // Note: no QueueJobRecord written here — BullMQ repeat jobs use a different job ID per
   // execution than the ID returned by queue.add(), so scheduling records would never
@@ -69,6 +73,7 @@ export async function scheduleDailySummary() {
 // Phase 7.2: Schedule pricing reconciliation
 // Per Master Spec Section 5.3: Pricing drift detection
 export async function scheduleReconciliation() {
+  if (!reconciliationQueue) return;
   // Schedule reconciliation daily at 2 AM (low traffic time)
   const correlationId = resolveCorrelationId();
   await reconciliationQueue.add(

@@ -8,6 +8,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/db';
+import { hashPasswordResetToken } from '@/lib/security/password-reset';
 
 const MIN_PASSWORD_LENGTH = 8;
 const BCRYPT_ROUNDS = 12;
@@ -32,9 +33,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Find user by token
+    const tokenHash = hashPasswordResetToken(token);
+
+    // Find user by hashed token
     const user = await prisma.user.findUnique({
-      where: { passwordResetToken: token },
+      where: { passwordResetToken: tokenHash },
       select: {
         id: true,
         email: true,
@@ -77,14 +80,15 @@ export async function POST(req: NextRequest) {
         passwordHash,
         passwordResetToken: null,
         passwordResetExpiresAt: null,
+        passwordChangedAt: new Date(),
       },
     });
 
-    console.log(`[ResetPassword] Password reset completed for ${user.email}`);
+    console.info('[ResetPassword] Password reset completed', { userId: user.id });
 
     return NextResponse.json({ ok: true });
   } catch (error) {
-    console.error('[ResetPassword] Error:', error);
+    console.error('[ResetPassword] Error', error instanceof Error ? { message: error.message } : { error: String(error) });
     return NextResponse.json(
       { error: 'Something went wrong. Please try again.' },
       { status: 500 }

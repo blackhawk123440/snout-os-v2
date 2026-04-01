@@ -11,9 +11,12 @@ import { Queue, Worker } from "bullmq";
 import { logAutomationRun, logEventFromLogger } from "./event-logger";
 import { publish, channels } from "@/lib/realtime/bus";
 import { createRedisConnection } from "@/lib/redis-config";
+import { isBuildPhase } from "@/lib/runtime-phase";
 
 // Redis connection
-const connection = createRedisConnection();
+const queueEnabled = !isBuildPhase && !!process.env.REDIS_URL;
+const connection = queueEnabled ? createRedisConnection() : undefined;
+const disabledQueue = (name: string) => ({ name } as unknown as Queue);
 const AUTOMATION_WORKER_CONCURRENCY = Number(process.env.AUTOMATION_WORKER_CONCURRENCY || "12");
 const AUTOMATION_HIGH_WORKER_CONCURRENCY = Number(
   process.env.AUTOMATION_HIGH_WORKER_CONCURRENCY || "8"
@@ -28,7 +31,7 @@ const HIGH_PRIORITY_AUTOMATIONS = new Set(
 );
 
 // Create automation queue
-export const automationQueue = new Queue(AUTOMATION_QUEUE_DEFAULT, {
+export const automationQueue = queueEnabled ? new Queue(AUTOMATION_QUEUE_DEFAULT, {
   connection,
   defaultJobOptions: {
     attempts: 3, // Retry 3 times
@@ -39,9 +42,9 @@ export const automationQueue = new Queue(AUTOMATION_QUEUE_DEFAULT, {
     removeOnComplete: 100, // Keep last 100 completed jobs
     removeOnFail: 50, // Keep last 50 failed jobs
   },
-});
+}) : disabledQueue(AUTOMATION_QUEUE_DEFAULT);
 
-export const automationHighQueue = new Queue(AUTOMATION_QUEUE_HIGH, {
+export const automationHighQueue = queueEnabled ? new Queue(AUTOMATION_QUEUE_HIGH, {
   connection,
   defaultJobOptions: {
     attempts: 3, // Retry 3 times
@@ -52,7 +55,7 @@ export const automationHighQueue = new Queue(AUTOMATION_QUEUE_HIGH, {
     removeOnComplete: 100, // Keep last 100 completed jobs
     removeOnFail: 50, // Keep last 50 failed jobs
   },
-});
+}) : disabledQueue(AUTOMATION_QUEUE_HIGH);
 
 /**
  * Job data for automation execution
@@ -86,6 +89,7 @@ export async function enqueueAutomation(
   idempotencyKey?: string,
   _correlationId?: string // preserved for call-site compatibility
 ): Promise<void> {
+  if (!queueEnabled) return;
   const jobData: AutomationJobData = {
     automationType,
     recipient,
@@ -110,6 +114,9 @@ export function createAutomationWorker(
   concurrency: number,
   queueClass: "high" | "default"
 ): Worker {
+  if (!queueEnabled || !connection) {
+    throw new Error("Automation worker unavailable during build or without REDIS_URL");
+  }
   return new Worker(
     queueName,
     async (job) => {

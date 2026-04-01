@@ -27,6 +27,9 @@ function twimlOk() {
 }
 
 function isE2eWebhookBypassAllowed(request: NextRequest): boolean {
+  if (process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production') {
+    return false;
+  }
   const enabled = process.env.ENABLE_E2E_AUTH === 'true' || process.env.ENABLE_E2E_LOGIN === 'true';
   if (!enabled) return false;
   const expected = process.env.E2E_AUTH_KEY;

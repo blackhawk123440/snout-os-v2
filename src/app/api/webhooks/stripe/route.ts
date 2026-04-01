@@ -21,7 +21,87 @@ import {
 } from '@/lib/stripe-webhook-persist';
 import { publish, channels } from '@/lib/realtime/bus';
 
+const WEBHOOK_CLAIM_TIMEOUT_MS = 5 * 60 * 1000;
+
+async function claimStripeWebhookEvent(event: Stripe.Event): Promise<'claimed' | 'duplicate'> {
+  const now = new Date();
+  try {
+    await (prisma as any).stripeWebhookEvent.create({
+      data: {
+        stripeEventId: event.id,
+        type: event.type,
+        status: 'processing',
+        claimedAt: now,
+        processedAt: null,
+        lastError: null,
+      },
+    });
+    return 'claimed';
+  } catch (error: any) {
+    const isUniqueViolation = error?.code === 'P2002';
+    if (!isUniqueViolation) throw error;
+  }
+
+  const existing = await (prisma as any).stripeWebhookEvent.findUnique({
+    where: { stripeEventId: event.id },
+  });
+  if (!existing) {
+    return 'duplicate';
+  }
+  if (existing.status === 'processed') {
+    return 'duplicate';
+  }
+
+  const staleBefore = new Date(Date.now() - WEBHOOK_CLAIM_TIMEOUT_MS);
+  const canReclaim =
+    existing.status === 'failed' ||
+    !existing.claimedAt ||
+    new Date(existing.claimedAt).getTime() <= staleBefore.getTime();
+
+  if (!canReclaim) {
+    return 'duplicate';
+  }
+
+  const updated = await (prisma as any).stripeWebhookEvent.updateMany({
+    where: {
+      stripeEventId: event.id,
+      status: existing.status,
+    },
+    data: {
+      type: event.type,
+      status: 'processing',
+      claimedAt: now,
+      processedAt: null,
+      lastError: null,
+    },
+  });
+
+  return updated.count > 0 ? 'claimed' : 'duplicate';
+}
+
+async function markStripeWebhookEventProcessed(eventId: string) {
+  await (prisma as any).stripeWebhookEvent.updateMany({
+    where: { stripeEventId: eventId },
+    data: {
+      status: 'processed',
+      processedAt: new Date(),
+      lastError: null,
+    },
+  });
+}
+
+async function markStripeWebhookEventFailed(eventId: string, error: unknown) {
+  await (prisma as any).stripeWebhookEvent.updateMany({
+    where: { stripeEventId: eventId },
+    data: {
+      status: 'failed',
+      lastError: error instanceof Error ? error.message.slice(0, 1000) : String(error).slice(0, 1000),
+    },
+  });
+}
+
 export async function POST(request: NextRequest) {
+  let eventId: string | null = null;
   try {
     const secret = process.env.STRIPE_WEBHOOK_SECRET;
     if (!secret) {
@@ -44,17 +124,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
     }
 
-    // Idempotency: skip if we've already processed this exact Stripe event
-    const existing = await (prisma as any).stripeWebhookEvent.findUnique({
-      where: { stripeEventId: event.id },
-    });
-    if (existing) {
+    eventId = event.id;
+    const claimResult = await claimStripeWebhookEvent(event);
+    if (claimResult === 'duplicate') {
       return NextResponse.json({ received: true, duplicate: true });
     }
-    // Record event BEFORE processing so concurrent retries are blocked
-    await (prisma as any).stripeWebhookEvent.create({
-      data: { stripeEventId: event.id, type: event.type, processedAt: new Date() },
-    });
 
     // payment_intent.succeeded
     if (event.type === 'payment_intent.succeeded') {
@@ -653,8 +727,12 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    await markStripeWebhookEventProcessed(event.id);
     return NextResponse.json({ received: true }, { status: 200 });
   } catch (error: any) {
+    if (eventId) {
+      await markStripeWebhookEventFailed(eventId, error).catch(() => {});
+    }
     console.error('[Stripe Webhook] Error:', error);
     return NextResponse.json(
       { error: 'Webhook handler failed', message: error.message },

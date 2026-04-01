@@ -8,11 +8,15 @@
 
 import IORedis from "ioredis";
 import { Queue } from "bullmq";
+import { isBuildPhase } from "@/lib/runtime-phase";
 
 /**
  * Check Redis connection
  */
 export async function checkRedisConnection(): Promise<{ connected: boolean; error?: string }> {
+  if (isBuildPhase) {
+    return { connected: false, error: "Skipped during build" };
+  }
   const redisUrl = process.env.REDIS_URL;
   if (!redisUrl) {
     return { connected: false, error: "REDIS_URL missing" };
@@ -37,6 +41,9 @@ export async function checkRedisConnection(): Promise<{ connected: boolean; erro
  * Tests if queues can be accessed
  */
 export async function checkQueueConnection(): Promise<{ connected: boolean; error?: string }> {
+  if (isBuildPhase) {
+    return { connected: false, error: "Skipped during build" };
+  }
   try {
     const connection = new IORedis(process.env.REDIS_URL || "redis://localhost:6379", {
       maxRetriesPerRequest: null,
@@ -71,6 +78,18 @@ export async function getWorkerStatus(): Promise<{
     reconciliation: { waiting: number; active: number; completed: number; failed: number };
   };
 }> {
+  if (isBuildPhase) {
+    return {
+      hasWorkers: false,
+      queues: {
+        automation: { waiting: 0, active: 0, completed: 0, failed: 0 },
+        automationHigh: { waiting: 0, active: 0, completed: 0, failed: 0 },
+        reminders: { waiting: 0, active: 0, completed: 0, failed: 0 },
+        summary: { waiting: 0, active: 0, completed: 0, failed: 0 },
+        reconciliation: { waiting: 0, active: 0, completed: 0, failed: 0 },
+      },
+    };
+  }
   try {
     const connection = new IORedis(process.env.REDIS_URL || "redis://localhost:6379", {
       maxRetriesPerRequest: null,

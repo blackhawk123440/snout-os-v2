@@ -10,11 +10,14 @@ import { logEvent } from "@/lib/log-event";
 import { attachQueueWorkerInstrumentation, recordQueueJobQueued } from "@/lib/queue-observability";
 import { resolveCorrelationId } from "@/lib/correlation-id";
 import { createRedisConnection } from "@/lib/redis-config";
+import { isBuildPhase } from "@/lib/runtime-phase";
 
-const connection = createRedisConnection();
+const queueEnabled = !isBuildPhase && !!process.env.REDIS_URL;
+const connection = queueEnabled ? createRedisConnection() : undefined;
+const disabledQueue = (name: string) => ({ name } as unknown as Queue);
 const FINANCE_RECONCILE_WORKER_CONCURRENCY = Number(process.env.FINANCE_RECONCILE_WORKER_CONCURRENCY || "4");
 
-export const financeReconcileQueue = new Queue("finance.reconcile", {
+export const financeReconcileQueue = queueEnabled ? new Queue("finance.reconcile", {
   connection,
   defaultJobOptions: {
     attempts: 2,
@@ -22,7 +25,7 @@ export const financeReconcileQueue = new Queue("finance.reconcile", {
     removeOnComplete: 50,
     removeOnFail: 20,
   },
-});
+}) : disabledQueue("finance.reconcile");
 
 export interface FinanceReconcileJobData {
   orgId: string;
@@ -37,6 +40,9 @@ export async function enqueueFinanceReconcile(params: {
   end: Date;
   correlationId?: string;
 }): Promise<string> {
+  if (!queueEnabled) {
+    return "build-skip";
+  }
   const jobCorrelationId = params.correlationId ?? resolveCorrelationId();
   const payload: FinanceReconcileJobData = {
     orgId: params.orgId,
@@ -69,6 +75,9 @@ export async function enqueueFinanceReconcile(params: {
 }
 
 export function initializeFinanceReconcileWorker(): Worker {
+  if (!queueEnabled || !connection) {
+    throw new Error("Finance reconcile worker unavailable during build or without REDIS_URL");
+  }
   const worker = new Worker(
     "finance.reconcile",
     async (job) => {

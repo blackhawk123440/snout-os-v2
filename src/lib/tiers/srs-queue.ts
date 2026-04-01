@@ -11,12 +11,15 @@ import { prisma } from "@/lib/db";
 import { attachQueueWorkerInstrumentation, recordQueueJobQueued } from "@/lib/queue-observability";
 import { resolveCorrelationId } from "@/lib/correlation-id";
 import { createRedisConnection } from "@/lib/redis-config";
+import { isBuildPhase } from "@/lib/runtime-phase";
 
 // Redis connection
-const connection = createRedisConnection();
+const queueEnabled = !isBuildPhase && !!process.env.REDIS_URL;
+const connection = queueEnabled ? createRedisConnection() : undefined;
+const disabledQueue = (name: string) => ({ name } as unknown as Queue);
 
 // Create SRS queue
-export const srsQueue = new Queue("srs", {
+export const srsQueue = queueEnabled ? new Queue("srs", {
   connection,
   defaultJobOptions: {
     attempts: 3,
@@ -27,7 +30,7 @@ export const srsQueue = new Queue("srs", {
     removeOnComplete: 100,
     removeOnFail: 50,
   },
-});
+}) : disabledQueue("srs");
 
 /**
  * Daily snapshot job data
@@ -304,6 +307,9 @@ async function performWeeklyEvaluation(data: WeeklyEvaluationJobData): Promise<v
  * Create worker for SRS jobs
  */
 export function createSRSWorker(): Worker {
+  if (!queueEnabled || !connection) {
+    throw new Error("SRS worker unavailable during build or without REDIS_URL");
+  }
   const worker = new Worker(
     "srs",
     async (job) => {
@@ -350,6 +356,7 @@ export async function scheduleDailySnapshots(
   asOfDate: Date = new Date(),
   correlationId?: string
 ): Promise<void> {
+  if (!queueEnabled) return;
   // Get all active sitters in org
   const sitters = await (prisma as any).sitter.findMany({
     where: {
@@ -409,6 +416,7 @@ export async function scheduleWeeklyEvaluations(
   asOfDate: Date = new Date(),
   correlationId?: string
 ): Promise<void> {
+  if (!queueEnabled) return;
   // Get all sitters with recent snapshots
   const snapshots = await (prisma as any).sitterTierSnapshot.findMany({
     where: {

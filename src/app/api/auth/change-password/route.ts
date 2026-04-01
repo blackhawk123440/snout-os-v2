@@ -59,11 +59,11 @@ export async function POST(req: NextRequest) {
       data: { passwordHash, passwordChangedAt: new Date() },
     });
 
-    console.log(`[ChangePassword] Password changed for ${user.email}`);
+    console.info('[ChangePassword] Password changed', { userId: user.id });
 
     return NextResponse.json({ ok: true });
   } catch (error) {
-    console.error('[ChangePassword] Error:', error);
+    console.error('[ChangePassword] Error', error instanceof Error ? { message: error.message } : { error: String(error) });
     return NextResponse.json({ error: 'Something went wrong.' }, { status: 500 });
   }
 }

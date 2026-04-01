@@ -20,6 +20,15 @@ What is not yet true:
 - Every feature and edge case has not been functionally verified.
 - The system has not completed a final launch-hardening pass.
 
+Since this status file was first written, the highest-priority security and compliance fixes have been materially reduced:
+- Stripe webhook processing now uses reclaimable processing state instead of one-shot preprocessed rows.
+- Twilio E2E webhook bypass is blocked in production.
+- Password reset tokens are hashed at rest.
+- Auth logging is reduced to audit-safe outcomes instead of verbose credential-state logs.
+- JWT verification now invalidates sessions if revocation checks cannot be completed.
+- Production Render config now targets the Standard database tier.
+- A real owner/admin erase workflow now exists for client and sitter accounts.
+
 ## Readiness Scorecard
 
 Owner portal UX/UI: 7.7/10
@@ -34,12 +43,13 @@ Sitter portal UX/UI: 7.2/10
 - Daily workflow, earnings, availability, profile, and training framing are stronger.
 - Performance, onboarding, deeper booking actions, and edge-case worker flows still need more audit coverage.
 
-Technical launch readiness: 6.8/10
+Technical launch readiness: 8.2/10
 - Typecheck clean.
-- Build can pass.
-- Runtime/build warning cleanup and deeper environment-quality work still remain.
+- Production build passes.
+- Build-time Redis/BullMQ/realtime coupling has been cleaned up.
+- One ecosystem-level Sentry/OpenTelemetry webpack warning still remains.
 
-Overall elite SaaS readiness: 7.4/10
+Overall elite SaaS readiness: 8.0/10
 
 ## What Has Been Improved
 
@@ -136,9 +146,10 @@ Assessment:
 - No complete regression pass has been run across owner/client/sitter.
 
 ### Launch-hardening still incomplete
-- Build/runtime warning cleanup is not fully done.
-- Build logs previously showed warning noise and `ECONNREFUSED` chatter during static generation.
-- Some deep flows may still depend on runtime service connectivity assumptions.
+- Build/runtime hardening is materially improved.
+- The prior `ECONNREFUSED` chatter during static generation has been eliminated.
+- A Sentry/OpenTelemetry webpack warning still appears during build.
+- Some deep flows may still depend on runtime service connectivity assumptions under production data shape.
 - A final pre-launch QA matrix has not been completed.
 
 ## Areas Still Requiring Audit Before Elite Signoff

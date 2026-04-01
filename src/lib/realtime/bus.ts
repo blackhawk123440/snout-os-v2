@@ -6,6 +6,7 @@
 import { isBuildPhase } from '@/lib/runtime-phase';
 
 const REDIS_URL = process.env.NODE_ENV === "test" ? "" : process.env.REDIS_URL;
+const REDIS_RUNTIME_ENABLED = Boolean(REDIS_URL) && !isBuildPhase;
 
 type Handler = (payload: unknown) => void;
 
@@ -68,7 +69,7 @@ async function getRedisSub(): Promise<import('ioredis').default> {
  */
 export async function publish(channel: string, payload: unknown): Promise<void> {
   try {
-    if (REDIS_URL) {
+    if (REDIS_RUNTIME_ENABLED) {
       const client = await getRedisClient();
       await client.publish(channel, JSON.stringify(payload));
     } else {
@@ -87,7 +88,7 @@ export async function subscribe(
   channel: string,
   handler: Handler
 ): Promise<() => void> {
-  if (REDIS_URL) {
+  if (REDIS_RUNTIME_ENABLED) {
     const sub = await getRedisSub();
     const listener = (_ch: string, message: string) => {
       try {

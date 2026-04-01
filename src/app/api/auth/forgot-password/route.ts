@@ -10,8 +10,7 @@ import { randomUUID } from 'crypto';
 import { prisma } from '@/lib/db';
 import { sendEmail } from '@/lib/email';
 import { passwordResetEmail } from '@/lib/email-templates/password-reset';
-
-const RESET_TOKEN_EXPIRY_MINUTES = 30;
+import { hashPasswordResetToken, RESET_TOKEN_EXPIRY_MINUTES } from '@/lib/security/password-reset';
 const RATE_LIMIT_WINDOW_MS = 60_000; // 1 minute
 const MAX_REQUESTS_PER_WINDOW = 3;
 
@@ -58,13 +57,14 @@ export async function POST(req: NextRequest) {
 
     // Generate secure reset token
     const token = randomUUID();
+    const tokenHash = hashPasswordResetToken(token);
     const expiresAt = new Date(Date.now() + RESET_TOKEN_EXPIRY_MINUTES * 60 * 1000);
 
     // Save token to user
     await prisma.user.update({
       where: { id: user.id },
       data: {
-        passwordResetToken: token,
+        passwordResetToken: tokenHash,
         passwordResetExpiresAt: expiresAt,
       },
     });
@@ -88,15 +88,20 @@ export async function POST(req: NextRequest) {
     });
 
     if (!result.success) {
-      console.error(`[ForgotPassword] Email send failed for ${email}:`, result.error);
+      console.error('[ForgotPassword] Email send failed', {
+        userId: user.id,
+        error: result.error,
+      });
     }
 
-    // Log the reset request for audit
-    console.log(`[ForgotPassword] Reset requested for ${email}, token expires at ${expiresAt.toISOString()}`);
+    console.info('[ForgotPassword] Reset token issued', {
+      userId: user.id,
+      expiresAt: expiresAt.toISOString(),
+    });
 
     return NextResponse.json({ ok: true });
   } catch (error) {
-    console.error('[ForgotPassword] Error:', error);
+    console.error('[ForgotPassword] Error', error instanceof Error ? { message: error.message } : { error: String(error) });
     // Still return 200 to prevent information leakage
     return NextResponse.json({ ok: true });
   }

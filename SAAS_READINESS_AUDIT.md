@@ -57,3 +57,28 @@ Scope: Source code, deployment manifests, CI workflow, and operational/complianc
 
 - This audit was static and evidence-based from repository contents.
 - Dependencies were not installed in this workspace, so tests/builds were not executed here.
+
+---
+
+## Remediation Update
+
+Status as of 2026-03-31 after follow-up remediation work in `snout-os-v2`:
+
+- Stripe webhook durability has been hardened with reclaimable processing state and explicit processed/failed transitions.
+- Twilio webhook E2E bypass is now blocked in production.
+- Password reset tokens are hashed at rest.
+- Auth logging has been reduced to audit-safe outcomes instead of verbose credential-state logs.
+- JWT revocation no longer fails open if database verification cannot complete.
+- Render production database config now targets the Standard tier.
+- A real owner/admin erase workflow now exists for client and sitter accounts.
+- Build-time Redis/BullMQ/realtime coupling has been removed from static generation paths.
+
+Current technical verification in this repo:
+
+- `pnpm typecheck` passes
+- `pnpm build` passes
+- static generation no longer emits the prior Redis `ECONNREFUSED` / `Connection is closed` noise
+
+Remaining non-blocking note:
+
+- Next.js build still reports the Sentry/OpenTelemetry `require-in-the-middle` webpack warning, which appears to be ecosystem-level rather than application logic failure.

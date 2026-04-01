@@ -8,7 +8,7 @@ Pre-launch operational requirements and procedures.
 
 ### Option A: Render Managed Backups (Recommended)
 
-**Action:** Upgrade Render PostgreSQL from Starter to Standard plan ($20/mo).
+**Action:** Run production on Render PostgreSQL Standard plan.
 
 Standard plan includes:
 - Automated daily backups with 7-day retention
@@ -20,6 +20,8 @@ Standard plan includes:
 2. Click "Change Plan" > select "Standard"
 3. Confirm the upgrade (no downtime — Render migrates in place)
 4. Verify: Dashboard should show "Backups: Enabled" within 24 hours
+
+The checked-in `render.yaml` now targets Render PostgreSQL `standard` so production infrastructure matches this requirement by default.
 
 ### Option B: Self-Managed Backups to S3
 

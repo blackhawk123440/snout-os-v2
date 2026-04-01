@@ -2,7 +2,7 @@ services:
   # PostgreSQL Database
   - type: pg
     name: snout-os-db
-    plan: starter
+    plan: standard
     databaseName: snout_os
     user: snoutos
 

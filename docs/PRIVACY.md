@@ -31,11 +31,22 @@ Snout OS supports account deletion for clients and sitters. Deletion is **soft d
 - **Endpoint**: `GET /api/client/export` (returns JSON bundle of profile, pets, bookings, reports, messages, payments)
 - **Deleted clients**: Cannot call export (403). Export is not available during the retention period for deleted accounts.
 
+## GDPR / Erase Workflow
+
+- **Endpoint**: `POST /api/ops/users/[id]/erase`
+- **Requires**: Owner or admin role
+- **Scope**: Client and sitter accounts linked to a `User`
+- **Effect**:
+  - Replaces direct identifiers on `User`, `Client`, and `Sitter` records with tombstone values
+  - Clears password hashes, reset tokens, saved payment identifiers, contact lists, emergency contacts, and connected calendar/payment tokens
+  - Scrubs identifying booking and pet fields that are retained for operational history
+- **Result**: Historical records stay structurally intact for finance and service integrity, but direct personal identifiers are removed from the active data model
+
 ## Retention
 
 - Soft-deleted records remain in the database for historical integrity (bookings, reports, payments).
 - Owners can still view deleted clients' and sitters' historical data (read-only) with a "Deleted" badge.
-- No hard deletion or full GDPR erase workflow is implemented in this phase.
+- GDPR-style erase is supported through the owner/admin anonymization workflow above.
 
 ## Background Jobs
 

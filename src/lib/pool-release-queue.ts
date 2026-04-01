@@ -10,12 +10,15 @@ import { releasePoolNumbers } from "./messaging/pool-release-job";
 import { attachQueueWorkerInstrumentation } from "@/lib/queue-observability";
 import { resolveCorrelationId } from "@/lib/correlation-id";
 import { createRedisConnection } from "@/lib/redis-config";
+import { isBuildPhase } from "@/lib/runtime-phase";
 
 // Redis connection
-const connection = createRedisConnection();
+const queueEnabled = !isBuildPhase && !!process.env.REDIS_URL;
+const connection = queueEnabled ? createRedisConnection() : undefined;
+const disabledQueue = (name: string) => ({ name } as unknown as Queue);
 
 // Create pool release queue
-export const poolReleaseQueue = new Queue("pool-release", {
+export const poolReleaseQueue = queueEnabled ? new Queue("pool-release", {
   connection,
   defaultJobOptions: {
     attempts: 3,
@@ -26,12 +29,15 @@ export const poolReleaseQueue = new Queue("pool-release", {
     removeOnComplete: 10,
     removeOnFail: 5,
   },
-});
+}) : disabledQueue("pool-release");
 
 /**
  * Create worker for processing pool release jobs
  */
 export function createPoolReleaseWorker(): Worker {
+  if (!queueEnabled || !connection) {
+    throw new Error("Pool release worker unavailable during build or without REDIS_URL");
+  }
   const worker = new Worker(
     "pool-release",
     async (job) => {
@@ -63,6 +69,7 @@ export function createPoolReleaseWorker(): Worker {
  * Schedule pool release job (runs every 5 minutes)
  */
 export async function schedulePoolRelease(): Promise<void> {
+  if (!queueEnabled) return;
   // Remove any existing repeatable jobs first
   const repeatableJobs = await poolReleaseQueue.getRepeatableJobs();
   for (const job of repeatableJobs) {
