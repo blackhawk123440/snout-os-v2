@@ -369,7 +369,7 @@ function PetQuickView({ petId, petName }: { petId: string; petName: string }) {
                 <div><p className="text-xs font-medium text-text-tertiary flex items-center gap-1"><PawPrint className="w-3 h-3" /> Behavior</p><p className="text-sm text-text-secondary">{data.behaviorNotes}</p></div>
               )}
               {!data.feedingInstructions && !data.medicationNotes && !data.behaviorNotes && (
-                <p className="text-xs text-text-tertiary italic">No care info on file yet.</p>
+                <p className="text-xs text-text-tertiary italic">No care details saved.</p>
               )}
             </div>
           ) : (

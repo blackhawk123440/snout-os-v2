@@ -127,9 +127,9 @@ export default function SitterBookingsPage() {
 
   const currentList = activeTab === 'active' ? active : activeTab === 'upcoming' ? upcoming : completed;
   const emptyConfig: { title: string; subtitle: string; cta?: { label: string; onClick: () => void } } = {
-    active: { title: 'No active bookings', subtitle: 'Check Calendar for upcoming visits.', cta: { label: 'Open Calendar', onClick: () => router.push('/sitter/calendar') } },
+    active: { title: 'No active bookings', subtitle: 'Check your calendar for upcoming visits.', cta: { label: 'Open Calendar', onClick: () => router.push('/sitter/calendar') } },
     upcoming: { title: 'No upcoming bookings', subtitle: 'New bookings will appear here.' },
-    completed: { title: 'No completed bookings yet', subtitle: 'Finished visits will show up here.' },
+    completed: { title: 'No completed bookings', subtitle: 'Finished visits appear here.' },
   }[activeTab];
 
   return (

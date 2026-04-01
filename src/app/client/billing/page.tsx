@@ -303,7 +303,7 @@ export default function ClientBillingPage() {
               <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-accent-primary shadow-sm mb-4">
                 <CreditCard className="h-7 w-7 text-text-inverse" />
               </div>
-              <p className="text-xl font-bold text-text-primary">No invoices yet</p>
+              <p className="text-xl font-bold text-text-primary">No invoices available</p>
               <p className="mt-2 text-sm text-text-secondary max-w-[280px] mx-auto leading-relaxed">
                 Invoices appear here after completed visits.
               </p>

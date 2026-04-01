@@ -87,7 +87,7 @@ export default function SitterPetsPage() {
         />
       ) : pets.length === 0 ? (
         <SitterEmptyState
-          title="No pets yet"
+          title="No pets assigned"
           subtitle="Pets from your bookings will appear here."
         />
       ) : (

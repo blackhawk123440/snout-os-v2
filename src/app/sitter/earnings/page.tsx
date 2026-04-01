@@ -125,22 +125,6 @@ export default function SitterEarningsPage() {
         />
       ) : data ? (
         <div className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="rounded-2xl border border-border-default bg-[radial-gradient(circle_at_top_left,_rgba(34,197,94,0.10),_transparent_42%),linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.96))] p-5 shadow-sm">
-              <p className="text-sm font-semibold text-text-primary">Clear earnings, calm payout timing</p>
-              <p className="mt-2 text-sm leading-6 text-text-secondary">
-                Track completed-visit pay, see what is already on the way, and know when the next payout will be released.
-              </p>
-            </div>
-            <div className="rounded-2xl border border-border-default bg-surface-primary p-5 shadow-sm">
-              <p className="text-sm font-semibold text-text-primary">How payouts work</p>
-              <div className="mt-2 space-y-2 text-sm text-text-secondary">
-                <p>Completed, paid visits move into a 7-day hold automatically.</p>
-                <p>Once the hold ends, the transfer appears in your payout history.</p>
-              </div>
-            </div>
-          </div>
-
           {/* Period selector */}
           <div className="flex gap-1.5 rounded-xl bg-surface-secondary p-1">
             {([['all', 'All time'], ['this_week', 'This week'], ['this_month', 'This month'], ['last_month', 'Last month']] as const).map(([key, label]) => (
@@ -241,7 +225,7 @@ export default function SitterEarningsPage() {
                   <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-accent-secondary mb-3">
                     <DollarSign className="h-5 w-5 text-accent-primary" />
                   </div>
-                  <p className="text-sm font-semibold text-text-primary">No payouts yet</p>
+                  <p className="text-sm font-semibold text-text-primary">No payouts available</p>
                   <p className="mt-1 text-xs text-text-tertiary max-w-[220px] mx-auto">Transfers will appear here after completed bookings are paid out.</p>
                 </div>
               ) : (
@@ -270,7 +254,7 @@ export default function SitterEarningsPage() {
                     ]}
                     data={transfers}
                     keyExtractor={(t) => t.id}
-                    emptyMessage="No payouts yet"
+                    emptyMessage="No payouts available"
                     forceTableLayout
                   />
                 </DataTableShell>
@@ -289,7 +273,7 @@ export default function SitterEarningsPage() {
                   <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-accent-secondary mb-3">
                     <ClipboardList className="h-5 w-5 text-accent-primary" />
                   </div>
-                  <p className="text-sm font-semibold text-text-primary">No completed jobs yet</p>
+                  <p className="text-sm font-semibold text-text-primary">No completed jobs</p>
                   <p className="mt-1 text-xs text-text-tertiary max-w-[220px] mx-auto">Your earnings breakdown will appear here after visits are completed.</p>
                 </div>
               ) : (
@@ -305,7 +289,7 @@ export default function SitterEarningsPage() {
                     ]}
                     data={completedJobs}
                     keyExtractor={(job) => job.id}
-                    emptyMessage="No completed jobs yet"
+                    emptyMessage="No completed jobs"
                     onRowClick={(job) => setSelectedJob(job as CompletedJob)}
                     forceTableLayout
                   />

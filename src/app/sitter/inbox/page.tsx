@@ -212,7 +212,7 @@ function SitterInboxContent() {
                   <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-surface-secondary mb-3">
                     <MessageSquare className="h-5 w-5 text-text-disabled" />
                   </div>
-                  <p className="text-sm font-medium text-text-secondary">No messages yet</p>
+                  <p className="text-sm font-medium text-text-secondary">No messages</p>
                   <p className="mt-1 text-xs text-text-tertiary max-w-[220px] mx-auto">Send the first update when the visit starts.</p>
                 </div>
               ) : (
@@ -425,7 +425,7 @@ function SitterInboxContent() {
                     <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-surface-secondary mb-3">
                       <MessageSquare className="h-5 w-5 text-text-disabled" />
                     </div>
-                    <p className="text-sm font-medium text-text-secondary">No messages yet</p>
+                    <p className="text-sm font-medium text-text-secondary">No messages</p>
                     <p className="mt-1 text-xs text-text-tertiary max-w-[220px] mx-auto">Send a quick update when the visit starts or wraps up.</p>
                   </div>
                 ) : (

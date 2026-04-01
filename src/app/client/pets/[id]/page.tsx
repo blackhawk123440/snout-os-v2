@@ -181,7 +181,7 @@ export default function ClientPetDetailPage() {
           icon="feeding"
           value={pet.feedingInstructions}
           fieldKey="feedingInstructions"
-          placeholder="No feeding instructions yet. Tap edit to add."
+          placeholder="No feeding instructions saved."
           onSave={savePetField}
           onSaved={onSaved}
         />
@@ -192,7 +192,7 @@ export default function ClientPetDetailPage() {
           icon="medication"
           value={pet.medicationNotes}
           fieldKey="medicationNotes"
-          placeholder="No medication notes yet. Tap edit to add."
+          placeholder="No medication notes saved."
           onSave={savePetField}
           onSaved={onSaved}
         />
@@ -208,8 +208,8 @@ export default function ClientPetDetailPage() {
           <AppCardBody>
             <DualFieldEditor
               fields={[
-                { key: 'behaviorNotes', label: 'Behavior', value: pet.behaviorNotes, placeholder: 'No behavior notes yet.' },
-                { key: 'walkInstructions', label: 'Walk instructions', value: pet.walkInstructions, placeholder: 'No walk instructions yet.' },
+                { key: 'behaviorNotes', label: 'Behavior', value: pet.behaviorNotes, placeholder: 'No behavior notes saved.' },
+                { key: 'walkInstructions', label: 'Walk instructions', value: pet.walkInstructions, placeholder: 'No walk instructions saved.' },
               ]}
               onSave={savePetField}
               onSaved={onSaved}
@@ -223,7 +223,7 @@ export default function ClientPetDetailPage() {
           icon="house"
           value={pet.houseRules}
           fieldKey="houseRules"
-          placeholder="No house rules yet. Tap edit to add."
+          placeholder="No house rules saved."
           onSave={savePetField}
           onSaved={onSaved}
         />
@@ -277,7 +277,7 @@ export default function ClientPetDetailPage() {
           icon="notes"
           value={pet.notes}
           fieldKey="notes"
-          placeholder="No additional notes. Tap edit to add."
+          placeholder="No additional notes saved."
           onSave={savePetField}
           onSaved={onSaved}
         />
@@ -591,7 +591,7 @@ function VetSection({
             {pet.vetAddress && <p className="text-sm text-text-tertiary">{pet.vetAddress}</p>}
           </div>
         ) : (
-          <p className="text-sm text-text-tertiary italic">No vet info yet. Tap edit to add.</p>
+          <p className="text-sm text-text-tertiary italic">No vet details saved.</p>
         )}
       </AppCardBody>
     </AppCard>
@@ -671,7 +671,7 @@ function HealthTimelineSection({
           </div>
         )}
         {healthLogs.length === 0 ? (
-          <p className="text-sm text-text-tertiary italic">No health notes yet.</p>
+          <p className="text-sm text-text-tertiary italic">No health notes saved.</p>
         ) : (
           <div className="space-y-3">
             {healthLogs.map((log) => (

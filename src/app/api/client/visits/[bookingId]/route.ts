@@ -7,7 +7,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getRequestContext } from '@/lib/request-context';
 import { requireRole, requireClientContext, ForbiddenError } from '@/lib/rbac';
-import { prisma } from '@/lib/db';
+import { getScopedDb } from '@/lib/tenancy';
 import { buildClientFacingSitterProfile } from '@/lib/sitter-helpers';
 
 export async function GET(
@@ -27,24 +27,26 @@ export async function GET(
   const { bookingId } = await params;
 
   try {
-    const card = await (prisma as any).visitCard.findUnique({
-      where: { bookingId },
+    const db = getScopedDb(ctx);
+
+    const card = await (db as any).visitCard.findFirst({
+      where: { bookingId, clientId: ctx.clientId },
     });
 
-    if (!card || card.orgId !== ctx.orgId || card.clientId !== ctx.clientId) {
+    if (!card) {
       return NextResponse.json({ error: 'Not found' }, { status: 404 });
     }
 
     // Get sitter info + trust profile
-    const sitter = await (prisma as any).sitter.findFirst({
-      where: { id: card.sitterId, orgId: ctx.orgId },
+    const sitter = await (db as any).sitter.findFirst({
+      where: { id: card.sitterId },
       select: { firstName: true, lastName: true },
     });
     const sitterName = sitter ? `${sitter.firstName} ${sitter.lastName}`.trim() : 'Your sitter';
 
     // Get booking pets
-    const booking = await (prisma as any).booking.findFirst({
-      where: { id: bookingId, orgId: ctx.orgId },
+    const booking = await (db as any).booking.findFirst({
+      where: { id: bookingId, clientId: ctx.clientId },
       select: {
         service: true,
         pets: { select: { id: true, name: true } },
@@ -55,14 +57,14 @@ export async function GET(
     // Build trust profile
     let sitterProfile = null;
     try {
-      const snapshot = await (prisma as any).sitterTierSnapshot.findFirst({
-        where: { orgId: ctx.orgId, sitterId: card.sitterId },
+      const snapshot = await (db as any).sitterTierSnapshot.findFirst({
+        where: { sitterId: card.sitterId },
         orderBy: { asOfDate: 'desc' },
         select: { tier: true, rolling30dBreakdownJson: true },
       });
       if (snapshot) {
-        const completedVisits = await (prisma as any).booking.count({
-          where: { orgId: ctx.orgId, sitterId: card.sitterId, status: 'completed' },
+        const completedVisits = await (db as any).booking.count({
+          where: { sitterId: card.sitterId, status: 'completed' },
         });
         sitterProfile = buildClientFacingSitterProfile(snapshot, completedVisits);
       }

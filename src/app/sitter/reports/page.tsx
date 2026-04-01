@@ -52,7 +52,7 @@ export default function SitterReportsPage() {
         <SitterErrorState title="Couldn't load reports" subtitle="Could not load reports." onRetry={refetch} />
       ) : reports.length === 0 ? (
         <SitterEmptyState
-          title="No reports yet"
+          title="No reports available"
           subtitle="Submit a report after a completed visit."
           cta={{ label: 'New report', onClick: () => router.push('/sitter/reports/new') }}
         />

@@ -101,7 +101,7 @@ export default function ClientBookingsPage() {
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-accent-primary shadow-sm mb-4">
             <Calendar className="h-7 w-7 text-text-inverse" />
           </div>
-          <p className="text-xl font-bold text-text-primary">No visits yet</p>
+          <p className="text-xl font-bold text-text-primary">No visits scheduled</p>
           <p className="mt-2 text-sm text-text-secondary max-w-[280px] mx-auto leading-relaxed">
             Book your first visit and your care team will take it from request to report in one place.
           </p>

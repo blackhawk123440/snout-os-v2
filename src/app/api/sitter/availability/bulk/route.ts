@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { prisma } from '@/lib/db';
 import { getRequestContext } from '@/lib/request-context';
 import { ForbiddenError, requireRole } from '@/lib/rbac';
+import { getScopedDb } from '@/lib/tenancy';
 
 const RuleSchema = z.object({
   daysOfWeek: z.array(z.number().min(0).max(6)).min(1),
@@ -35,13 +35,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid input', details: parsed.error.issues }, { status: 400 });
     }
 
-    // Replace all existing rules with the new set (array-based transaction per CLAUDE.md)
-    await prisma.$transaction([
-      prisma.sitterAvailabilityRule.deleteMany({
+    const db = getScopedDb(ctx);
+
+    // Replace all existing rules with the new set.
+    await (db as any).$transaction([
+      (db as any).sitterAvailabilityRule.deleteMany({
         where: { orgId: ctx.orgId, sitterId: ctx.sitterId! },
       }),
       ...parsed.data.rules.map((rule) =>
-        prisma.sitterAvailabilityRule.create({
+        (db as any).sitterAvailabilityRule.create({
           data: {
             orgId: ctx.orgId,
             sitterId: ctx.sitterId!,

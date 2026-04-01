@@ -64,7 +64,7 @@ export default function ClientReportsPage() {
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-accent-primary shadow-sm mb-4">
             <FileText className="h-7 w-7 text-text-inverse" />
           </div>
-          <p className="text-xl font-bold text-text-primary">No reports yet</p>
+          <p className="text-xl font-bold text-text-primary">No reports available</p>
           <p className="mt-2 text-sm text-text-secondary max-w-[280px] mx-auto leading-relaxed">
             Your sitter will send visit reports after each appointment.
           </p>

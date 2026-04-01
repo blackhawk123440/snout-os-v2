@@ -280,7 +280,7 @@ function ClientHomeContent() {
               <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-accent-primary shadow-sm mb-4">
                 <Calendar className="h-7 w-7 text-text-inverse" />
               </div>
-              <p className="text-xl font-bold text-text-primary">No upcoming visits yet</p>
+              <p className="text-xl font-bold text-text-primary">No upcoming visits</p>
               <p className="mt-2 text-sm text-text-secondary max-w-[280px] mx-auto leading-relaxed">
                 {onboardingRemaining.length > 0
                   ? 'Finish a few essentials, then book with confidence knowing your care team has what they need.'

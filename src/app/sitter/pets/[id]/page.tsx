@@ -397,7 +397,7 @@ function SitterHealthTimeline({
           </div>
         )}
         {healthLogs.length === 0 ? (
-          <p className="text-sm text-text-tertiary italic">No health notes yet.</p>
+          <p className="text-sm text-text-tertiary italic">No health notes saved.</p>
         ) : (
           <div className="space-y-3">
             {healthLogs.map((log) => (

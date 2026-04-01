@@ -340,7 +340,7 @@ function HomeAccessSection({ data, onSaved }: { data: ClientProfileData; onSaved
             {data.parkingNotes && <div><p className="text-[11px] text-text-tertiary">Parking</p><p className="text-[13px] text-text-secondary">{data.parkingNotes}</p></div>}
           </div>
         ) : (
-          <p className="text-[13px] text-text-tertiary italic">No home access info yet. Tap edit to add key location, codes, and entry instructions.</p>
+          <p className="text-[13px] text-text-tertiary italic">No home access details saved.</p>
         )}
       </div>
     </div>
@@ -398,7 +398,7 @@ function EmergencyContactsSection({ contacts, onChanged }: { contacts: ClientEme
           </div>
         )}
         {contacts.length === 0 && !adding && (
-          <p className="text-[13px] text-text-tertiary italic mb-2">No emergency contacts yet. Add one so your sitter knows who to call.</p>
+          <p className="text-[13px] text-text-tertiary italic mb-2">No emergency contacts saved.</p>
         )}
         {adding && (
           <div className="space-y-3 rounded-xl border border-border-default bg-surface-secondary p-4">
